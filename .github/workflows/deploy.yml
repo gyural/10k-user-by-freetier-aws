@@ -68,7 +68,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            docker stop honorsparking-be || true
-            docker rm honorsparking-be || true
-            docker pull ${{ steps.login-ecr.outputs.registry }}/honorsparking-be:latest
-            docker run -d --name honorsparking-be -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/honorsparking-be:latest
+            docker stop honorsparking-server || true
+            docker rm honorsparking-server || true
+            docker pull ${{ steps.login-ecr.outputs.registry }}/honorsparking-server:latest
+            docker run -d --name honorsparking-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/honorsparking-server:latest
