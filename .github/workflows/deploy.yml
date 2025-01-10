@@ -3,7 +3,8 @@ name: Deploy To EC2
 on:
   push:
     branches:
-      - develop
+      - feat/cicd
+      #- develop
 
 jobs:
   deploy:
@@ -50,11 +51,11 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Docker 이미지 생성
-        run: docker build -t honorsparking-be .
+        run: docker build -t honorsparking-server .
         # . 은 현재 경로의 Dockerfile을 기반으로 이미지 파일 생성
 
       - name: Docker 이미지에 Tag 붙이기
-        run: docker tag honorsparking-be ${{ steps.login-ecr.outputs.registry }}/honorsparking-be:latest
+        run: docker tag honorsparking-server ${{ steps.login-ecr.outputs.registry }}/honorsparking-server:latest
 
       - name: ECR에 Docker 이미지 Push하기
         run: docker push ${{ steps.login-ecr.outputs.registry }}/honorsparking-server:latest
