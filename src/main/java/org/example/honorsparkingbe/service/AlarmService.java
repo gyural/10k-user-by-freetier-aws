@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -22,6 +23,8 @@ public class AlarmService {
         this.alarmRepository = alarmRepository;
     }
 
+    // 회원 알람 불러오기
+    // GET /api/v1/alarmAll
     public Map<String, Object> getAlarms(Long memberId, String category, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
@@ -46,6 +49,23 @@ public class AlarmService {
                         "pageSize", alarmPage.getSize(),
                         "totalItems", alarmPage.getTotalElements()
                 )
+        );
+    }
+
+    // 회원 알람 읽기
+    // PUT /api/v1/alarm
+    public Map<String, Object> updateAlarmsToRead(List<Long> alarmIDList) {
+        if (alarmIDList == null || alarmIDList.isEmpty()) {
+            throw new IllegalArgumentException("alarmIDList cannot be null or empty");
+        }
+
+        // 업데이트 실행
+        int updatedCount = alarmRepository.updateAlarmsToRead(alarmIDList);
+
+        // 응답 데이터 구성
+        return Map.of(
+                "success", updatedCount > 0,
+                "updatedIds", alarmIDList
         );
     }
 }

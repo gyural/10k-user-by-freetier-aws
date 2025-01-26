@@ -2,11 +2,9 @@ package org.example.honorsparkingbe.controller;
 
 import org.example.honorsparkingbe.service.AlarmService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,6 +17,15 @@ public class AlarmController {
         this.alarmService = alarmService;
     }
 
+    /**
+     * 회원 알람 불러오기
+     * GET /api/v1/alarmAll
+     * @param memberid
+     * @param category
+     * @param page
+     * @param size
+     * @return
+     */
     @GetMapping("/alarmAll")
     public ResponseEntity<Map<String, Object>> getAlarms(
             @RequestParam Long memberid,
@@ -34,6 +41,27 @@ public class AlarmController {
             // Pagination 값 조정
             Map<String, Object> pagination = (Map<String, Object>) response.get("pagination");
             pagination.put("currentPage", (int) pagination.get("currentPage") + 1);
+
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * 회원 알람 읽기
+     * PUT /api/v1/alarm
+     * @param requestBody
+     * @return
+     */
+    @PutMapping("/alarm")
+    public ResponseEntity<Map<String, Object>> updateAlarmsToRead(@RequestBody Map<String, List<Long>> requestBody) {
+        // 요청에서 alarmIDList 추출
+        List<Long> alarmIDList = requestBody.get("alarmIDList");
+
+        try {
+            // 서비스 호출
+            Map<String, Object> response = alarmService.updateAlarmsToRead(alarmIDList);
 
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
