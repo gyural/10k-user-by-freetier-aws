@@ -26,13 +26,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String authId) throws UsernameNotFoundException {
-        System.out.println("로그인 시도: " + authId);
+        System.out.println("로그인 시도 : " + authId);
         MemberEntity userData = userRepository.findByAuthId(authId);
         if (userData == null) {
-            System.out.println("유저 정보를 찾을 수 없음: " + authId);
+            System.out.println("유저 정보를 찾을 수 없음 : " + authId);
             throw new UsernameNotFoundException("User not found with authId: " + authId);
         }
-        System.out.println("유저 정보: " + userData);
+        System.out.println("유저 정보 : " + userData);
         return new CustomUserDetails(userData);
     }
 }

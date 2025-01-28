@@ -5,6 +5,7 @@ package org.example.honorsparkingbe.config;
  * - 접근 권한 설정, 로그인 로그아웃 및 세션 관리, CSRF 비활성화 등
  */
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.honorsparkingbe.security.CustomOAuth2LoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomFormLoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2UserService;
@@ -48,7 +49,7 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults()) // CORS 활성화 -- 250119 추가(이상 시 삭제)
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/v1/auth/login/**", "/login/**", "/oauth2/**", "/api/v1/auth/join", "/confirm", "/loginProc").permitAll()
+                        .requestMatchers("api/v1/","/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm").permitAll()
                         .requestMatchers("/api/v1/admin").hasRole("ADMIN")                  // 해당 role만 접근 가능
                         .requestMatchers("/api/v1/my/**").hasAnyRole("ADMIN", "USER") // /api/v1/my/**만 허용
                         .anyRequest().authenticated());
