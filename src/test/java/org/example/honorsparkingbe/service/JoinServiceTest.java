@@ -1,50 +1,79 @@
 package org.example.honorsparkingbe.service;
 
+/**
+ *  회원가입 테스트
+ *  - authId 중복 시, 예외 발생
+ */
+import org.example.honorsparkingbe.domain.entity.CarEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.dto.JoinDTO;
+import org.example.honorsparkingbe.repository.CarRepository;
 import org.example.honorsparkingbe.repository.UserRepository;
+import org.example.honorsparkingbe.service.JoinService;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class JoinServiceTest {
+class JoinServiceTest {
 
-    @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @InjectMocks
+    private CarRepository carRepository;
+    private BCryptPasswordEncoder passwordEncoder;
     private JoinService joinService;
 
+    @BeforeEach
+    void setUp() {
+        userRepository = Mockito.mock(UserRepository.class);
+        carRepository = Mockito.mock(CarRepository.class);
+        passwordEncoder = Mockito.mock(BCryptPasswordEncoder.class);
+        joinService = new JoinService(userRepository, carRepository, passwordEncoder);
+    }
+
+    // 올바른 값일 경우
     @Test
-    public void testJoinProcess_Success() {
+    void joinProcess_ShouldSaveMemberAndCar_WhenValidInput() {
+        // Given: JSON 데이터를 기반으로 JoinDTO 생성
         JoinDTO joinDTO = new JoinDTO();
-        joinDTO.setAuthId("testuser");
-        joinDTO.setPassword("testpassword");
+        joinDTO.setPlatform("NORMAL");
+        joinDTO.setMobile("01012341234");
+        joinDTO.setName("아너스");
+        joinDTO.setBirthyear("1990");
+        joinDTO.setBirthday("01-01");
+        joinDTO.setCarNumber("12가3456");
+        joinDTO.setAccountId("user123");
+        joinDTO.setAccountPassword("password123");
+        joinDTO.setEmail("user@example.com");
 
-        when(userRepository.existsByAuthId("testuser")).thenReturn(false);
-        when(bCryptPasswordEncoder.encode("testpassword")).thenReturn("encodedPassword");
+        when(userRepository.existsByAuthId("user123")).thenReturn(false);
+        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
+        // When: JoinService의 joinProcess 호출
         joinService.joinProcess(joinDTO);
 
+        // Then: CarRepository와 UserRepository가 올바르게 호출되었는지 검증
+        verify(carRepository, times(1)).save(any(CarEntity.class));
         verify(userRepository, times(1)).save(any(MemberEntity.class));
     }
 
+    // 중복된 authId일 경우 예외 발생
     @Test
-    public void testJoinProcess_DuplicateAuthId() {
+    void joinProcess_ShouldThrowException_WhenAuthIdAlreadyExists() {
+        // Given
         JoinDTO joinDTO = new JoinDTO();
-        joinDTO.setAuthId("testuser");
+        joinDTO.setAccountId("existingUser");
 
-        when(userRepository.existsByAuthId("testuser")).thenReturn(true);
+        when(userRepository.existsByAuthId("existingUser")).thenReturn(true);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> joinService.joinProcess(joinDTO));
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> {
+            joinService.joinProcess(joinDTO);
+        });
 
-        assertEquals("authId= testuser already exists.", exception.getMessage());
+        verify(userRepository, times(1)).existsByAuthId("existingUser");
     }
 }
+
