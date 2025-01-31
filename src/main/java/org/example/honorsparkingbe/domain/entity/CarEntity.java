@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table( name = "car")
-
+@Builder
 
 public class CarEntity {
 
@@ -29,7 +29,7 @@ public class CarEntity {
 
     // 차종 (Enum)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private CarType carType;
 
     // 전기차 여부
