@@ -11,6 +11,7 @@ import org.example.honorsparkingbe.security.CustomFormLoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,10 +25,12 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final String activeProfile;
 
-    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService) {
+    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, Environment environment) {
 
         this.customOAuth2UserService = customOAuth2UserService;
+        this.activeProfile = environment.getProperty("spring.profiles.active", "default"); // 현재 프로필 가져오기
     }
 
     /**
@@ -70,8 +73,11 @@ public class SecurityConfig {
 
 
         // CSRF(Cross Site Request Forgery: 사이트 간 요청 위조)
-        http
-                .csrf((auth) -> auth.disable()); // 개발환경에서 csrf 비활성화
+        if ("dev".equals(activeProfile)) {
+            http.csrf(auth -> auth.disable()); // 개발 환경에서 CSRF 비활성화
+        } else {
+            http.csrf(Customizer.withDefaults()); // 프로덕션 환경에서는 CSRF 활성화
+        }
 
         http
                 .httpBasic((basic) -> basic.disable());

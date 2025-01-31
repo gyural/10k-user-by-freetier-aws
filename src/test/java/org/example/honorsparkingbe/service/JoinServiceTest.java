@@ -8,8 +8,8 @@ import org.example.honorsparkingbe.domain.entity.CarEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.dto.JoinDTO;
 import org.example.honorsparkingbe.repository.CarRepository;
-import org.example.honorsparkingbe.repository.UserRepository;
-import org.example.honorsparkingbe.service.JoinService;
+import org.example.honorsparkingbe.repository.MemberRepository;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,17 +20,17 @@ import static org.mockito.Mockito.*;
 
 class JoinServiceTest {
 
-    private UserRepository userRepository;
+    private MemberRepository memberRepository;
     private CarRepository carRepository;
     private BCryptPasswordEncoder passwordEncoder;
     private JoinService joinService;
 
     @BeforeEach
     void setUp() {
-        userRepository = Mockito.mock(UserRepository.class);
+        memberRepository = Mockito.mock(MemberRepository.class);
         carRepository = Mockito.mock(CarRepository.class);
         passwordEncoder = Mockito.mock(BCryptPasswordEncoder.class);
-        joinService = new JoinService(userRepository, carRepository, passwordEncoder);
+        joinService = new JoinService(memberRepository, carRepository, passwordEncoder);
     }
 
     // 올바른 값일 경우
@@ -48,7 +48,7 @@ class JoinServiceTest {
         joinDTO.setAccountPassword("password123");
         joinDTO.setEmail("user@example.com");
 
-        when(userRepository.existsByAuthId("user123")).thenReturn(false);
+        when(memberRepository.existsByAuthId("user123")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
         // When: JoinService의 joinProcess 호출
@@ -56,7 +56,7 @@ class JoinServiceTest {
 
         // Then: CarRepository와 UserRepository가 올바르게 호출되었는지 검증
         verify(carRepository, times(1)).save(any(CarEntity.class));
-        verify(userRepository, times(1)).save(any(MemberEntity.class));
+        verify(memberRepository, times(1)).save(any(MemberEntity.class));
     }
 
     // 중복된 authId일 경우 예외 발생
@@ -66,14 +66,14 @@ class JoinServiceTest {
         JoinDTO joinDTO = new JoinDTO();
         joinDTO.setAccountId("existingUser");
 
-        when(userRepository.existsByAuthId("existingUser")).thenReturn(true);
+        when(memberRepository.existsByAuthId("existingUser")).thenReturn(true);
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () -> {
             joinService.joinProcess(joinDTO);
         });
 
-        verify(userRepository, times(1)).existsByAuthId("existingUser");
+        verify(memberRepository, times(1)).existsByAuthId("existingUser");
     }
 }
 

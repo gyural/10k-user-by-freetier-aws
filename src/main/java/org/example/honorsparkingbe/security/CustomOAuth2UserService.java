@@ -8,7 +8,7 @@ import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.LoginPlatform;
 import org.example.honorsparkingbe.domain.enums.MemberRole;
 import org.example.honorsparkingbe.dto.*;
-import org.example.honorsparkingbe.repository.UserRepository;
+import org.example.honorsparkingbe.repository.MemberRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -19,11 +19,11 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     //DefaultOAuth2UserService OAuth2UserService의 구현체
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
-    public CustomOAuth2UserService(UserRepository userRepository) {
+    public CustomOAuth2UserService(MemberRepository memberRepository) {
 
-        this.userRepository = userRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
 
             String authId = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
-            MemberEntity existData = userRepository.findByAuthId(authId);
+            MemberEntity existData = memberRepository.findByAuthId(authId);
             String name= oAuth2Response.getName();
 
 
@@ -63,14 +63,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 );
                 memberEntity.setLoginPlatform(LoginPlatform.NAVER);
 
-                userRepository.save(memberEntity);
+                memberRepository.save(memberEntity);
             }
         }
         else if (registrationId.equals("google")) {
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
 
             String authId = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
-            MemberEntity existData = userRepository.findByAuthId(authId);
+            MemberEntity existData = memberRepository.findByAuthId(authId);
             String name= oAuth2Response.getName();
 
             if (existData == null) { // 회원가입인 경우
@@ -82,14 +82,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 memberEntity.setUserName(name);
                 memberEntity.setLoginPlatform(LoginPlatform.GOOGLE);
 
-                userRepository.save(memberEntity);
+                memberRepository.save(memberEntity);
             }
         }
         else if (registrationId.equals("kakao")) {
             oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
 
             String authId = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
-            MemberEntity existData = userRepository.findByAuthId(authId);
+            MemberEntity existData = memberRepository.findByAuthId(authId);
             String name= oAuth2Response.getName();
 
             if (existData == null) { // 회원가입인 경우
@@ -108,7 +108,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 );
                 memberEntity.setPhoneNumber(kakaoResponse.getPhoneNumber());
 
-                userRepository.save(memberEntity);
+                memberRepository.save(memberEntity);
             }
         }
         else {

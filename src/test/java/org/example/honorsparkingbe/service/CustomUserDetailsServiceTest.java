@@ -7,7 +7,7 @@ package org.example.honorsparkingbe.service;
  */
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.MemberRole;
-import org.example.honorsparkingbe.repository.UserRepository;
+import org.example.honorsparkingbe.repository.MemberRepository;
 import org.example.honorsparkingbe.security.CustomUserDetails;
 import org.example.honorsparkingbe.security.CustomUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,15 +20,15 @@ import static org.mockito.Mockito.*;
 
 class CustomUserDetailsServiceTest {
 
-    private UserRepository userRepository;
+    private MemberRepository memberRepository;
     private CustomUserDetailsService userDetailsService;
 
     @BeforeEach
     void setUp() {
         // Mock UserRepository 생성
-        userRepository = Mockito.mock(UserRepository.class);
+        memberRepository = Mockito.mock(MemberRepository.class);
         // CustomUserDetailsService 초기화
-        userDetailsService = new CustomUserDetailsService(userRepository);
+        userDetailsService = new CustomUserDetailsService(memberRepository);
     }
 
     @Test
@@ -40,7 +40,7 @@ class CustomUserDetailsServiceTest {
         mockUser.setPassword("password123");
         mockUser.setRole(MemberRole.ROLE_USER);
 
-        when(userRepository.findByAuthId(authId)).thenReturn(mockUser);
+        when(memberRepository.findByAuthId(authId)).thenReturn(mockUser);
 
         // When
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(authId);
@@ -51,14 +51,14 @@ class CustomUserDetailsServiceTest {
         assertEquals("password123", userDetails.getPassword());
         assertTrue(userDetails.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_USER")));
-        verify(userRepository, times(1)).findByAuthId(authId);
+        verify(memberRepository, times(1)).findByAuthId(authId);
     }
 
     @Test
     void loadUserByUsername_ShouldThrowException_WhenUserDoesNotExist() {
         // Given
         String authId = "nonExistentUser";
-        when(userRepository.findByAuthId(authId)).thenReturn(null);
+        when(memberRepository.findByAuthId(authId)).thenReturn(null);
 
         // When & Then
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () -> {
@@ -66,6 +66,6 @@ class CustomUserDetailsServiceTest {
         });
 
         assertEquals("User not found with authId: " + authId, exception.getMessage());
-        verify(userRepository, times(1)).findByAuthId(authId);
+        verify(memberRepository, times(1)).findByAuthId(authId);
     }
 }

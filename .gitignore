@@ -1,5 +1,6 @@
 # 민감한 파일 제외
 src/main/resources/config/application.properties
+src/main/resources/config/application.yml
 
 # 빌드 파일 제외
 *.class

@@ -7,8 +7,7 @@ package org.example.honorsparkingbe.security;
 
 
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
-import org.example.honorsparkingbe.security.CustomUserDetails;
-import org.example.honorsparkingbe.repository.UserRepository;
+import org.example.honorsparkingbe.repository.MemberRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,17 +16,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public CustomUserDetailsService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
 
     @Override
     public UserDetails loadUserByUsername(String authId) throws UsernameNotFoundException {
         System.out.println("로그인 시도 : " + authId);
-        MemberEntity userData = userRepository.findByAuthId(authId);
+        MemberEntity userData = memberRepository.findByAuthId(authId);
         if (userData == null) {
             System.out.println("유저 정보를 찾을 수 없음 : " + authId);
             throw new UsernameNotFoundException("User not found with authId: " + authId);

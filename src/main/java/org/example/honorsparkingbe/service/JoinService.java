@@ -8,19 +8,19 @@ import org.example.honorsparkingbe.domain.enums.LoginPlatform;
 import org.example.honorsparkingbe.domain.enums.MemberRole;
 import org.example.honorsparkingbe.dto.JoinDTO;
 import org.example.honorsparkingbe.repository.CarRepository;
-import org.example.honorsparkingbe.repository.UserRepository;
+import org.example.honorsparkingbe.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JoinService {
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final CarRepository carRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public JoinService(UserRepository userRepository, CarRepository carRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userRepository = userRepository;
+    public JoinService(MemberRepository memberRepository, CarRepository carRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.memberRepository = memberRepository;
         this.carRepository = carRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -31,7 +31,7 @@ public class JoinService {
     public void joinProcess(JoinDTO joinDTO) {
 
         // accountId 중복 확인
-        boolean isUser = userRepository.existsByAuthId(joinDTO.getAccountId());
+        boolean isUser = memberRepository.existsByAuthId(joinDTO.getAccountId());
         if (isUser) {
             throw new IllegalArgumentException("accountId= " + joinDTO.getAccountId() + " already exists.");
         }
@@ -59,7 +59,7 @@ public class JoinService {
         data.setCarEntity(carEntity);
 
         // 저장
-        userRepository.save(data);
+        memberRepository.save(data);
     }
 }
 
