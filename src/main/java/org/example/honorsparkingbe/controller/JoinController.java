@@ -32,7 +32,7 @@ public class JoinController {
     public ResponseEntity<String> joinPost(@RequestBody JoinDTO joinDTO) {
         try {
             joinService.joinProcess(joinDTO);
-            return ResponseEntity.status(202).body("Join process complete.");
+            return ResponseEntity.status(201).body("Join process complete.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(409).body(e.getMessage());
         }
