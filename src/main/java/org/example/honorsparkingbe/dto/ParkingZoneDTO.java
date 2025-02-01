@@ -1,28 +1,25 @@
 package org.example.honorsparkingbe.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
+@Builder
 public class ParkingZoneDTO {
-    private boolean isFavorite;
-    private double latitude;
-    private double longitude;
+    private Boolean isFavorite;
+    private Double latitude;
+    private Double longitude;
     private String zoneName;
     private String cityName;
     private String districtName;
     private String eupMyeonDongName;
-    private int electricCarSpaceCount;
-    private boolean isReservedOk;
-    private int size;
+    private Integer electricCarSpaceCount;
+    private Boolean isReservedOk;
+    private Integer size;
     private List<Integer> floor;
-    private int maxCost;
-    private int hourlyRate;
-    private int minuteRate;
+    private Integer maxCost;
+    private List<ParkingFeeRuleDTO> parkingFeeRules;  // 요금 정보
 }

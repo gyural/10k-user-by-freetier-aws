@@ -1,9 +1,12 @@
 package org.example.honorsparkingbe.unit.repository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.example.honorsparkingbe.domain.entity.*;
 import org.example.honorsparkingbe.domain.enums.LoginPlatform;
 import org.example.honorsparkingbe.domain.enums.MemberRole;
 import org.example.honorsparkingbe.repository.*;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,22 +29,16 @@ public class FavoriteParkingZoneRepositoryTest {
 
     @Autowired
     private FavoriteParkingZoneRepository favoriteParkingZoneRepository;
-
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private CarRepository carRepository;
-
     @Autowired
     private CityRepository cityRepository;
-
     @Autowired
     private ParkingZoneRepository parkingZoneRepository;
-
     @Autowired
     private DistrictRepository districtRepository;
-
     @Autowired
     private EupMyeonDongRepository eupMyeonDongRepository;
 
@@ -163,8 +161,8 @@ public class FavoriteParkingZoneRepositoryTest {
         // memberWith0Favorite의 ID를 통해 즐겨찾는 주차장 조회
         Long memberId1 = memberWith3Favorite.getId();
         Long memberId2 = memberWith0Favorite.getId();
-        List<FavoriteParkingZoneEntity> result1 = favoriteParkingZoneRepository.findAllByMemberEntity_Id(memberId1);
-        List<FavoriteParkingZoneEntity> result2 = favoriteParkingZoneRepository.findAllByMemberEntity_Id(memberId2);
+        List<FavoriteParkingZoneEntity> result1 = favoriteParkingZoneRepository.findAllByMemberEntity_IdOrderByIdAsc(memberId1);
+        List<FavoriteParkingZoneEntity> result2 = favoriteParkingZoneRepository.findAllByMemberEntity_IdOrderByIdAsc(memberId2);
 
         // then
         // 3개가 모두 정확하게 나와야함
@@ -176,5 +174,25 @@ public class FavoriteParkingZoneRepositoryTest {
         // then
         // 0개가 모두 나와야함
         assertThat(result2).hasSize(0);
+    }
+
+    @Test
+    @DisplayName("즐겨찾기 주차장이 ID 순서대로 정렬되는지 확인")
+    void testFindAllByMemberEntity_IdOrderByIdAsc() {
+        // given: 테스트용 데이터 준비
+        Long memberId = 1L; // 테스트하려는 memberId
+
+        // memberId로 즐겨찾기 주차장을 ID 순으로 불러옴
+        List<FavoriteParkingZoneEntity> favoriteParkingZones = favoriteParkingZoneRepository.findAllByMemberEntity_IdOrderByIdAsc(memberId);
+
+        // when: ID 순으로 정렬되었는지 검증
+        // favoriteParkingZones의 각 주차장의 ID가 오름차순으로 정렬되어 있어야 함
+        for (int i = 0; i < favoriteParkingZones.size() - 1; i++) {
+            Long currentId = favoriteParkingZones.get(i).getId();
+            Long nextId = favoriteParkingZones.get(i + 1).getId();
+
+            // 현재 ID가 다음 ID보다 작거나 같으면 통과, 그렇지 않으면 실패
+            assertThat(currentId).isLessThanOrEqualTo(nextId);
+        }
     }
 }

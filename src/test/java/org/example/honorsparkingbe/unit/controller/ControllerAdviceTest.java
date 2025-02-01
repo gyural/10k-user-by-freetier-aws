@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.apache.catalina.security.SecurityConfig;
 import org.example.honorsparkingbe.Slf4jRestControllerAdvice;
+import org.example.honorsparkingbe.TempSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@Import({Slf4jRestControllerAdvice.class, ControllerAdviceTest.TestController.class})
+@Import({Slf4jRestControllerAdvice.class, ControllerAdviceTest.TestController.class, TempSecurityConfig.class})
 @AutoConfigureMockMvc
 public class ControllerAdviceTest {
 
@@ -98,14 +99,14 @@ public class ControllerAdviceTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Name must not be blank")));
     }
 
-    @TestConfiguration
-    static class SecurityConfig {
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            // CSRF 보호 비활성화
-            http
-                    .csrf((auth) -> auth.disable());
-            return http.build();
-        }
-    }
+    //@TestConfiguration
+    //static class SecurityConfig {
+    //    @Bean(name = "securityFilterChainTest")
+    //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    //        // CSRF 보호 비활성화
+    //        http
+    //                .csrf((auth) -> auth.disable());
+    //        return http.build();
+    //    }
+    //}
 }

@@ -2,7 +2,6 @@ package org.example.honorsparkingbe.dto.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +20,8 @@ public class ParkingZoneListRequest {
     @Max(value = 180, message = "경도는 180 이하이어야 합니다.")
     private Double longitude;
 
-    @NotBlank(message = "회원 ID(memberID)는 필수입니다.")
-    private String memberID;
+    @NotNull(message = "회원 ID(memberID)는 필수입니다.")
+    private Long memberID;
+
+    private Long page = 0L;  // 기본값을 설정
 }
