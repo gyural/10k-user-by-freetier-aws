@@ -1,6 +1,7 @@
 package org.example.honorsparkingbe.repository;
 
 import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,7 +32,6 @@ public interface ParkingZoneRepository extends JpaRepository<ParkingZoneEntity, 
             @Param("limit") int limit,
             @Param("offset") int offset
     );
-
     @Query(value = """
     SELECT p.*,
            (6371 * acos(

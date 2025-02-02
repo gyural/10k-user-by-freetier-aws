@@ -13,6 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
@@ -44,7 +48,9 @@ public class FavoriteParkingZoneRepositoryTest {
 
     private CarEntity sampleCar1;
     private CarEntity sampleCar2;
+    private CarEntity sampleCar3;
 
+    private MemberEntity memberWith12Favorite;
     private MemberEntity memberWith3Favorite;
     private MemberEntity memberWith0Favorite;
 
@@ -62,6 +68,9 @@ public class FavoriteParkingZoneRepositoryTest {
     private FavoriteParkingZoneEntity favoriteParkingZone1;
     private FavoriteParkingZoneEntity favoriteParkingZone2;
     private FavoriteParkingZoneEntity favoriteParkingZone3;
+
+    //paging
+    private int pagePerItem = 10;
 
     @BeforeEach
     void setUp() {
@@ -101,15 +110,30 @@ public class FavoriteParkingZoneRepositoryTest {
         sampleCar1 = carRepository.save(CarEntity.builder().carNumber("sampleCarNumber1").build());
         sampleCar2 = carRepository.save(CarEntity.builder().carNumber("sampleCarNumber2").build());
 
+        // 12개 즐겨찾기 추가한 유저 생성
+        memberWith12Favorite = memberRepository.save(
+                MemberEntity.builder()
+                        .carEntity(sampleCar1)
+                        .userName("12bookMarkUser")
+                        .authId("authId1")
+                        .password("password2")
+                        .phoneNumber("01087654321")
+                        .email("user1@example.com")
+                        .birthdayYear(1985)
+                        .birthday("0202")
+                        .loginPlatform(LoginPlatform.GOOGLE)
+                        .role(MemberRole.USER)
+                        .build()
+        );
         // 멤버 엔티티 저장
         memberWith3Favorite = memberRepository.save(
                 MemberEntity.builder()
-                        .carEntity(sampleCar1)
+                        .carEntity(sampleCar2)
                         .userName("3bookMarkUser")
-                        .authId("authId1")
+                        .authId("authId2")
                         .password("password1")
                         .phoneNumber("01012345678")
-                        .email("user1@example.com")
+                        .email("user2@example.com")
                         .birthdayYear(1990)
                         .birthday("0101")
                         .loginPlatform(LoginPlatform.GOOGLE)
@@ -119,12 +143,12 @@ public class FavoriteParkingZoneRepositoryTest {
 
         memberWith0Favorite = memberRepository.save(
                 MemberEntity.builder()
-                        .carEntity(sampleCar2)
+                        .carEntity(sampleCar3)
                         .userName("0bookMarkUser")
-                        .authId("authId2")
+                        .authId("authId3")
                         .password("password2")
                         .phoneNumber("01087654321")
-                        .email("user2@example.com")
+                        .email("user3@example.com")
                         .birthdayYear(1995)
                         .birthday("0202")
                         .loginPlatform(LoginPlatform.GOOGLE)
@@ -151,6 +175,23 @@ public class FavoriteParkingZoneRepositoryTest {
                         .parkingZoneEntity(daejeonParking)
                         .build()
         );
+
+        // 즐겨찾기 12개 추가
+        for (int i = 0; i < 12; i++) {
+            ParkingZoneEntity newParking = parkingZoneRepository.save(
+                    ParkingZoneEntity.builder()
+                            .cityEntity(seoul)
+                            .districtEntity(sampleDistrict)
+                            .eupMyeonDongEntity(sampleEupMyeonDong)
+                            .build()
+            );
+
+            favoriteParkingZoneRepository.save(FavoriteParkingZoneEntity.builder()
+                    .memberEntity(memberWith12Favorite)
+                    .parkingZoneEntity(newParking)
+                    .build()
+            );
+        }
     }
 
     @Test
@@ -161,8 +202,11 @@ public class FavoriteParkingZoneRepositoryTest {
         // memberWith0Favorite의 ID를 통해 즐겨찾는 주차장 조회
         Long memberId1 = memberWith3Favorite.getId();
         Long memberId2 = memberWith0Favorite.getId();
-        List<FavoriteParkingZoneEntity> result1 = favoriteParkingZoneRepository.findAllByMemberEntity_IdOrderByIdAsc(memberId1);
-        List<FavoriteParkingZoneEntity> result2 = favoriteParkingZoneRepository.findAllByMemberEntity_IdOrderByIdAsc(memberId2);
+
+        Pageable pageable = PageRequest.of(0, pagePerItem); // 첫 번째 페이지, 2개씩 가져오기
+
+        Page<FavoriteParkingZoneEntity> result1 = favoriteParkingZoneRepository.findAllByMemberEntity_IdOrderByIdAsc(memberId1, pageable);
+        Page<FavoriteParkingZoneEntity> result2 = favoriteParkingZoneRepository.findAllByMemberEntity_IdOrderByIdAsc(memberId2, pageable);
 
         // then
         // 3개가 모두 정확하게 나와야함
@@ -177,22 +221,41 @@ public class FavoriteParkingZoneRepositoryTest {
     }
 
     @Test
-    @DisplayName("즐겨찾기 주차장이 ID 순서대로 정렬되는지 확인")
+    @DisplayName("즐겨찾기 주차장이 ID 순서대로 정렬되는지  1페이지 2페이지에 가각 알맞은 데티거 개수와 정렬 확인")
     void testFindAllByMemberEntity_IdOrderByIdAsc() {
         // given: 테스트용 데이터 준비
-        Long memberId = 1L; // 테스트하려는 memberId
+        Long memberId = memberWith12Favorite.getId();
 
-        // memberId로 즐겨찾기 주차장을 ID 순으로 불러옴
-        List<FavoriteParkingZoneEntity> favoriteParkingZones = favoriteParkingZoneRepository.findAllByMemberEntity_IdOrderByIdAsc(memberId);
+        // 10개 요청 (0페이지)
+        Pageable tenItemsPageable = PageRequest.of(0, pagePerItem);
+        Page<FavoriteParkingZoneEntity> tenItemsPage = favoriteParkingZoneRepository.findAllByMemberEntity_IdOrderByIdAsc(memberId, tenItemsPageable);
 
-        // when: ID 순으로 정렬되었는지 검증
-        // favoriteParkingZones의 각 주차장의 ID가 오름차순으로 정렬되어 있어야 함
-        for (int i = 0; i < favoriteParkingZones.size() - 1; i++) {
-            Long currentId = favoriteParkingZones.get(i).getId();
-            Long nextId = favoriteParkingZones.get(i + 1).getId();
+        // 2개 요청 (1페이지)
+        Pageable twoItemsPageable = PageRequest.of(1, pagePerItem);
+        Page<FavoriteParkingZoneEntity> twoItemsPage = favoriteParkingZoneRepository.findAllByMemberEntity_IdOrderByIdAsc(memberId, twoItemsPageable);
 
-            // 현재 ID가 다음 ID보다 작거나 같으면 통과, 그렇지 않으면 실패
-            assertThat(currentId).isLessThanOrEqualTo(nextId);
+        // when: 10개 요청 결과 개수 확인
+        assertThat(tenItemsPage.getContent()).hasSize(10);
+
+        // when: 2개 요청 결과 개수 확인
+        assertThat(twoItemsPage.getContent()).hasSize(2);
+
+        // when: 10개 요청 ID 오름차순 확인
+        List<FavoriteParkingZoneEntity> tenItemsContent = tenItemsPage.getContent();
+        for (int i = 0; i < tenItemsContent.size() - 1; i++) {
+            assertThat(tenItemsContent.get(i).getId()).isLessThan(tenItemsContent.get(i + 1).getId());
+        }
+
+        // when: 2개 요청 ID 오름차순 확인
+        List<FavoriteParkingZoneEntity> twoItemsContent = twoItemsPage.getContent();
+        for (int i = 0; i < twoItemsContent.size() - 1; i++) {
+            assertThat(twoItemsContent.get(i).getId()).isLessThan(twoItemsContent.get(i + 1).getId());
+        }
+
+        // then: 10개 요청과 2개 요청이 서로 겹치지 않는지 확인
+        if (!tenItemsContent.isEmpty() && !twoItemsContent.isEmpty()) {
+            assertThat(tenItemsContent.get(tenItemsContent.size() - 1).getId())
+                    .isLessThan(twoItemsContent.get(0).getId());
         }
     }
 }
