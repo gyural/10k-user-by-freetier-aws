@@ -60,10 +60,10 @@ jobs:
         # . 은 현재 경로의 Dockerfile을 기반으로 이미지 파일 생성
 
       - name: Docker 이미지에 Tag 붙이기
-        run: docker tag honorsparking-be ${{ steps.login-ecr.outputs.registry }}/honorsparking-be:latest
+        run: docker tag honorsparking-be ${{ steps.login-ecr.outputs.registry }}/honorsparking-server:latest
 
       - name: ECR에 Docker 이미지 Push하기
-        run: docker push ${{ steps.login-ecr.outputs.registry }}/honorsparking-be:latest
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/honorsparking-server:latest
 
       - name: SSH(원격 접속)로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
