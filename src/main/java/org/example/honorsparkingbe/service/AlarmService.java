@@ -95,4 +95,40 @@ public class AlarmService {
                 "alreadyReadIds", alreadyReadAlarms  // 이미 읽은 알람 리스트 포함
         );
     }
+
+    // 회원 알람 선택 삭제
+    // DELETE /api/v1/alarm
+    @Transactional
+    public Map<String, Object> deleteAlarms(List<Long> alarmIDList) {
+        if (alarmIDList == null || alarmIDList.isEmpty()) {
+            throw new IllegalArgumentException("alarmIDList cannot be null or empty");
+        }
+
+        // 삭제 실행
+        int deletedCount = alarmRepository.deleteAlarms(alarmIDList);
+
+        // 응답 데이터 구성
+        return Map.of(
+                "success", deletedCount > 0,
+                "deletedIds", deletedCount > 0 ? alarmIDList : List.of()
+        );
+    }
+
+    // 회원 알람 전체 삭제
+    // DELETE /api/v1/alarm/all
+    @Transactional
+    public Map<String, Object> deleteAllAlarms(Long memberId) {
+        if (memberId == null) {
+            throw new IllegalArgumentException("memberId cannot be null");
+        }
+
+        // 삭제 실행
+        int deletedCount = alarmRepository.deleteAllAlarmsByMemberId(memberId);
+
+        // 응답 데이터 구성
+        return Map.of(
+                "success", deletedCount > 0,
+                "deletedCount", deletedCount
+        );
+    }
 }

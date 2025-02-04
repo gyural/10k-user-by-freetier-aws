@@ -72,4 +72,39 @@ public class AlarmController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    /**
+     * 알람 선택 삭제
+     * DELETE /api/v1/alarm
+     * @param requestBody
+     * @return
+     */
+    @DeleteMapping("/alarm")
+    public ResponseEntity<Map<String, Object>> deleteAlarms(@RequestBody Map<String, List<Long>> requestBody) {
+        // 요청에서 alarmIDList 추출
+        List<Long> alarmIDList = requestBody.get("alarmIDList");
+
+        try {
+            Map<String, Object> response = alarmService.deleteAlarms(alarmIDList);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * 알람 전체 삭제
+     * DELETE /api/v1/alarm/all
+     * @param memberid
+     * @return
+     */
+    @DeleteMapping("/alarm/all")
+    public ResponseEntity<Map<String, Object>> deleteAllAlarms(@RequestParam Long memberid) {
+        try {
+            Map<String, Object> response = alarmService.deleteAllAlarms(memberid);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }

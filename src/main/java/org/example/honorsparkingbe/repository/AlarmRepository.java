@@ -29,4 +29,14 @@ public interface AlarmRepository extends JpaRepository<AlarmEntity, Long> {
     // 이미 읽은 알람 ID 조회
     @Query("SELECT a.id FROM AlarmEntity a WHERE a.id IN :ids AND a.isRead = 'READ'")
     List<Long> findReadAlarms(@Param("ids") List<Long> ids);
+
+    // 알람 선택 삭제
+    @Modifying
+    @Query("DELETE FROM AlarmEntity a WHERE a.id IN :ids")
+    int deleteAlarms(@Param("ids") List<Long> ids);
+
+    // 알람 전체 삭제
+    @Modifying
+    @Query("DELETE FROM AlarmEntity a WHERE a.memberEntity.id = :memberId")
+    int deleteAllAlarmsByMemberId(@Param("memberId") Long memberId);
 }
