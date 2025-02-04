@@ -4,6 +4,7 @@ import org.example.honorsparkingbe.service.AlarmService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +40,11 @@ public class AlarmController {
             Map<String, Object> response = alarmService.getAlarms(memberid, category, adjustedPage, size);
 
             // Pagination 값 조정
-            Map<String, Object> pagination = (Map<String, Object>) response.get("pagination");
+            Map<String, Object> pagination = new HashMap<>((Map<String, Object>) response.get("pagination"));
             pagination.put("currentPage", (int) pagination.get("currentPage") + 1);
+
+            response = new HashMap<>(response);
+            response.put("pagination", pagination);
 
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {

@@ -2,6 +2,7 @@ package org.example.honorsparkingbe.service;
 
 import org.example.honorsparkingbe.domain.entity.AlarmEntity;
 import org.example.honorsparkingbe.domain.enums.AlarmType;
+import org.example.honorsparkingbe.dto.AlarmResponse;
 import org.example.honorsparkingbe.repository.AlarmRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,9 +11,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class AlarmService {
@@ -32,19 +33,25 @@ public class AlarmService {
         if (category != null) {
             boolean isValidCategory = Arrays.stream(AlarmType.values())
                     .anyMatch(type -> type.name().equalsIgnoreCase(category));
+
             if (!isValidCategory) {
                 throw new IllegalArgumentException("Invalid category value: " + category);
             }
+
             AlarmType alarmType = AlarmType.valueOf(category.toUpperCase());
             alarmPage = alarmRepository.findByMemberEntityIdAndAlarmType(memberId, alarmType, pageable);
         } else {
             alarmPage = alarmRepository.findByMemberEntityId(memberId, pageable);
         }
 
+        List<AlarmResponse> alarmList = alarmPage.getContent().stream()
+                .map(AlarmResponse::new)
+                .collect(Collectors.toList());
+
         return Map.of(
-                "alarms", alarmPage.getContent(),
+                "alarms", alarmList,
                 "pagination", Map.of(
-                        "currentPage", alarmPage.getNumber(), // 내부에서 0부터 시작
+                        "currentPage", alarmPage.getNumber(),
                         "totalPages", alarmPage.getTotalPages(),
                         "pageSize", alarmPage.getSize(),
                         "totalItems", alarmPage.getTotalElements()
