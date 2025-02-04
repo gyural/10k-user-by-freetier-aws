@@ -1,5 +1,6 @@
 package org.example.honorsparkingbe.service;
 
+import jakarta.transaction.Transactional;
 import org.example.honorsparkingbe.domain.entity.AlarmEntity;
 import org.example.honorsparkingbe.domain.enums.AlarmType;
 import org.example.honorsparkingbe.dto.AlarmResponse;
@@ -61,18 +62,37 @@ public class AlarmService {
 
     // 회원 알람 읽기
     // PUT /api/v1/alarm
+    @Transactional
     public Map<String, Object> updateAlarmsToRead(List<Long> alarmIDList) {
         if (alarmIDList == null || alarmIDList.isEmpty()) {
             throw new IllegalArgumentException("alarmIDList cannot be null or empty");
         }
 
-        // 업데이트 실행
+        // 1. 이미 READ 상태인 알람 조회
+        List<Long> alreadyReadAlarms = alarmRepository.findReadAlarms(alarmIDList);
+
+        // 2. UNREAD 상태인 알람만 추출
+        List<Long> unreadAlarms = alarmIDList.stream()
+                .filter(id -> !alreadyReadAlarms.contains(id))  // READ 상태인 알람 제외
+                .collect(Collectors.toList());
+
+        if (unreadAlarms.isEmpty()) {
+            // 모든 알람이 READ 상태라면 예외 발생시키지 않고 success=false 반환
+            return Map.of(
+                    "success", false,
+                    "message", "All selected alarms are already read",
+                    "updatedIds", List.of()
+            );
+        }
+
+        // 3. UNREAD 상태인 알람만 READ로 변경
         int updatedCount = alarmRepository.updateAlarmsToRead(alarmIDList);
 
         // 응답 데이터 구성
         return Map.of(
                 "success", updatedCount > 0,
-                "updatedIds", alarmIDList
+                "updatedIds", unreadAlarms,
+                "alreadyReadIds", alreadyReadAlarms  // 이미 읽은 알람 리스트 포함
         );
     }
 }
