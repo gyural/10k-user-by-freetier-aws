@@ -2,22 +2,34 @@ version: '3.8'
 
 services:
 
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+
   db:
     image: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: example
-      MYSQL_USER: example
-      MYSQL_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: parking
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 1234
     ports:
       - "3306:3306"
-  backend:
-    container_name: honorsParking
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      db-url: jdbc:mysql://db:3306/example # 역할 확인
-      db-username: example
-      db-password: example
+
+
+
+#  backend:
+#    container_name: honorsParking
+#    build: .
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      db-url: jdbc:mysql://db:3306/parking
+#      db-username: user
+#      db-password: 1234
+#      redis-host: redis
+#      redis-port: 6379
+
