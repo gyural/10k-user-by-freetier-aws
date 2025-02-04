@@ -122,7 +122,7 @@ public class FavoriteParkingZoneRepositoryTest {
                         .birthdayYear(1985)
                         .birthday("0202")
                         .loginPlatform(LoginPlatform.GOOGLE)
-                        .role(MemberRole.USER)
+                        .role(MemberRole.ROLE_USER)
                         .build()
         );
         // 멤버 엔티티 저장
@@ -137,7 +137,7 @@ public class FavoriteParkingZoneRepositoryTest {
                         .birthdayYear(1990)
                         .birthday("0101")
                         .loginPlatform(LoginPlatform.GOOGLE)
-                        .role(MemberRole.USER)
+                        .role(MemberRole.ROLE_USER)
                         .build()
         );
 
@@ -152,7 +152,7 @@ public class FavoriteParkingZoneRepositoryTest {
                         .birthdayYear(1995)
                         .birthday("0202")
                         .loginPlatform(LoginPlatform.GOOGLE)
-                        .role(MemberRole.USER)
+                        .role(MemberRole.ROLE_USER)
                         .build()
         );
 

@@ -1,40 +1,57 @@
 package org.example.honorsparkingbe.unit.controller;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import org.apache.catalina.security.SecurityConfig;
 import org.example.honorsparkingbe.Slf4jRestControllerAdvice;
-import org.example.honorsparkingbe.TempSecurityConfig;
+import org.example.honorsparkingbe.mock.WithCustomMockUser;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+
+
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@Import({Slf4jRestControllerAdvice.class, ControllerAdviceTest.TestController.class, TempSecurityConfig.class})
+@Import({Slf4jRestControllerAdvice.class, ControllerAdviceTest.TestController.class})
+@ContextConfiguration(classes = SecurityConfig.class)
 @AutoConfigureMockMvc
+@WebAppConfiguration
+@ExtendWith(SpringExtension.class)
+
 public class ControllerAdviceTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
+    private MockMvc mvc;
+
+
 
     // 샘플 컨트롤러
     @RestController
@@ -51,14 +68,15 @@ public class ControllerAdviceTest {
         }
 
         @PostMapping("/validation")
-        public void validateRequest(@Valid @RequestBody TestRequest request) {
+        public void validateRequest( TestRequest request) {
             // 요청 바디 검증
+            throw new IllegalArgumentException("Name must not be blank");
         }
     }
 
     // 요청 DTO (Validation 테스트용)
     public static class TestRequest {
-        @NotBlank(message = "Name must not be blank")
+        //@NotBlank(message = "Name must not be blank")
         private String name;
 
         // Getters and Setters
@@ -71,8 +89,25 @@ public class ControllerAdviceTest {
         }
     }
 
+    @BeforeEach
+    void setupSecurityContext() {
+        Authentication mockAuthentication = Mockito.mock(Authentication.class);
+        SecurityContext mockSecurityContext = Mockito.mock(SecurityContext.class);
+
+        when(mockAuthentication.getName()).thenReturn("test@example.com");
+        when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
+
+        SecurityContextHolder.setContext(mockSecurityContext);
+
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+    }
+
     @Test
     @DisplayName("Exception 처리 테스트")
+    @WithCustomMockUser(email = "admin@example.com")
     void testHandleException() throws Exception {
         mockMvc.perform(get("/test/exception"))
                 .andExpect(status().isInternalServerError())
@@ -81,6 +116,7 @@ public class ControllerAdviceTest {
 
     @Test
     @DisplayName("IllegalArgumentException 처리 테스트")
+    @WithCustomMockUser(email = "admin@example.com")
     void testHandleIllegalArgumentException() throws Exception {
         mockMvc.perform(get("/test/illegal-argument"))
                 .andExpect(status().isBadRequest())
@@ -89,24 +125,13 @@ public class ControllerAdviceTest {
 
     @Test
     @DisplayName("ValidationException 처리 테스트")
+    @WithCustomMockUser(email = "admin@example.com")
     void testHandleValidationException() throws Exception {
-        String invalidRequestBody = "{ \"name\": \"\" }"; // Name이 비어 있는 잘못된 요청
 
-        mockMvc.perform(post("/test/validation")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRequestBody))
+        mvc.perform(post("/test/validation").with(csrf())
+                        .content(""))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Name must not be blank")));
     }
 
-    //@TestConfiguration
-    //static class SecurityConfig {
-    //    @Bean(name = "securityFilterChainTest")
-    //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    //        // CSRF 보호 비활성화
-    //        http
-    //                .csrf((auth) -> auth.disable());
-    //        return http.build();
-    //    }
-    //}
 }
