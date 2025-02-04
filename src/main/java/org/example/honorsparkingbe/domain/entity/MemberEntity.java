@@ -1,8 +1,7 @@
 package org.example.honorsparkingbe.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.example.honorsparkingbe.domain.enums.LoginPlatform;
 import org.example.honorsparkingbe.domain.enums.MemberRole;
 
@@ -10,8 +9,10 @@ import java.io.Serializable;
 
 @Entity
 @Table( name = "member")
-@Getter
-@Setter
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
+@Builder
+
 public class MemberEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

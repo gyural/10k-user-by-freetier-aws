@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table( name = "car")
-
+@Builder
 
 public class CarEntity implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -31,7 +31,7 @@ public class CarEntity implements Serializable {
 
     // 차종 (Enum)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private CarType carType;
 
     // 전기차 여부

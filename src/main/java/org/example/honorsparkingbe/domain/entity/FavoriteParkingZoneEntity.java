@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table( name = "favoriteParkingZone")
-
+@Builder
 
 public class FavoriteParkingZoneEntity {
 
@@ -18,12 +18,12 @@ public class FavoriteParkingZoneEntity {
     private Long id;
 
     // ParkingZone 연관 관계
-    @OneToOne
-    @JoinColumn(name = "parkingZoneId", unique = true, nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "parkingZoneId", nullable = false)
     private ParkingZoneEntity parkingZoneEntity;
 
     // Member 연관 관계
-    @OneToOne
-    @JoinColumn(name = "memberId", unique = true, nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "memberId", nullable = false)
     private MemberEntity memberEntity;
 }
