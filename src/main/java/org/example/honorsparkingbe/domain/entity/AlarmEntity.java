@@ -19,9 +19,13 @@ public class AlarmEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 알람 고유 ID
 
-    @OneToOne
-    @JoinColumn(name = "memberId", referencedColumnName = "id", unique = true)
-    private MemberEntity memberEntity; // Member와 1:1 관계
+//    @OneToOne
+//    @JoinColumn(name = "memberId", referencedColumnName = "id", unique = true)
+//    private MemberEntity memberEntity; // Member와 1:1 관계
+
+    @ManyToOne
+    @JoinColumn(name = "member_id", referencedColumnName = "id")
+    private MemberEntity memberEntity; // Member와 N:1 관계
 
     private String content; // 알람 내용
 
