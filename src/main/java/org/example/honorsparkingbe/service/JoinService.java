@@ -1,6 +1,7 @@
 package org.example.honorsparkingbe.service;
 
 
+import jakarta.transaction.Transactional;
 import org.example.honorsparkingbe.domain.entity.CarEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.CarType;
@@ -28,6 +29,7 @@ public class JoinService {
     /**
      * 회원가입 기본 로직
      */
+    @Transactional
     public void joinProcess(JoinDTO joinDTO) {
 
         // accountId 중복 확인
