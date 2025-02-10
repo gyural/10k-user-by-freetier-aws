@@ -10,7 +10,6 @@ import org.example.honorsparkingbe.repository.CityRepository;
 import org.example.honorsparkingbe.repository.DistrictRepository;
 import org.example.honorsparkingbe.repository.EupMyeonDongRepository;
 import org.example.honorsparkingbe.repository.ParkingZoneRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,27 +26,27 @@ public class CreateParkingZoneList {
     @Transactional
     public void insertDummyData() {
         // City 데이터 추가 (중복 체크)
-        CityEntity seoul = cityRepository.findByName("서울").orElse(CityEntity.builder().name("서울").build());
-        CityEntity busan = cityRepository.findByName("부산").orElse(CityEntity.builder().name("부산").build());
-        CityEntity daejeon = cityRepository.findByName("대전").orElse(CityEntity.builder().name("대전").build());
+        CityEntity seoul = cityRepository.findByName("Seoul").orElse(CityEntity.builder().name("Seoul").build());
+        CityEntity busan = cityRepository.findByName("Busan").orElse(CityEntity.builder().name("Busan").build());
+        CityEntity daejeon = cityRepository.findByName("Daejeon").orElse(CityEntity.builder().name("Daejeon").build());
 
         cityRepository.save(seoul);
         cityRepository.save(busan);
         cityRepository.save(daejeon);
 
         // District 데이터 추가 (중복 체크)
-        DistrictEntity gangnam = districtRepository.findByName("강남구").orElse(DistrictEntity.builder().name("강남구").build());
-        DistrictEntity haeundae = districtRepository.findByName("해운대구").orElse(DistrictEntity.builder().name("해운대구").build());
-        DistrictEntity seo = districtRepository.findByName("서구").orElse(DistrictEntity.builder().name("서구").build());
+        DistrictEntity gangnam = districtRepository.findByName("Gangnam-gu").orElse(DistrictEntity.builder().name("Gangnam-gu").build());
+        DistrictEntity haeundae = districtRepository.findByName("Haeundae-gu").orElse(DistrictEntity.builder().name("Haeundae-gu").build());
+        DistrictEntity seo = districtRepository.findByName("Seo-gu").orElse(DistrictEntity.builder().name("Seo-gu").build());
 
         districtRepository.save(gangnam);
         districtRepository.save(haeundae);
         districtRepository.save(seo);
 
         // EupMyeonDong 데이터 추가 (중복 체크)
-        EupMyeonDongEntity yeoksam = eupMyeonDongRepository.findByName("역삼동").orElse(EupMyeonDongEntity.builder().name("역삼동").build());
-        EupMyeonDongEntity centum = eupMyeonDongRepository.findByName("센텀시티").orElse(EupMyeonDongEntity.builder().name("센텀시티").build());
-        EupMyeonDongEntity doma = eupMyeonDongRepository.findByName("도마동").orElse(EupMyeonDongEntity.builder().name("도마동").build());
+        EupMyeonDongEntity yeoksam = eupMyeonDongRepository.findByName("Yeoksam-dong").orElse(EupMyeonDongEntity.builder().name("Yeoksam-dong").build());
+        EupMyeonDongEntity centum = eupMyeonDongRepository.findByName("Centum City").orElse(EupMyeonDongEntity.builder().name("Centum City").build());
+        EupMyeonDongEntity doma = eupMyeonDongRepository.findByName("Doma-dong").orElse(EupMyeonDongEntity.builder().name("Doma-dong").build());
 
         eupMyeonDongRepository.save(yeoksam);
         eupMyeonDongRepository.save(centum);
@@ -55,7 +54,7 @@ public class CreateParkingZoneList {
 
         // ParkingZone 데이터 추가
         ParkingZoneEntity parkingZone1 = ParkingZoneEntity.builder()
-                .zoneName("서울 강남구 역삼동 주차장")
+                .zoneName("Seoul Gangnam-gu Yeoksam-dong Parking Lot")
                 .size(10)
                 .latitude(37.4979)
                 .longitude(127.0276)
@@ -65,7 +64,7 @@ public class CreateParkingZoneList {
                 .build();
 
         ParkingZoneEntity parkingZone2 = ParkingZoneEntity.builder()
-                .zoneName("부산 해운대구 센텀시티 주차장")
+                .zoneName("Busan Haeundae-gu Centum City Parking Lot")
                 .size(5)
                 .latitude(35.1710)
                 .longitude(129.1213)
@@ -75,7 +74,7 @@ public class CreateParkingZoneList {
                 .build();
 
         ParkingZoneEntity parkingZone3 = ParkingZoneEntity.builder()
-                .zoneName("대전 서구 도마동 주차장")
+                .zoneName("Daejeon Seo-gu Doma-dong Parking Lot")
                 .size(3)
                 .latitude(36.3510)
                 .longitude(127.3845)

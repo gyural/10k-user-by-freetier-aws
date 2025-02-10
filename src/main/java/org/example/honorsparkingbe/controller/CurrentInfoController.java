@@ -1,0 +1,71 @@
+package org.example.honorsparkingbe.controller;
+
+import org.example.honorsparkingbe.dto.CustomOAuth2User;
+import org.example.honorsparkingbe.security.CustomUserDetails;
+import org.example.honorsparkingbe.service.CurrentInfoService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+/**
+ * 주차장 이용상태 불러오기
+ * - 현재 사용자의 주차정보, 주차시간, 요금 등
+ */
+
+@RestController
+@RequestMapping("/api/v1/parking")
+public class CurrentInfoController {
+
+    private final CurrentInfoService currentInfoService;
+
+    public CurrentInfoController(CurrentInfoService currentInfoService) {
+        this.currentInfoService = currentInfoService;
+    }
+
+    /**
+     * GET /api/v1/parking/me/{memberID}
+     * @param memberId
+     */
+    @GetMapping("/me/{memberID}")
+    public Map<String, Object> getParkingInfo(@PathVariable("memberID") String memberId) {
+        // 세션으로부터 로그인된 사용자 ID를 받아오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long sessionMemberId = null;
+
+        // principal이 CustomOAuth2User 타입인 경우 처리
+        if (principal instanceof CustomOAuth2User) {
+            sessionMemberId = ((CustomOAuth2User) principal).getId();
+
+        }else if(principal instanceof CustomUserDetails){
+            sessionMemberId= ((CustomUserDetails) principal).getId();
+        }
+        else {
+            throw new IllegalStateException("Unexpected principal type: " + principal.getClass().getName());
+        }
+
+        Long pathMemberId= Long.parseLong(memberId);
+
+        System.out.println("PathMemberID: " + pathMemberId);
+        System.out.println("SessionMemberID: " + sessionMemberId);
+
+        // 세션으로부터 받은 ID와 URI로부터 받은 ID가 다른 경우(부적절한 접근)
+        if(!sessionMemberId.equals(pathMemberId)) {
+            throw new IllegalStateException("SessionMemberID is not the same as memberID");
+        }
+
+        return currentInfoService.getCurrentParkingInfo(pathMemberId);
+
+
+    }
+
+
+
+}

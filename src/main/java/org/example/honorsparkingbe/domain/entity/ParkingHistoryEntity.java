@@ -19,20 +19,20 @@ public class ParkingHistoryEntity {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
-        @OneToOne
-        @JoinColumn(name = "carId", unique = true, nullable = false)
+        @ManyToOne  // 이것도 왜 1대1?
+        @JoinColumn(name = "carId", nullable = false) // 왜 unique인지 모르겠어서 제거(그러면 기록을 저장 못하니까)
         private CarEntity carEntity;
 
-        @OneToOne
-        @JoinColumn(name = "memberId", unique = true, nullable = false)
+        @ManyToOne
+        @JoinColumn(name = "memberId", nullable = false)
         private MemberEntity memberEntity;
 
         @ManyToOne
-        @JoinColumn(name = "parkingZoneId", unique = true, nullable = false)
+        @JoinColumn(name = "parkingZoneId", nullable = false)
         private ParkingZoneEntity parkingZoneEntity;
 
-        @OneToOne
-        @JoinColumn(name = "cardId", unique = true)
+        @ManyToOne
+        @JoinColumn(name = "cardId")
         private CardEntity cardEntity;
 
         @Column(nullable = false)
@@ -45,6 +45,6 @@ public class ParkingHistoryEntity {
         private PaymentType paymentType;
 
         @ManyToOne
-        @JoinColumn(name = "payId", nullable = false)
+        @JoinColumn(name = "payId") // nullable = false 제거
         private PayEntity payEntity;
 }
