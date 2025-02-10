@@ -21,6 +21,10 @@ public class CustomUserDetails implements UserDetails {
         this.memberEntity = memberEntity;
     }
 
+    public Long getId() {
+        return memberEntity.getId();
+    }
+
     // 사용자의 권한 목록 반환
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
