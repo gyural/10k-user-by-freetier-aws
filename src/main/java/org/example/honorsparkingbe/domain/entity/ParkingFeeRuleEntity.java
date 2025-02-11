@@ -47,6 +47,3 @@ public class ParkingFeeRuleEntity {
     @Column(nullable = false)
     private Integer costTimeSlot;
 }
-
-
-
