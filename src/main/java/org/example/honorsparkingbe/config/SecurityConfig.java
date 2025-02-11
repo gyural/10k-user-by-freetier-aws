@@ -19,6 +19,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
+import org.springframework.web.cors.CorsConfiguration; // cors
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // cors
+import org.springframework.web.filter.CorsFilter; // cors
+
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @EnableRedisHttpSession
@@ -38,7 +44,6 @@ public class SecurityConfig {
      */
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
@@ -47,10 +52,9 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-
         // 접근 설정
         http
-                .cors(Customizer.withDefaults()) // CORS 활성화 -- 250119 추가(이상 시 삭제)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화 -- 250119 추가(이상 시 삭제)
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("api/v1/","/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm").permitAll()
                         .requestMatchers("/api/v1/admin").hasRole("ADMIN")                  // 해당 role만 접근 가능
@@ -105,6 +109,36 @@ public class SecurityConfig {
 
 
         return http.build();
+    }
+
+    /**
+     * 🔹 CORS 필터 설정 (프론트엔드 요청 허용)
+     */
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true); // 인증 정보를 포함한 요청 허용 (JWT, 세션 쿠키 등)
+        config.setAllowedOrigins(List.of("http://localhost:3000")); // 🔹 프론트엔드 주소 허용
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 🔹 허용할 HTTP 메서드 설정
+        config.setAllowedHeaders(List.of("*")); // 🔹 모든 요청 헤더 허용
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+
+    /**
+     * 🔹 CORS 설정을 Security Filter Chain에서 사용할 수 있도록 구성
+     */
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(List.of("http://localhost:3000")); // 🔹 프론트엔드 주소 허용
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 🔹 허용할 HTTP 메서드 설정
+        config.setAllowedHeaders(List.of("*")); // 🔹 모든 요청 헤더 허용
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
 }
