@@ -1,8 +1,7 @@
 package org.example.honorsparkingbe.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Table( name = "city")
 
@@ -10,6 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CityEntity {
 
     @Id

@@ -10,7 +10,7 @@ import org.example.honorsparkingbe.domain.enums.CarType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table( name = "parkingFeeRule")
-
+@Builder
 
 public class ParkingFeeRuleEntity {
 
@@ -19,8 +19,8 @@ public class ParkingFeeRuleEntity {
     private Long id;
 
     // ParkingZone 연관 관계
-    @OneToOne
-    @JoinColumn(name = "parkingZoneId", unique = true, nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "parkingZoneId", nullable = false)
     private ParkingZoneEntity parkingZoneEntity;
 
     // 차량 타입 (Enum)
@@ -32,15 +32,19 @@ public class ParkingFeeRuleEntity {
     private String ruleName;
 
     // 측정 시작 시간
+    @Column(nullable = false)
     private Integer startTime;
 
     // 측정 종료 시간
+    @Column(nullable = false)
     private Integer endTime;
 
     // 단위 시간당 부과 요금
+    @Column(nullable = false)
     private Integer costPerTimeSlot;
 
     // 단위 시간
+    @Column(nullable = false)
     private Integer costTimeSlot;
 }
 

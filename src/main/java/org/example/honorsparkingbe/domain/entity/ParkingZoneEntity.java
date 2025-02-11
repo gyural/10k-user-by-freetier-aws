@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table( name = "parkingZone")
-
+@Builder
 
 public class ParkingZoneEntity {
 
@@ -21,10 +21,10 @@ public class ParkingZoneEntity {
     private Long id;
 
     // 위도
-    private Float latitude;
+    private Double latitude;
 
     // 경도
-    private Float longitude;
+    private Double longitude;
 
     // 주차장 이름
     private String zoneName;

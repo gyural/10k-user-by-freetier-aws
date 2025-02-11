@@ -1,14 +1,15 @@
 package org.example.honorsparkingbe.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
 @Table( name = "eupMyeonDong")
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 
 public class EupMyeonDongEntity {
 
