@@ -40,10 +40,22 @@ public class CurrentInfoService {
             response.put("cost", 0);
             response.put("message", "현재 주차 중인 상태가 아닙니다.");
             return response;
-        }else{ // exit time이 null 인 경우 : 현재 입차된 상태
-            response.put("isParked", true);
-            return response;
         }
+
+        // exitTime이 없는 경우 : 현재 주차 중
+        ParkingZoneEntity parkingZone = latestHistory.getParkingZoneEntity();
+
+        // JSON 응답 형식 맞추기
+        Map<String, Object> parkingZoneInfo = new HashMap<>();
+        parkingZoneInfo.put("zoneName", parkingZone.getZoneName());
+        parkingZoneInfo.put("hourlyRate", null); // 요금 정보는 현재 설정되지 않음
+        parkingZoneInfo.put("entranceTime", latestHistory.getEntranceTime());
+        parkingZoneInfo.put("cost", null); // 요금 정보는 현재 설정되지 않음
+
+        response.put("parkingZone", parkingZoneInfo);
+        return response;
+
+
     }
 }
 
