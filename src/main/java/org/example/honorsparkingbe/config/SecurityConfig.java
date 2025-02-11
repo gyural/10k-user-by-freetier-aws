@@ -112,7 +112,7 @@ public class SecurityConfig {
     }
 
     /**
-     * 🔹 CORS 필터 설정 (프론트엔드 요청 허용)
+     * CORS 필터 설정 (프론트엔드 요청 허용)
      */
     @Bean
     public CorsFilter corsFilter() {
@@ -130,7 +130,7 @@ public class SecurityConfig {
     }
 
     /**
-     * 🔹 CORS 설정을 Security Filter Chain에서 사용할 수 있도록 구성
+     * CORS 설정을 Security Filter Chain에서 사용할 수 있도록 구성
      */
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
@@ -141,8 +141,8 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "https://honorsparking-web.vercel.app"
         ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 🔹 허용할 HTTP 메서드 설정
-        config.setAllowedHeaders(List.of("*")); // 🔹 모든 요청 헤더 허용
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드 설정
+        config.setAllowedHeaders(List.of("*")); // 모든 요청 헤더 허용
         source.registerCorsConfiguration("/**", config);
         return source;
     }
