@@ -119,9 +119,12 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // 인증 정보를 포함한 요청 허용 (JWT, 세션 쿠키 등)
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // 🔹 프론트엔드 주소 허용
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 🔹 허용할 HTTP 메서드 설정
-        config.setAllowedHeaders(List.of("*")); // 🔹 모든 요청 헤더 허용
+        config.setAllowedOriginPatterns(List.of( // 프론트엔드 도메인 허용
+                "http://localhost:3000",
+                "https://honorsparking-web.vercel.app"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드 설정
+        config.setAllowedHeaders(List.of("*")); // 모든 요청 헤더 허용
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
@@ -134,7 +137,10 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // 🔹 프론트엔드 주소 허용
+        config.setAllowedOriginPatterns(List.of( // 프론트엔드 도메인 허용
+                "http://localhost:3000",
+                "https://honorsparking-web.vercel.app"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 🔹 허용할 HTTP 메서드 설정
         config.setAllowedHeaders(List.of("*")); // 🔹 모든 요청 헤더 허용
         source.registerCorsConfiguration("/**", config);
