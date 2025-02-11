@@ -24,38 +24,26 @@ public class CurrentInfoService {
         // ParkingHistory에서 해당 memberId를 가진 가장 최신의 기록 가져오기
         ParkingHistoryEntity latestHistory = parkingHistoryRepository.findFirstByMemberEntityIdOrderByEntranceTimeDesc(memberId);
 
-
-
-        // 디버깅용 로그 출력
-        System.out.println("Latest Parking History: " + latestHistory);
-
         Map<String, Object> response = new HashMap<>();
 
+        // 아예 이용 기록이 없는 경우
         if (latestHistory == null) {
             response.put("message", "해당 사용자의 주차 기록이 없습니다.");
             return response;
         }
 
-        // 가져온 주차 내역의 모든 정보 출력
-        System.out.println("Parking History ID: " + latestHistory.getId());
-        System.out.println("Car ID: " + (latestHistory.getCarEntity() != null ? latestHistory.getCarEntity().getId() : "NULL"));
-        System.out.println("Member ID: " + (latestHistory.getMemberEntity() != null ? latestHistory.getMemberEntity().getId() : "NULL"));
-        System.out.println("Parking Zone ID: " + (latestHistory.getParkingZoneEntity() != null ? latestHistory.getParkingZoneEntity().getId() : "NULL"));
-        System.out.println("Entrance Time: " + latestHistory.getEntranceTime());
-        System.out.println("Exit Time: " + latestHistory.getExitTime());
-        System.out.println("Payment Type: " + latestHistory.getPaymentType());
-
-        // ParkingZone 정보 확인
-        ParkingZoneEntity parkingZone = latestHistory.getParkingZoneEntity();
-        if (parkingZone != null) {
-            System.out.println("Parking Zone Name: " + parkingZone.getZoneName());
-        } else {
-            System.out.println("Parking Zone is NULL!");
+        // exit time이 있는 경우 : 현재 입차된 상태 X
+        if(latestHistory.getExitTime()!=null){
+            response.put("isParked", false);
+            response.put("parkingZone", null);
+            response.put("entranceTime", null);
+            response.put("cost", 0);
+            response.put("message", "현재 주차 중인 상태가 아닙니다.");
+            return response;
+        }else{ // exit time이 null 인 경우 : 현재 입차된 상태
+            response.put("isParked", true);
+            return response;
         }
-
-        // 그대로 반환하여 JSON 응답 확인
-        response.put("parkingHistory", latestHistory);
-        return response;
     }
 }
 
