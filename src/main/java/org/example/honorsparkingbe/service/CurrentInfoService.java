@@ -45,6 +45,20 @@ public class CurrentInfoService {
         // exitTime이 없는 경우 : 현재 주차 중
         ParkingZoneEntity parkingZone = latestHistory.getParkingZoneEntity();
 
+
+        /**
+         * 1. parkingHistory(latesHistory)에서 parkingZoneId를 찾는다.
+         * 1-2. 해당 parkingZoneId를 이용하여 parkingFeeRule에 들어가 해당되는 값을 찾는다.
+         * 1-3. 아마 여러 튜플을 가져올 것으로 예상됨
+         *
+         * 2. parkingHistory(latesHistory)에서 carId를 찾아 해당하는 자동차의 carType을 찾아온다.
+         * 2-2. 아까 가져온 여러 튜플들 중 carType이 일치하지 않는 것은 제외한다.
+         *
+         * 3. 남은 튜플들을 해당 페이지에서 sysout을 확인
+         */
+
+
+
         // JSON 응답 형식 맞추기
         Map<String, Object> parkingZoneInfo = new HashMap<>();
         parkingZoneInfo.put("zoneName", parkingZone.getZoneName());
