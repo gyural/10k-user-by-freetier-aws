@@ -79,14 +79,17 @@ public class CurrentInfoService {
          * 2-2. 가져온 요금 규칙 리스트에서 carType이 일치하지 않는 것은 제외한다.
          */
         CarEntity car = latestHistory.getCarEntity();
-        CarType carType = car.getCarType(); // 정상적으로 가져오고 있음
+        CarType carType = car.getCarType();
 
+        // applicableFeeRules : 해당 차종, 주차장에 해당하는 규칙들(튜플들)
         List<ParkingFeeRuleEntity> applicableFeeRules = feeRules.stream()
                 .filter(rule -> rule.getCarType().equals(carType))
                 .toList();
 
         // 3. 남은 튜플들을 출력하여 확인
+        System.out.println("==================================================================");
         System.out.println("Applicable Fee Rules for CarType: " + carType);
+        System.out.println("해당되는 규칙들");
         for (ParkingFeeRuleEntity rule : applicableFeeRules) {
             System.out.println("Rule Name: " + rule.getRuleName() +
                     ", CarType: " + rule.getCarType() +
@@ -96,11 +99,33 @@ public class CurrentInfoService {
                     ", CostTimeSlot: " + rule.getCostTimeSlot());
         }
 
-        // 위의 결과들로 applicableFeeRules 해당 리스트에는 해당 차종, 주차장에 해당하는 규칙들만 가져온 것을 알 수 있다.
+
+        /**
+         * 현재시간과 entranceTime을 비교하여 몇 분 차이인지 계산
+         */
+        LocalDateTime entranceTime= latestHistory.getEntranceTime(); // 입차 시간
+        LocalDateTime now = LocalDateTime.now(); // 현재 시간
+        Duration duration = Duration.between(entranceTime, now);
+        long totalMinutesParked = duration.toMinutes(); // 주차한 총 시간(분)
+
+        System.out.println("Entrance Time: " + entranceTime);
+        System.out.println("Current Time: " + now);
+        System.out.println("Total Minutes Parked: " + totalMinutesParked);
+
+
+        /**
+         * totalMinutesParked = 주차한 시간(분)
+         * applicableFeeRules = 해당 차종, 주차장에 해당하는 규칙들(튜플들)
+         * totalMinutesParked를 applicableFeeRules의 규칙들에 적용하여 요금을 계산하면 된다.
+         * 일단 로직부터 구현해보자!!!
+         */
 
 
 
-        // JSON 응답 형식 맞추기
+
+
+
+        // JSON 응답 형식 맞추기 ============================== 위에서 다 처리하고 대입 =======================
         Map<String, Object> parkingZoneInfo = new HashMap<>();
         parkingZoneInfo.put("zoneName", parkingZone.getZoneName());
         parkingZoneInfo.put("hourlyRate", null); // 요금 정보는 현재 설정되지 않음
