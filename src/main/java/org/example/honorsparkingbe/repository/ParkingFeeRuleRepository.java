@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface ParkingFeeRuleRepository extends JpaRepository<ParkingFeeRuleEntity, Long> {
     List<ParkingFeeRuleEntity> findAllByParkingZoneEntity_Id(Long parkingZoneId);
+
+    List<ParkingFeeRuleEntity> findByParkingZoneEntityId(Long parkingZoneId);
 }

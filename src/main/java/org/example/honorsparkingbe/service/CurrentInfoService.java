@@ -1,22 +1,29 @@
 package org.example.honorsparkingbe.service;
 
+import org.example.honorsparkingbe.domain.entity.CarEntity;
+import org.example.honorsparkingbe.domain.entity.ParkingFeeRuleEntity;
 import org.example.honorsparkingbe.domain.entity.ParkingHistoryEntity;
 import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
+import org.example.honorsparkingbe.domain.enums.CarType;
+import org.example.honorsparkingbe.repository.ParkingFeeRuleRepository;
 import org.example.honorsparkingbe.repository.ParkingHistoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class CurrentInfoService {
 
     private final ParkingHistoryRepository parkingHistoryRepository;
+    private final ParkingFeeRuleRepository parkingFeeRuleRepository;
 
-    public CurrentInfoService(ParkingHistoryRepository parkingHistoryRepository) {
+    public CurrentInfoService(ParkingHistoryRepository parkingHistoryRepository, ParkingFeeRuleRepository parkingFeeRuleRepository) {
         this.parkingHistoryRepository = parkingHistoryRepository;
+        this.parkingFeeRuleRepository = parkingFeeRuleRepository;
     }
 
     public Map<String, Object> getCurrentParkingInfo(Long memberId) {
@@ -47,15 +54,49 @@ public class CurrentInfoService {
 
 
         /**
-         * 1. parkingHistory(latesHistory)에서 parkingZoneId를 찾는다.
+         * 1. parkingHistory(latestHistory)에서 parkingZoneId를 찾는다.
          * 1-2. 해당 parkingZoneId를 이용하여 parkingFeeRule에 들어가 해당되는 값을 찾는다.
-         * 1-3. 아마 여러 튜플을 가져올 것으로 예상됨
-         *
-         * 2. parkingHistory(latesHistory)에서 carId를 찾아 해당하는 자동차의 carType을 찾아온다.
-         * 2-2. 아까 가져온 여러 튜플들 중 carType이 일치하지 않는 것은 제외한다.
-         *
-         * 3. 남은 튜플들을 해당 페이지에서 sysout을 확인
+         * 1-3. 여러 요금 규칙 튜플을 가져올 수 있음.
          */
+        Long parkingZoneId = parkingZone.getId(); // 정상적으로 가져오고 있음
+        List<ParkingFeeRuleEntity> feeRules = parkingFeeRuleRepository.findByParkingZoneEntityId(parkingZoneId); // 정상적으로 가져오고 있음
+
+        System.out.println("parkingZoneId: " + parkingZoneId);
+        System.out.println("feeRules: " + feeRules);
+        System.out.println("Parking Fee Rules for Zone ID " + parkingZoneId + ":");
+        feeRules.forEach(rule -> System.out.println(
+                "Rule Name: " + rule.getRuleName() +
+                        ", CarType: " + rule.getCarType() +
+                        ", StartTime: " + rule.getStartTime() +
+                        ", EndTime: " + rule.getEndTime() +
+                        ", CostPerTimeSlot: " + rule.getCostPerTimeSlot() +
+                        ", CostTimeSlot: " + rule.getCostTimeSlot()
+        ));
+
+
+        /**
+         * 2. parkingHistory(latestHistory)에서 carId를 찾아 해당하는 자동차의 carType을 가져온다.
+         * 2-2. 가져온 요금 규칙 리스트에서 carType이 일치하지 않는 것은 제외한다.
+         */
+        CarEntity car = latestHistory.getCarEntity();
+        CarType carType = car.getCarType(); // 정상적으로 가져오고 있음
+
+        List<ParkingFeeRuleEntity> applicableFeeRules = feeRules.stream()
+                .filter(rule -> rule.getCarType().equals(carType))
+                .toList();
+
+        // 3. 남은 튜플들을 출력하여 확인
+        System.out.println("Applicable Fee Rules for CarType: " + carType);
+        for (ParkingFeeRuleEntity rule : applicableFeeRules) {
+            System.out.println("Rule Name: " + rule.getRuleName() +
+                    ", CarType: " + rule.getCarType() +
+                    ", StartTime: " + rule.getStartTime() +
+                    ", EndTime: " + rule.getEndTime() +
+                    ", CostPerTimeSlot: " + rule.getCostPerTimeSlot() +
+                    ", CostTimeSlot: " + rule.getCostTimeSlot());
+        }
+
+        // 위의 결과들로 applicableFeeRules 해당 리스트에는 해당 차종, 주차장에 해당하는 규칙들만 가져온 것을 알 수 있다.
 
 
 
