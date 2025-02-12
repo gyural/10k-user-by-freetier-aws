@@ -2,6 +2,7 @@ package org.example.honorsparkingbe.controller;
 
 import org.example.honorsparkingbe.service.AlarmService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.security.core.Authentication;
@@ -119,6 +120,8 @@ public class AlarmController {
 
     /**
      * 현재 로그인한 사용자의 memberId 가져오기
+     * 일반 로그인: UserDetails에서 authId 가져와서 memberId 조회
+     * 소셜 로그인: OAuth2User에서 socialId 가져와서 memberId 조회
      * @return memberId
      */
     private Long getCurrentMemberId() {
@@ -129,10 +132,31 @@ public class AlarmController {
         }
 
         Object principal = authentication.getPrincipal();
+        System.out.println("Principal: " + principal.getClass().getName()); // 디버깅 로그
+
+        // 일반 로그인 처리 (UserDetails 기반)
         if (principal instanceof UserDetails userDetails) {
-            return Long.parseLong(userDetails.getUsername()); // 🔹 username을 memberId로 저장했다고 가정
-        } else {
-            throw new IllegalStateException("Invalid user authentication data");
+            return findMemberIdByAuthId(userDetails.getUsername()); // authId → memberId 조회
         }
+
+        // 소셜 로그인 처리 (OAuth2User)
+        if (principal instanceof OAuth2User oAuth2User) {
+            String authId = (String) oAuth2User.getAttribute("sub"); // 소셜 로그인 고유 ID
+            return findMemberIdByAuthId(authId);  // 🔥 authId로 memberId 조회
+        }
+
+        throw new IllegalStateException("Invalid user authentication data");
     }
+
+    /**
+     * 로그인 사용자의 authId로 memberId 조회
+     */
+    private Long findMemberIdByAuthId(String authId) {
+        Long memberId = alarmService.findMemberIdByAuthId(authId);
+        if (memberId == null) {
+            throw new IllegalStateException("User not found with authId: " + authId);
+        }
+        return memberId;
+    }
+
 }
