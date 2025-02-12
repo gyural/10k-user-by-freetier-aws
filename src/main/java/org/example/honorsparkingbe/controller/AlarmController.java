@@ -4,6 +4,10 @@ import org.example.honorsparkingbe.service.AlarmService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +23,8 @@ public class AlarmController {
     }
 
     /**
-     * 회원 알람 불러오기
+     * 회원 알람 불러오기 (현재 로그인한 사용자)
      * GET /api/v1/alarmAll
-     * @param memberid
      * @param category
      * @param page
      * @param size
@@ -29,15 +32,17 @@ public class AlarmController {
      */
     @GetMapping("/alarmAll")
     public ResponseEntity<Map<String, Object>> getAlarms(
-            @RequestParam Long memberid,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
 
         try {
+            Long memberId = getCurrentMemberId();
+
             // JPA 에서는 page 0부터 시작하므로
             int adjustedPage = Math.max(page - 1, 0); // 음수 방지
-            Map<String, Object> response = alarmService.getAlarms(memberid, category, adjustedPage, size);
+
+            Map<String, Object> response = alarmService.getAlarms(memberId, category, adjustedPage, size);
 
             // Pagination 값 조정
             Map<String, Object> pagination = new HashMap<>((Map<String, Object>) response.get("pagination"));
@@ -47,7 +52,9 @@ public class AlarmController {
             response.put("pagination", pagination);
 
             return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalStateException e) {  // 인증되지 않은 경우 예외 처리
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+        } catch (IllegalArgumentException e) { // 잘못된 category 값 등 처리
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
@@ -93,18 +100,39 @@ public class AlarmController {
     }
 
     /**
-     * 알람 전체 삭제
+     * 알람 전체 삭제 (현재 로그인한 사용자)
      * DELETE /api/v1/alarm/all
-     * @param memberid
      * @return
      */
     @DeleteMapping("/alarm/all")
-    public ResponseEntity<Map<String, Object>> deleteAllAlarms(@RequestParam Long memberid) {
+    public ResponseEntity<Map<String, Object>> deleteAllAlarms() {
         try {
-            Map<String, Object> response = alarmService.deleteAllAlarms(memberid);
+            Long memberId = getCurrentMemberId(); // 로그인한 사용자 ID 가져오기
+            Map<String, Object> response = alarmService.deleteAllAlarms(memberId);
             return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {  // 인증되지 않은 경우 예외 처리
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * 현재 로그인한 사용자의 memberId 가져오기
+     * @return memberId
+     */
+    private Long getCurrentMemberId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User is not authenticated");
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails userDetails) {
+            return Long.parseLong(userDetails.getUsername()); // 🔹 username을 memberId로 저장했다고 가정
+        } else {
+            throw new IllegalStateException("Invalid user authentication data");
         }
     }
 }
