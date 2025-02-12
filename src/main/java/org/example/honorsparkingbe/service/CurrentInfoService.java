@@ -86,7 +86,7 @@ public class CurrentInfoService {
                 .filter(rule -> rule.getCarType().equals(carType))
                 .toList();
 
-        // 3. 남은 튜플들을 출력하여 확인
+        // 3. 남은 튜플들을 출력하여 확인.
         System.out.println("==================================================================");
         System.out.println("Applicable Fee Rules for CarType: " + carType);
         System.out.println("해당되는 규칙들");
