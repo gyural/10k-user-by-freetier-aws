@@ -56,7 +56,7 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화 -- 250119 추가(이상 시 삭제)
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("api/v1/","/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm").permitAll()
+                        .requestMatchers("/api/v1/","/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm").permitAll()
                         .requestMatchers("/api/v1/admin").hasRole("ADMIN")                  // 해당 role만 접근 가능
                         .requestMatchers("/api/v1/my/**").hasAnyRole("ADMIN", "USER") // /api/v1/my/**만 허용
                         .anyRequest().authenticated()
@@ -117,24 +117,6 @@ public class SecurityConfig {
 
 
         return http.build();
-    }
-
-    /**
-     * CORS 필터 설정 (프론트엔드 요청 허용)
-     */
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true); // 인증 정보를 포함한 요청 허용 (JWT, 세션 쿠키 등)
-        config.setAllowedOriginPatterns(List.of( // 프론트엔드 도메인 허용
-                "http://localhost:3000",
-                "https://honorsparking-web.vercel.app"
-        ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드 설정
-        config.setAllowedHeaders(List.of("*")); // 모든 요청 헤더 허용
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
     }
 
     /**
