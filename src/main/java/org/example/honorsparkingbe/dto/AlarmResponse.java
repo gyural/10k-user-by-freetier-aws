@@ -14,7 +14,7 @@ public class AlarmResponse {
     private IsRead isRead;
     private AlarmType alarmType;
     private LocalDateTime createdAt;
-    private LocalDateTime readAt;
+    // private LocalDateTime readAt;
 
     public AlarmResponse(AlarmEntity alarm) {
         this.id = alarm.getId();
@@ -22,6 +22,6 @@ public class AlarmResponse {
         this.isRead = alarm.getIsRead();
         this.alarmType = alarm.getAlarmType();
         this.createdAt = alarm.getCreatedAt();
-        this.readAt = alarm.getReadAt();
+        // this.readAt = alarm.getReadAt();
     }
 }
