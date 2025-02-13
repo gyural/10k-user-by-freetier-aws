@@ -2,9 +2,11 @@ package org.example.honorsparkingbe.service;
 
 import jakarta.transaction.Transactional;
 import org.example.honorsparkingbe.domain.entity.AlarmEntity;
+import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.AlarmType;
 import org.example.honorsparkingbe.dto.AlarmResponse;
 import org.example.honorsparkingbe.repository.AlarmRepository;
+import org.example.honorsparkingbe.repository.MemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,15 +16,18 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class AlarmService {
 
     private final AlarmRepository alarmRepository;
+    private final MemberRepository memberRepository;
 
-    public AlarmService(AlarmRepository alarmRepository) {
+    public AlarmService(AlarmRepository alarmRepository, MemberRepository memberRepository) {
         this.alarmRepository = alarmRepository;
+        this.memberRepository = memberRepository;
     }
 
     // 회원 알람 불러오기
@@ -130,5 +135,18 @@ public class AlarmService {
                 "success", deletedCount > 0,
                 "deletedCount", deletedCount
         );
+    }
+
+    /**
+     * 로그인 사용자의 authId로 memberId 조회
+     * @param authId 로그인할 때 사용한 유저 ID
+     * @return memberId (Long 타입)
+     */
+    public Long findMemberIdByAuthId(String authId) {
+        MemberEntity member = memberRepository.findByAuthId(authId);
+        if (member == null) {
+            throw new IllegalStateException("User not found with authId: " + authId);
+        }
+        return member.getId();
     }
 }

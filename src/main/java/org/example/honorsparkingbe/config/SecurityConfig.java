@@ -19,6 +19,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
+import org.springframework.web.cors.CorsConfiguration; // cors
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // cors
+import org.springframework.web.filter.CorsFilter; // cors
+
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @EnableRedisHttpSession
@@ -38,7 +44,6 @@ public class SecurityConfig {
      */
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
@@ -47,15 +52,22 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-
         // 접근 설정
         http
-                .cors(Customizer.withDefaults()) // CORS 활성화 -- 250119 추가(이상 시 삭제)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화 -- 250119 추가(이상 시 삭제)
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("api/v1/","/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm").permitAll()
+                        .requestMatchers("/api/v1/","/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm").permitAll()
                         .requestMatchers("/api/v1/admin").hasRole("ADMIN")                  // 해당 role만 접근 가능
                         .requestMatchers("/api/v1/my/**").hasAnyRole("ADMIN", "USER") // /api/v1/my/**만 허용
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated()
+                )
+
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"); // 비인가 접근 시 401 반환
+                        })
+                );
+
 
         http
                 .formLogin((formLogin) -> formLogin
@@ -105,6 +117,24 @@ public class SecurityConfig {
 
 
         return http.build();
+    }
+
+    /**
+     * CORS 설정을 Security Filter Chain에서 사용할 수 있도록 구성
+     */
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOriginPatterns(List.of( // 프론트엔드 도메인 허용
+                "http://localhost:3000",
+                "https://honorsparking-web.vercel.app"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드 설정
+        config.setAllowedHeaders(List.of("*")); // 모든 요청 헤더 허용
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
 }
