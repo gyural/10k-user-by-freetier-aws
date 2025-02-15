@@ -98,6 +98,7 @@ public class CurrentInfoService {
                     ", CostPerTimeSlot: " + rule.getCostPerTimeSlot() +
                     ", CostTimeSlot: " + rule.getCostTimeSlot());
         }
+        System.out.println("==================================================================");
 
 
         /**
@@ -120,7 +121,37 @@ public class CurrentInfoService {
          * 일단 로직부터 구현해보자!!!
          */
 
+        // totalMinutesParked= 30; // for test
+        int totalCost = 0; // 총 요금
+        long remainingMinutes = totalMinutesParked; // 남은 분량
+        long temp_hourlyRate= 0;
 
+        for (ParkingFeeRuleEntity rule : applicableFeeRules) {
+            // 현재 규칙에서 사용 가능한 최대 분량
+            long availableMinutes = rule.getEndTime() - rule.getStartTime() + 1;
+
+            // 현재 남은 시간이 이 규칙에서 처리할 수 있는 범위를 초과하는 경우
+            long usedMinutes = Math.min(remainingMinutes, availableMinutes);
+
+            // 요금 추가 계산
+            totalCost += (usedMinutes / rule.getCostTimeSlot()) * rule.getCostPerTimeSlot();
+            temp_hourlyRate= rule.getCostPerTimeSlot();
+
+            // 남은 시간 차감
+            remainingMinutes -= usedMinutes;
+
+            // 적용된 규칙 로그 출력
+            System.out.println("Applied Rule: " + rule.getRuleName() +
+                    ", Used Minutes: " + usedMinutes +
+                    ", Added Cost: " + ((usedMinutes / rule.getCostTimeSlot()) * rule.getCostPerTimeSlot()) +
+                    ", Remaining Minutes: " + remainingMinutes);
+
+            // 남은 시간이 0이면 종료
+            if (remainingMinutes <= 0) break;
+        }
+
+        // 최종 요금 출력
+        System.out.println("Total Parking Cost: " + totalCost);
 
 
 
@@ -128,9 +159,9 @@ public class CurrentInfoService {
         // JSON 응답 형식 맞추기 ============================== 위에서 다 처리하고 대입 =======================
         Map<String, Object> parkingZoneInfo = new HashMap<>();
         parkingZoneInfo.put("zoneName", parkingZone.getZoneName());
-        parkingZoneInfo.put("hourlyRate", null); // 요금 정보는 현재 설정되지 않음
+        parkingZoneInfo.put("hourlyRate", temp_hourlyRate); // 요금 정보는 현재 설정되지 않음
         parkingZoneInfo.put("entranceTime", latestHistory.getEntranceTime());
-        parkingZoneInfo.put("cost", null); // 요금 정보는 현재 설정되지 않음
+        parkingZoneInfo.put("cost", totalCost);
 
         response.put("parkingZone", parkingZoneInfo);
         return response;
