@@ -29,11 +29,10 @@ public class CurrentInfoController {
     }
 
     /**
-     * GET /api/v1/parking/me/{memberID}
-     * @param memberId
+     * GET /api/v1/parking/me
      */
-    @GetMapping("/me/{memberID}")
-    public Map<String, Object> getParkingInfo(@PathVariable("memberID") String memberId) {
+    @GetMapping("/me")
+    public Map<String, Object> getParkingInfo() {
         // 세션으로부터 로그인된 사용자 ID를 받아오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
@@ -51,17 +50,9 @@ public class CurrentInfoController {
             throw new IllegalStateException("Unexpected principal type: " + principal.getClass().getName());
         }
 
-        Long pathMemberId= Long.parseLong(memberId);
-
-        System.out.println("PathMemberID: " + pathMemberId);
         System.out.println("SessionMemberID: " + sessionMemberId);
 
-        // 세션으로부터 받은 ID와 URI로부터 받은 ID가 다른 경우(부적절한 접근)
-        if(!sessionMemberId.equals(pathMemberId)) {
-            throw new IllegalStateException("SessionMemberID is not the same as memberID");
-        }
-
-        return currentInfoService.getCurrentParkingInfo(pathMemberId);
+        return currentInfoService.getCurrentParkingInfo(sessionMemberId);
 
 
     }
