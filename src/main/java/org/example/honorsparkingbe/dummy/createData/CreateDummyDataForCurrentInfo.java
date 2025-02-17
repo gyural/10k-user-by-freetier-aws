@@ -1,0 +1,130 @@
+package org.example.honorsparkingbe.dummy.createData;
+
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.example.honorsparkingbe.domain.entity.*;
+import org.example.honorsparkingbe.domain.enums.CarType;
+import org.example.honorsparkingbe.domain.enums.LoginPlatform;
+import org.example.honorsparkingbe.domain.enums.MemberRole;
+import org.example.honorsparkingbe.domain.enums.PaymentType;
+import org.example.honorsparkingbe.repository.*;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@DependsOn("createParkingZoneList")  // ParkingZoneList가 먼저 생성되도록 설정
+public class CreateDummyDataForCurrentInfo {
+
+    private final CarRepository carRepository;
+    private final MemberRepository memberRepository;
+    private final ParkingZoneRepository parkingZoneRepository;
+    private final ParkingHistoryRepository parkingHistoryRepository;
+    private final ParkingFeeRuleRepository parkingFeeRuleRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    @PostConstruct
+    @Transactional
+    public void insertDummyData() {
+        // 🚗 **Car 데이터 추가**
+        CarEntity car1 = CarEntity.builder().carNumber("12ga 3456").carType(CarType.COMPACT).isElectric(false).build();
+        CarEntity car2 = CarEntity.builder().carNumber("30na 6789").carType(CarType.MIDSIZE).isElectric(true).build();
+        CarEntity car3 = CarEntity.builder().carNumber("56da 9012").carType(CarType.FULLSIZE).isElectric(false).build();
+        carRepository.saveAll(List.of(car1, car2, car3));
+
+        // 🔑 **Member 데이터 추가 (BCrypt 비밀번호 적용)**
+        MemberEntity member1 = MemberEntity.builder()
+                .authId("1111").birthday("01-01").birthdayYear(1990).email("user@example.com")
+                .loginPlatform(LoginPlatform.NORMAL).password(passwordEncoder.encode("1111"))
+                .phoneNumber("01012341234").role(MemberRole.ROLE_USER).userName("name1").carEntity(car1)
+                .build();
+        MemberEntity member2 = MemberEntity.builder()
+                .authId("2222").birthday("01-01").birthdayYear(1990).email("user@example.com")
+                .loginPlatform(LoginPlatform.NORMAL).password(passwordEncoder.encode("2222"))
+                .phoneNumber("01012341234").role(MemberRole.ROLE_USER).userName("name2").carEntity(car2)
+                .build();
+        MemberEntity member3 = MemberEntity.builder()
+                .authId("3333").birthday("01-01").birthdayYear(1990).email("user@example.com")
+                .loginPlatform(LoginPlatform.NORMAL).password(passwordEncoder.encode("3333"))
+                .phoneNumber("01012341234").role(MemberRole.ROLE_USER).userName("name3").carEntity(car3)
+                .build();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+
+//        // 🅿 **ParkingZone 데이터 추가**
+//        ParkingZoneEntity parkingZone1 = ParkingZoneEntity.builder()
+//                .zoneName("Seoul Gangnam-gu Parking Lot").size(10).latitude(37.4979).longitude(127.0276).build();
+//        ParkingZoneEntity parkingZone2 = ParkingZoneEntity.builder()
+//                .zoneName("Busan Haeundae-gu Parking Lot").size(5).latitude(35.1710).longitude(129.1213).build();
+//        parkingZoneRepository.saveAll(List.of(parkingZone1, parkingZone2));
+
+        // 🅿 **ParkingZone ID를 사용하여 엔티티 조회**
+        ParkingZoneEntity parkingZone1 = parkingZoneRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("ParkingZone ID 1 not found"));
+        ParkingZoneEntity parkingZone2 = parkingZoneRepository.findById(2L)
+                .orElseThrow(() -> new RuntimeException("ParkingZone ID 2 not found"));
+        ParkingZoneEntity parkingZone3 = parkingZoneRepository.findById(3L)
+                .orElseThrow(() -> new RuntimeException("ParkingZone ID 3 not found"));
+
+        // 🏁 **ParkingHistory 데이터 추가**
+        ParkingHistoryEntity history1 = parkingHistoryRepository.save(ParkingHistoryEntity.builder()
+                .carEntity(car1).memberEntity(member1).parkingZoneEntity(parkingZone1)
+                .entranceTime(LocalDateTime.of(2025, 2, 10, 8, 30))
+                .exitTime(LocalDateTime.of(2025, 2, 10, 10, 30)).paymentType(PaymentType.ON_SITE).build());
+        ParkingHistoryEntity history2 = parkingHistoryRepository.save(ParkingHistoryEntity.builder()
+                .carEntity(car2).memberEntity(member2).parkingZoneEntity(parkingZone1)
+                .entranceTime(LocalDateTime.of(2025, 2, 10, 9, 15))
+                .exitTime(LocalDateTime.of(2025, 2, 10, 11, 00)).paymentType(PaymentType.KIOSK).build());
+        ParkingHistoryEntity history3 = parkingHistoryRepository.save(ParkingHistoryEntity.builder()
+                .carEntity(car2).memberEntity(member2).parkingZoneEntity(parkingZone2)
+                .entranceTime(LocalDateTime.of(2025, 2, 10, 10, 0)).exitTime(null).paymentType(PaymentType.NONE).build());
+
+        // 💰 **ParkingFeeRule 데이터 추가**
+        List<ParkingFeeRuleEntity> rules = List.of(
+                ParkingFeeRuleEntity.builder()
+                        .carType(CarType.COMPACT).costPerTimeSlot(500).costTimeSlot(30)
+                        .endTime(30).ruleName("First").startTime(1).parkingZoneEntity(parkingZone1)
+                        .build(),
+                ParkingFeeRuleEntity.builder()
+                        .carType(CarType.COMPACT).costPerTimeSlot(200).costTimeSlot(10)
+                        .endTime(120).ruleName("Second").startTime(31).parkingZoneEntity(parkingZone1)
+                        .build(),
+                ParkingFeeRuleEntity.builder()
+                        .carType(CarType.COMPACT).costPerTimeSlot(300).costTimeSlot(10)
+                        .endTime(Integer.MAX_VALUE).ruleName("Third").startTime(121).parkingZoneEntity(parkingZone1)
+                        .build(),
+
+                ParkingFeeRuleEntity.builder()
+                        .carType(CarType.MIDSIZE).costPerTimeSlot(600).costTimeSlot(30)
+                        .endTime(30).ruleName("First").startTime(1).parkingZoneEntity(parkingZone2)
+                        .build(),
+                ParkingFeeRuleEntity.builder()
+                        .carType(CarType.MIDSIZE).costPerTimeSlot(250).costTimeSlot(10)
+                        .endTime(120).ruleName("Second").startTime(31).parkingZoneEntity(parkingZone2)
+                        .build(),
+                ParkingFeeRuleEntity.builder()
+                        .carType(CarType.MIDSIZE).costPerTimeSlot(350).costTimeSlot(10)
+                        .endTime(Integer.MAX_VALUE).ruleName("Third").startTime(121).parkingZoneEntity(parkingZone2)
+                        .build(),
+
+                ParkingFeeRuleEntity.builder()
+                        .carType(CarType.FULLSIZE).costPerTimeSlot(400).costTimeSlot(30)
+                        .endTime(30).ruleName("First").startTime(1).parkingZoneEntity(parkingZone3)
+                        .build(),
+                ParkingFeeRuleEntity.builder()
+                        .carType(CarType.FULLSIZE).costPerTimeSlot(150).costTimeSlot(10)
+                        .endTime(120).ruleName("Second").startTime(31).parkingZoneEntity(parkingZone3)
+                        .build(),
+                ParkingFeeRuleEntity.builder()
+                        .carType(CarType.FULLSIZE).costPerTimeSlot(200).costTimeSlot(10)
+                        .endTime(Integer.MAX_VALUE).ruleName("Third").startTime(121).parkingZoneEntity(parkingZone3)
+                        .build()
+        );
+
+        parkingFeeRuleRepository.saveAll(rules);
+    }
+}

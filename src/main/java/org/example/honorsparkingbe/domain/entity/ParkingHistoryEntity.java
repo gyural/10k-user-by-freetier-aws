@@ -1,8 +1,7 @@
 package org.example.honorsparkingbe.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.example.honorsparkingbe.domain.enums.PaymentType;
 
 import java.time.LocalDateTime;
@@ -11,6 +10,9 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table( name = "parkingHistory")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 
 
 public class ParkingHistoryEntity {
