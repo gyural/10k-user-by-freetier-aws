@@ -39,10 +39,9 @@ public class CurrentInfoController {
 
         Long sessionMemberId = null;
 
-        // principal이 CustomOAuth2User 타입인 경우 처리
+        // principal이 CustomOAuth2User 타입인 경우 처리 (시간나면 두 클래스 하나의 인터페이스로 묶어보자)
         if (principal instanceof CustomOAuth2User) {
             sessionMemberId = ((CustomOAuth2User) principal).getId();
-
         }else if(principal instanceof CustomUserDetails){
             sessionMemberId= ((CustomUserDetails) principal).getId();
         }

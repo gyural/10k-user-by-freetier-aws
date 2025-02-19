@@ -1,177 +1,168 @@
-//package org.example.honorsparkingbe.service;
-//
-//import jakarta.transaction.Transactional;
-//import org.example.honorsparkingbe.domain.entity.CarEntity;
-//import org.example.honorsparkingbe.domain.entity.MemberEntity;
-//import org.example.honorsparkingbe.domain.entity.ParkingHistoryEntity;
-//import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
-//import org.example.honorsparkingbe.domain.enums.CarType;
-//import org.example.honorsparkingbe.domain.enums.LoginPlatform;
-//import org.example.honorsparkingbe.domain.enums.MemberRole;
-//import org.example.honorsparkingbe.repository.*;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//
-//import java.time.LocalDateTime;
-//
-//@SpringBootTest
-//@Transactional
-//public class CurrentInfoServiceTest {
-//
-//    @Autowired
-//    private ParkingHistoryRepository parkingHistoryRepository;
-//    @Autowired private ParkingFeeRuleRepository parkingFeeRuleRepository;
-//    @Autowired private MemberRepository memberRepository;
-//    @Autowired private CarRepository carRepository;
-//    @Autowired private ParkingZoneRepository parkingZoneRepository;
-//    @Autowired private BCryptPasswordEncoder passwordEncoder;
-//
-//    @Autowired private CurrentInfoService currentInfoService;
-//
-//    private MemberEntity testMember1, testMember2, testMember3;
-//    private CarEntity testCar1, testCar2, testCar3;
-//    private ParkingZoneEntity testParkingZone1, testParkingZone2;
-//    private ParkingHistoryEntity testParkingHistory;
-//
-//    @BeforeEach
-//    void setUp() {
-//        System.out.println("🔄 Before Each Test: 데이터 초기화");
-//
-//        /** 1️⃣ CarEntity 저장 **/
-//        testCar1 = carRepository.save(CarEntity.builder()
-//                .carNumber("12ga 3456")
-//                .carType(CarType.COMPACT)
-//                .isElectric(false)
-//                // .entranceTime(LocalDateTime.of(2025, 2, 10, 8, 30))
-//                .build());
-//
-//        testCar2 = carRepository.save(CarEntity.builder()
-//                .carNumber("30na 6789")
-//                .carType(CarType.MIDSIZE)
-//                .isElectric(false)
-//                // .entranceTime(LocalDateTime.of(2025, 2, 10, 9, 15))
-//                .build());
-//
-//        testCar3 = carRepository.save(CarEntity.builder()
-//                .carNumber("56da 9012")
-//                .carType(CarType.FULLSIZE)
-//                .isElectric(false)
-//                // .entranceTime(LocalDateTime.of(2025, 2, 10, 9, 15))
-//                .build());
-//
-//        /** 2️⃣ MemberEntity 저장 (BCrypt 적용) **/
-//        testMember1 = memberRepository.save(MemberEntity.builder()
-//                .authId("1111")
-//                .email("user1@example.com")
-//                .userName("TestUser1")
-//                .password(passwordEncoder.encode("1111")) // ✅ 비밀번호 암호화
-//                .role(MemberRole.ROLE_USER)
-//                .phoneNumber("01012341234")
-//                .birthday("01-01")
-//                .birthdayYear(1990)
-//                .loginPlatform(LoginPlatform.NORMAL)
-//                .carEntity(testCar1) // ✅ CarEntity 연결
-//                .build());
-//
-//        testMember2 = memberRepository.save(MemberEntity.builder()
-//                .authId("2222")
-//                .email("user2@example.com")
-//                .userName("TestUser2")
-//                .password(passwordEncoder.encode("2222")) // ✅ 비밀번호 암호화
-//                .role(MemberRole.ROLE_USER)
-//                .phoneNumber("01056785678")
-//                .birthday("02-02")
-//                .birthdayYear(1992)
-//                .loginPlatform(LoginPlatform.NORMAL)
-//                .carEntity(testCar2) // ✅ CarEntity 연결
-//                .build());
-//
-//        testMember3 = memberRepository.save(MemberEntity.builder()
-//                .authId("3333")
-//                .email("user3@example.com")
-//                .userName("TestUser3")
-//                .password(passwordEncoder.encode("3333")) // ✅ 비밀번호 암호화
-//                .role(MemberRole.ROLE_USER)
-//                .phoneNumber("01056785678")
-//                .birthday("02-02")
-//                .birthdayYear(1992)
-//                .loginPlatform(LoginPlatform.NORMAL)
-//                .carEntity(testCar3) // ✅ CarEntity 연결
-//                .build());
-//
-//
-//        /** 4️⃣ ParkingHistoryEntity 저장 **/
-//        testParkingHistory = parkingHistoryRepository.save(ParkingHistoryEntity.builder()
-//                .memberEntity(testMember1)  // ✅ Member 연결
-//                .carEntity(testCar1)        // ✅ Car 연결
-//                .parkingZoneEntity(1) // ✅ ParkingZone 연결
-//                .entranceTime(LocalDateTime.of(2025, 2, 10, 10, 0))
-//                .exitTime(null)  // ✅ 현재 주차 중
-//                .paymentType("NONE")
-//                .build());
-//
-//        /** 5️⃣ ParkingFeeRuleEntity 저장 **/
-//        parkingFeeRuleRepository.saveAll(List.of(
-//                ParkingFeeRuleEntity.builder()
-//                        .carType(CarType.COMPACT)
-//                        .ruleName("Early Morning Rate")
-//                        .startTime(0)
-//                        .endTime(30)
-//                        .costPerTimeSlot(500)
-//                        .costTimeSlot(30)
-//                        .parkingZoneEntity(testParkingZone1) // ✅ Zone A 연결
-//                        .build(),
-//
-//                ParkingFeeRuleEntity.builder()
-//                        .carType(CarType.COMPACT)
-//                        .ruleName("Daytime Rate")
-//                        .startTime(31)
-//                        .endTime(120)
-//                        .costPerTimeSlot(200)
-//                        .costTimeSlot(10)
-//                        .parkingZoneEntity(testParkingZone1) // ✅ Zone A 연결
-//                        .build(),
-//
-//                ParkingFeeRuleEntity.builder()
-//                        .carType(CarType.COMPACT)
-//                        .ruleName("Night Rate")
-//                        .startTime(121)
-//                        .endTime(2147483647)
-//                        .costPerTimeSlot(300)
-//                        .costTimeSlot(10)
-//                        .parkingZoneEntity(testParkingZone1) // ✅ Zone A 연결
-//                        .build()
-//        ));
-//    }
-//
-//    @AfterEach
-//    void tearDown() {
-//        System.out.println("🗑️ After Each Test: 데이터 정리");
-//        parkingHistoryRepository.deleteAll();
-//        parkingFeeRuleRepository.deleteAll();
-//        parkingZoneRepository.deleteAll();
-//        carRepository.deleteAll();
-//        memberRepository.deleteAll();
-//    }
-//
-//    @Test
-//    void testGetCurrentParkingInfo() {
-//        // ✅ given: 테스트 대상 멤버 ID
-//        Long memberId = testMember1.getId();
-//
-//        // ✅ when: 현재 주차 정보 조회
-//        Map<String, Object> result = currentInfoService.getCurrentParkingInfo(memberId);
-//
-//        // ✅ then: 결과 검증
-//        assertNotNull(result);
-//        assertNotNull(result.get("parkingZone"));
-//        assertEquals("Zone A", ((Map<?, ?>) result.get("parkingZone")).get("zoneName"));
-//        assertEquals(testParkingHistory.getEntranceTime(), ((Map<?, ?>) result.get("parkingZone")).get("entranceTime"));
-//
-//        // ✅ 요금 관련 테스트 추가
-//        assertNotNull(((Map<?, ?>) result.get("parkingZone")).get("cost"));
-//        assertTrue((Integer) ((Map<?, ?>) result.get("parkingZone")).get("cost") >= 0);
-//    }
-//}
+package org.example.honorsparkingbe.service;
+
+import org.example.honorsparkingbe.domain.entity.*;
+import org.example.honorsparkingbe.domain.enums.CarType;
+import org.example.honorsparkingbe.repository.ParkingFeeRuleRepository;
+import org.example.honorsparkingbe.repository.ParkingHistoryRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class CurrentInfoServiceTest {
+
+    @Mock
+    private ParkingHistoryRepository parkingHistoryRepository;
+
+    @Mock
+    private ParkingFeeRuleRepository parkingFeeRuleRepository;
+
+    @InjectMocks
+    private CurrentInfoService currentInfoService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testGetCurrentParkingInfo_NoHistory() {
+        when(parkingHistoryRepository.findFirstByMemberEntityIdOrderByEntranceTimeDesc(1L)).thenReturn(null);
+
+        Map<String, Object> result = currentInfoService.getCurrentParkingInfo(1L);
+
+        assertEquals("해당 사용자의 주차 기록이 없습니다.", result.get("message"));
+    }
+
+    @Test
+    void testGetCurrentParkingInfo_NotParked() {
+        ParkingHistoryEntity history = mock(ParkingHistoryEntity.class);
+        when(history.getExitTime()).thenReturn(LocalDateTime.now());
+
+        when(parkingHistoryRepository.findFirstByMemberEntityIdOrderByEntranceTimeDesc(2L)).thenReturn(history);
+
+        Map<String, Object> result = currentInfoService.getCurrentParkingInfo(2L);
+
+        assertEquals(false, result.get("isParked"));
+        assertEquals("현재 주차 중인 상태가 아닙니다.", result.get("message"));
+    }
+
+    @Test
+    void testGetCurrentParkingInfo_CurrentlyParked() {
+        // 1. 테스트 데이터 설정
+        Long memberId = 2L; // member2가 현재 주차 중 (exitTime이 null)
+        Long parkingZoneId = 2L; // ParkingZoneEntity ID
+        LocalDateTime entranceTime = LocalDateTime.of(2025, 2, 10, 10, 0); // 입차 시간
+
+        // 🔥 현재 시간을 고정하여 테스트가 변하지 않도록 설정
+        LocalDateTime now = LocalDateTime.of(2025, 2, 19, 13, 20); // 실제 시간
+
+        // ParkingZoneEntity (주차장)
+        ParkingZoneEntity parkingZone = mock(ParkingZoneEntity.class);
+        when(parkingZone.getId()).thenReturn(parkingZoneId);
+        when(parkingZone.getZoneName()).thenReturn("Busan Haeundae-gu Centum City Parking Lot");
+
+        // CarEntity (차량)
+        CarEntity car = mock(CarEntity.class);
+        when(car.getCarType()).thenReturn(CarType.MIDSIZE);
+
+        // ParkingHistoryEntity (주차 이력)
+        ParkingHistoryEntity history = mock(ParkingHistoryEntity.class);
+        when(history.getParkingZoneEntity()).thenReturn(parkingZone);
+        when(history.getCarEntity()).thenReturn(car);
+        when(history.getEntranceTime()).thenReturn(entranceTime);
+        when(history.getExitTime()).thenReturn(null); // 출차 기록 없음 (현재 주차 중)
+
+        when(parkingHistoryRepository.findFirstByMemberEntityIdOrderByEntranceTimeDesc(memberId))
+                .thenReturn(history);
+
+        // 🚀 요금 규칙 설정 (더미 데이터 반영)
+
+        // 1. 0~30분: 30분당 600원
+        ParkingFeeRuleEntity feeRule1 = mock(ParkingFeeRuleEntity.class);
+        when(feeRule1.getCarType()).thenReturn(CarType.MIDSIZE);
+        when(feeRule1.getStartTime()).thenReturn(0);
+        when(feeRule1.getEndTime()).thenReturn(30);
+        when(feeRule1.getCostTimeSlot()).thenReturn(30); // 30분 단위
+        when(feeRule1.getCostPerTimeSlot()).thenReturn(600);
+
+        // 2. 31~120분: 10분당 250원
+        ParkingFeeRuleEntity feeRule2 = mock(ParkingFeeRuleEntity.class);
+        when(feeRule2.getCarType()).thenReturn(CarType.MIDSIZE);
+        when(feeRule2.getStartTime()).thenReturn(31);
+        when(feeRule2.getEndTime()).thenReturn(120);
+        when(feeRule2.getCostTimeSlot()).thenReturn(10); // 10분 단위
+        when(feeRule2.getCostPerTimeSlot()).thenReturn(250);
+
+        // 3. 121분 이후: 10분당 350원
+        ParkingFeeRuleEntity feeRule3 = mock(ParkingFeeRuleEntity.class);
+        when(feeRule3.getCarType()).thenReturn(CarType.MIDSIZE);
+        when(feeRule3.getStartTime()).thenReturn(121);
+        when(feeRule3.getEndTime()).thenReturn(Integer.MAX_VALUE); // 무제한 시간
+        when(feeRule3.getCostTimeSlot()).thenReturn(10); // 10분 단위
+        when(feeRule3.getCostPerTimeSlot()).thenReturn(350);
+
+        when(parkingFeeRuleRepository.findByParkingZoneEntityId(parkingZoneId))
+                .thenReturn(List.of(feeRule1, feeRule2, feeRule3));
+
+        // 2. 서비스 메서드 실행
+        Map<String, Object> result = currentInfoService.getCurrentParkingInfo(memberId);
+
+        // 3. 결과 검증
+        assertNotNull(result);
+        assertTrue(result.containsKey("parkingZone"));
+
+        Map<String, Object> parkingZoneInfo = (Map<String, Object>) result.get("parkingZone");
+        assertEquals("Busan Haeundae-gu Centum City Parking Lot", parkingZoneInfo.get("zoneName"));
+
+        // 🚀 현재 시간과 입차 시간 기반으로 실제 주차 시간을 계산
+        long totalMinutesParked = Duration.between(entranceTime, now).toMinutes();
+
+        // ✅ 요금 계산 로직 (규칙 기반)
+        int calculatedCost = 0;
+
+        // 1. 0~30분: 30분당 600원
+        if (totalMinutesParked > 0) {
+            long minutesUsed = Math.min(totalMinutesParked, 30);
+            calculatedCost += (minutesUsed / 30) * 600;
+            totalMinutesParked -= minutesUsed;
+        }
+
+        // 2. 31~120분: 10분당 250원
+        if (totalMinutesParked > 0) {
+            long minutesUsed = Math.min(totalMinutesParked, 90);
+            calculatedCost += (minutesUsed / 10) * 250;
+            totalMinutesParked -= minutesUsed;
+        }
+
+        // 3. 121분 이후: 10분당 350원
+        if (totalMinutesParked > 0) {
+            calculatedCost += (totalMinutesParked / 10) * 350;
+        }
+
+        int actualCost = ((Number) parkingZoneInfo.get("cost")).intValue();
+
+        // ✅ 예상 요금과 실제 계산된 요금을 비교
+        assertEquals(calculatedCost, actualCost);
+
+        // 디버깅용 출력
+        System.out.println("Total Minutes Parked: " + Duration.between(entranceTime, now).toMinutes());
+        System.out.println("Calculated Cost: " + calculatedCost);
+        System.out.println("Actual Cost: " + actualCost);
+
+        System.out.println("테스트 완료: 현재 주차 중인 경우 (요금: " + actualCost + "원)");
+    }
+
+
+
+
+}
