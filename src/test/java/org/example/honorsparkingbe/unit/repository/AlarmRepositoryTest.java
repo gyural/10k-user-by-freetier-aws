@@ -36,14 +36,14 @@
 //
 //    @BeforeEach
 //    void setUp() {
-//        // ✅ 테스트용 회원 저장
+//        // 테스트용 회원 저장
 //        testMember = memberRepository.save(
 //                MemberEntity.builder()
 //                        .authId("testAuthId")
 //                        .build()
 //        );
 //
-//        // ✅ 테스트용 알람 2개 저장
+//        // 테스트용 알람 2개 저장
 //        alarmRepository.saveAll(List.of(
 //                createAlarm(testMember, "첫 번째 알람", IsRead.UNREAD, AlarmType.INOUT),
 //                createAlarm(testMember, "두 번째 알람", IsRead.READ, AlarmType.RESERVE)
@@ -51,7 +51,7 @@
 //    }
 //
 //    /**
-//     * ✅ 1. 특정 회원의 알람 조회 (페이지네이션 포함)
+//     * 1. 특정 회원의 알람 조회 (페이지네이션 포함)
 //     */
 //    @Test
 //    @DisplayName("특정 회원의 알람 조회")
@@ -65,7 +65,7 @@
 //    }
 //
 //    /**
-//     * ✅ 2. 특정 회원의 특정 알람 유형 조회
+//     * 2. 특정 회원의 특정 알람 유형 조회
 //     */
 //    @Test
 //    @DisplayName("특정 회원의 특정 알람 유형 조회")
@@ -79,7 +79,7 @@
 //    }
 //
 //    /**
-//     * ✅ 3. 읽음 처리된 알람 조회
+//     * 3. 읽음 처리된 알람 조회
 //     */
 //    @Test
 //    @DisplayName("읽음 처리된 알람 조회")
@@ -95,7 +95,7 @@
 //    }
 //
 //    /**
-//     * ✅ 4. 여러 개의 알람 읽음 처리
+//     * 4. 여러 개의 알람 읽음 처리
 //     */
 //    @Test
 //    @DisplayName("알람 읽음 처리")
@@ -114,7 +114,7 @@
 //    }
 //
 //    /**
-//     * ✅ 5. 특정 알람 삭제
+//     * 5. 특정 알람 삭제
 //     */
 //    @Test
 //    @DisplayName("특정 알람 삭제")
@@ -131,7 +131,7 @@
 //    }
 //
 //    /**
-//     * ✅ 6. 특정 회원의 모든 알람 삭제
+//     * 6. 특정 회원의 모든 알람 삭제
 //     */
 //    @Test
 //    @DisplayName("특정 회원의 모든 알람 삭제")
@@ -145,7 +145,7 @@
 //    }
 //
 //    /**
-//     * ✅ 도우미 메서드 - 알람 생성
+//     * 도우미 메서드 - 알람 생성
 //     */
 //    private AlarmEntity createAlarm(MemberEntity member, String content, IsRead isRead, AlarmType alarmType) {
 //        AlarmEntity alarm = new AlarmEntity();
