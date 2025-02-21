@@ -45,7 +45,9 @@ class AlarmServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // 1. 알람 목록 조회 테스트
+    /**
+     * 1. 알람 목록 조회 테스트
+     */
     @Test
     @DisplayName("알람 목록 조회")
     void testGetAlarms_Success() {
@@ -70,7 +72,9 @@ class AlarmServiceTest {
         assertThat(((List<?>) response.get("alarms")).size()).isEqualTo(2);
     }
 
-    // 2. 존재하지 않는 카테고리로 요청 시 예외 발생
+    /**
+     * 2. 존재하지 않는 카테고리로 요청 시 예외 발생
+     */
     @Test
     @DisplayName("존재하지 않는 카테고리로 알람 조회 시 예외 발생")
     void testGetAlarms_InvalidCategory_ShouldThrowException() {
@@ -82,7 +86,9 @@ class AlarmServiceTest {
                 alarmService.getAlarms(memberId, "INVALID", 0, 10));
     }
 
-    // 3. 알람이 없을 때 빈 리스트 반환
+    /**
+     * 3. 알람이 없을 때 빈 리스트 반환
+     */
     @Test
     @DisplayName("알람이 없을 때 빈 리스트 반환")
     void testGetAlarms_NoAlarms_ShouldReturnEmptyList() {
@@ -100,7 +106,9 @@ class AlarmServiceTest {
         assertThat(((List<?>) response.get("alarms")).isEmpty()).isTrue();
     }
 
-    // 4. 알람 읽기
+    /**
+     * 4. 알람 읽기
+     */
     @Test
     @DisplayName("알람 읽기")
     void testUpdateAlarmsToRead_Success() {
@@ -123,7 +131,9 @@ class AlarmServiceTest {
         assertThat(response.get("success")).isEqualTo(!((List<?>) response.get("updatedIds")).isEmpty()); // 읽음 처리된 게 있으면 success=true
     }
 
-    // 5. 알람 삭제
+    /**
+     * 5. 알람 삭제
+     */
     @Test
     @DisplayName("알람 삭제")
     void testDeleteAlarms_Success() {
@@ -139,7 +149,9 @@ class AlarmServiceTest {
         assertThat(((List<?>) response.get("deletedIds")).size()).isEqualTo(2);
     }
 
-    // 6. 특정 유저의 모든 알람 삭제
+    /**
+     * 6. 특정 유저의 모든 알람 삭제
+     */
     @Test
     @DisplayName("특정 유저의 모든 알람 삭제")
     void testDeleteAllAlarms_Success() {
@@ -155,7 +167,9 @@ class AlarmServiceTest {
         assertThat(response.get("deletedCount")).isEqualTo(5);
     }
 
-    // 7. 회원 ID 조회
+    /**
+     * 7. 회원 ID 조회
+     */
     @Test
     @DisplayName("회원 ID 조회")
     void testFindMemberIdByAuthId_Success() {
@@ -172,6 +186,9 @@ class AlarmServiceTest {
         assertThat(memberId).isEqualTo(1L);
     }
 
+    /**
+     * 페이지네이션 적용 여부 확인
+     */
     @Test
     @DisplayName("페이지네이션 적용 여부 확인")
     void testGetAlarms_Pagination() {
@@ -196,8 +213,10 @@ class AlarmServiceTest {
         assertThat(((List<?>) response.get("alarms")).size()).isEqualTo(2);
     }
 
-    // 도우미 메서드: 알람 생성
-    // 테스트 코드에서 반복되는 AlarmEntity 생성 로직을 줄이기 위해 만들어짐
+    /**
+     * 도우미 메서드: 알람 생성
+     * 테스트 코드에서 반복되는 AlarmEntity 생성 로직을 줄이기 위해 만들어짐
+     */
     private AlarmEntity createAlarm(Long id, String content, IsRead isRead, AlarmType alarmType) {
         AlarmEntity alarm = new AlarmEntity();
         alarm.setId(id);
