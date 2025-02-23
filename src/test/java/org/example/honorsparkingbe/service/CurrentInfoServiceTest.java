@@ -63,8 +63,9 @@ class CurrentInfoServiceTest {
         Long parkingZoneId = 2L; // ParkingZoneEntity ID
         LocalDateTime entranceTime = LocalDateTime.of(2025, 2, 10, 10, 0); // 입차 시간
 
-        // 🔥 현재 시간을 고정하여 테스트가 변하지 않도록 설정
-        LocalDateTime now = LocalDateTime.of(2025, 2, 19, 13, 20); // 실제 시간
+        // LocalDateTime now = LocalDateTime.of(2025, 2, 23, 21, 53); // 실제 시간 제대로 가져오지 못할경우 현재 시간 직접 삽입
+        LocalDateTime now = LocalDateTime.now();
+
 
         // ParkingZoneEntity (주차장)
         ParkingZoneEntity parkingZone = mock(ParkingZoneEntity.class);
@@ -136,6 +137,7 @@ class CurrentInfoServiceTest {
             calculatedCost += (minutesUsed / 30) * 600;
             totalMinutesParked -= minutesUsed;
         }
+        System.out.println("current: "+ totalMinutesParked);
 
         // 2. 31~120분: 10분당 250원
         if (totalMinutesParked > 0) {
@@ -143,6 +145,7 @@ class CurrentInfoServiceTest {
             calculatedCost += (minutesUsed / 10) * 250;
             totalMinutesParked -= minutesUsed;
         }
+        System.out.println("current: "+ totalMinutesParked);
 
         // 3. 121분 이후: 10분당 350원
         if (totalMinutesParked > 0) {
