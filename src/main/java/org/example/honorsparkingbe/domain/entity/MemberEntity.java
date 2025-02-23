@@ -25,17 +25,17 @@ public class MemberEntity implements Serializable {
     private CarEntity carEntity;
 
     @Enumerated(EnumType.STRING)
-    // @Column(nullable = false)
+    @Column(nullable = false)
     private LoginPlatform loginPlatform;
 
     @Enumerated(EnumType.STRING)
-    // @Column(nullable = false)
+    @Column(nullable = false)
     private MemberRole role;
 
-    // @Column(nullable = false, length = 60)
+    @Column(nullable = false, length = 60)
     private String userName;
 
-    // @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String authId;
 
     // @Column(nullable = false)
