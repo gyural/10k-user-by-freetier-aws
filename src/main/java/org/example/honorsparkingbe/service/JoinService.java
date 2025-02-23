@@ -42,7 +42,7 @@ public class JoinService {
         CarEntity carEntity = new CarEntity();
         carEntity.setCarNumber(joinDTO.getCarNumber());
         carEntity.setCarType(CarType.NOT_DEFINED); // 기본값 설정 (차량 종류)
-        carEntity.setElectric(false);        // 기본값 설정 (전기차 여부)
+        carEntity.setIsElectric(false);        // 기본값 설정 (전기차 여부)
         carEntity.setEntranceTime(null);     // 입차 시간 초기화
 
         carRepository.save(carEntity);

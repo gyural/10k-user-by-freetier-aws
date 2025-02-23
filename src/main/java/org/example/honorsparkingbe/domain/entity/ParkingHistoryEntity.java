@@ -46,7 +46,9 @@ public class ParkingHistoryEntity {
         @Column(nullable = false)
         private PaymentType paymentType;
 
-        @ManyToOne
-        @JoinColumn(name = "payId") // nullable = false 제거
-        private PayEntity payEntity;
+  @ManyToOne
+  @JoinColumn(name = "payId")
+  private PayEntity payEntity;
+
+  private LocalDateTime deleteAt;
 }

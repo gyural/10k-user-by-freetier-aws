@@ -1,15 +1,23 @@
 package org.example.honorsparkingbe.dummy.createData;
 
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.honorsparkingbe.domain.entity.CityEntity;
 import org.example.honorsparkingbe.domain.entity.DistrictEntity;
 import org.example.honorsparkingbe.domain.entity.EupMyeonDongEntity;
+import org.example.honorsparkingbe.domain.entity.ParkingFeeRuleEntity;
 import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
+import org.example.honorsparkingbe.domain.enums.CarType;
+import org.example.honorsparkingbe.repository.CarRepository;
 import org.example.honorsparkingbe.repository.CityRepository;
 import org.example.honorsparkingbe.repository.DistrictRepository;
 import org.example.honorsparkingbe.repository.EupMyeonDongRepository;
+import org.example.honorsparkingbe.repository.MemberRepository;
+import org.example.honorsparkingbe.repository.ParkingFeeRuleRepository;
+import org.example.honorsparkingbe.repository.ParkingHistoryRepository;
 import org.example.honorsparkingbe.repository.ParkingZoneRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,18 +43,18 @@ public class CreateParkingZoneList {
         cityRepository.save(daejeon);
 
         // District 데이터 추가 (중복 체크)
-        DistrictEntity gangnam = districtRepository.findByName("Gangnam-gu").orElse(DistrictEntity.builder().name("Gangnam-gu").build());
-        DistrictEntity haeundae = districtRepository.findByName("Haeundae-gu").orElse(DistrictEntity.builder().name("Haeundae-gu").build());
-        DistrictEntity seo = districtRepository.findByName("Seo-gu").orElse(DistrictEntity.builder().name("Seo-gu").build());
+        DistrictEntity gangnam = districtRepository.findByName("강남구").orElse(DistrictEntity.builder().name("강남구").build());
+        DistrictEntity haeundae = districtRepository.findByName("해운대구").orElse(DistrictEntity.builder().name("해운대구").build());
+        DistrictEntity seo = districtRepository.findByName("서구").orElse(DistrictEntity.builder().name("서구").build());
 
         districtRepository.save(gangnam);
         districtRepository.save(haeundae);
         districtRepository.save(seo);
 
         // EupMyeonDong 데이터 추가 (중복 체크)
-        EupMyeonDongEntity yeoksam = eupMyeonDongRepository.findByName("Yeoksam-dong").orElse(EupMyeonDongEntity.builder().name("Yeoksam-dong").build());
-        EupMyeonDongEntity centum = eupMyeonDongRepository.findByName("Centum City").orElse(EupMyeonDongEntity.builder().name("Centum City").build());
-        EupMyeonDongEntity doma = eupMyeonDongRepository.findByName("Doma-dong").orElse(EupMyeonDongEntity.builder().name("Doma-dong").build());
+        EupMyeonDongEntity yeoksam = eupMyeonDongRepository.findByName("역삼동").orElse(EupMyeonDongEntity.builder().name("역삼동").build());
+        EupMyeonDongEntity centum = eupMyeonDongRepository.findByName("센텀시티").orElse(EupMyeonDongEntity.builder().name("센텀시티").build());
+        EupMyeonDongEntity doma = eupMyeonDongRepository.findByName("도마동").orElse(EupMyeonDongEntity.builder().name("도마동").build());
 
         eupMyeonDongRepository.save(yeoksam);
         eupMyeonDongRepository.save(centum);
