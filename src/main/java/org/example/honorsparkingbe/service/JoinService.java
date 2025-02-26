@@ -1,6 +1,7 @@
 package org.example.honorsparkingbe.service;
 
 
+import jakarta.transaction.Transactional;
 import org.example.honorsparkingbe.domain.entity.CarEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.CarType;
@@ -15,54 +16,52 @@ import org.springframework.stereotype.Service;
 @Service
 public class JoinService {
 
-  private final MemberRepository memberRepository;
-  private final CarRepository carRepository;
-  private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final MemberRepository memberRepository;
+    private final CarRepository carRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-  public JoinService(MemberRepository memberRepository, CarRepository carRepository,
-      BCryptPasswordEncoder bCryptPasswordEncoder) {
-    this.memberRepository = memberRepository;
-    this.carRepository = carRepository;
-    this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-  }
-
-  /**
-   * 회원가입 기본 로직
-   */
-  public void joinProcess(JoinDTO joinDTO) {
-
-    // accountId 중복 확인
-    boolean isUser = memberRepository.existsByAuthId(joinDTO.getAccountId());
-    if (isUser) {
-      throw new IllegalArgumentException(
-          "accountId= " + joinDTO.getAccountId() + " already exists.");
+    public JoinService(MemberRepository memberRepository, CarRepository carRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.memberRepository = memberRepository;
+        this.carRepository = carRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    // CarEntity 생성
-    CarEntity carEntity = new CarEntity();
-    carEntity.setCarNumber(joinDTO.getCarNumber());
-    carEntity.setCarType(CarType.NOT_DEFINED); // 기본값 설정 (차량 종류)
-    carEntity.setEntranceTime(null);     // 입차 시간 초기화
+    /**
+     * 회원가입 기본 로직
+     */
+    @Transactional
+    public void joinProcess(JoinDTO joinDTO) {
 
-    carRepository.save(carEntity);
+        // accountId 중복 확인
+        boolean isUser = memberRepository.existsByAuthId(joinDTO.getAccountId());
+        if (isUser) {
+            throw new IllegalArgumentException("accountId= " + joinDTO.getAccountId() + " already exists.");
+        }
 
-    // MemberEntity 생성
-    MemberEntity data = new MemberEntity();
-    data.setAuthId(joinDTO.getAccountId());
-    data.setPassword(bCryptPasswordEncoder.encode(joinDTO.getAccountPassword()));
-    data.setUserName(joinDTO.getName());
-    data.setPhoneNumber(joinDTO.getMobile());
-    data.setEmail(joinDTO.getEmail());
-    data.setBirthdayYear(Integer.parseInt(joinDTO.getBirthyear()));
-    data.setBirthday(joinDTO.getBirthday());
-    data.setLoginPlatform(LoginPlatform.valueOf(joinDTO.getPlatform().toUpperCase()));
-    data.setRole(MemberRole.ROLE_USER);
-    data.setCarEntity(carEntity);
+        // CarEntity 생성
+        CarEntity carEntity = new CarEntity();
+        carEntity.setCarNumber(joinDTO.getCarNumber());
+        carEntity.setCarType(CarType.NOT_DEFINED); // 기본값 설정 (차량 종류)
+        carEntity.setIsElectric(false);        // 기본값 설정 (전기차 여부)
+        carEntity.setEntranceTime(null);     // 입차 시간 초기화
 
-    System.out.println(bCryptPasswordEncoder.encode(joinDTO.getAccountPassword()));
+        carRepository.save(carEntity);
 
-    // 저장
-    memberRepository.save(data);
-  }
+        // MemberEntity 생성
+        MemberEntity data = new MemberEntity();
+        data.setAuthId(joinDTO.getAccountId());
+        data.setPassword(bCryptPasswordEncoder.encode(joinDTO.getAccountPassword()));
+        data.setUserName(joinDTO.getName());
+        data.setPhoneNumber(joinDTO.getMobile());
+        data.setEmail(joinDTO.getEmail());
+        data.setBirthdayYear(Integer.parseInt(joinDTO.getBirthyear()));
+        data.setBirthday(joinDTO.getBirthday());
+        data.setLoginPlatform(LoginPlatform.valueOf(joinDTO.getPlatform().toUpperCase()));
+        data.setRole(MemberRole.ROLE_USER);
+        data.setCarEntity(carEntity);
+
+        // 저장
+        memberRepository.save(data);
+    }
 }
 

@@ -1,5 +1,6 @@
 package org.example.honorsparkingbe.controller;
 
+import org.example.honorsparkingbe.security.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,9 @@ public class SessionController {
         response.put("userName", authentication.getName());
         response.put("authorities", authentication.getAuthorities());
         response.put("authenticated", authentication.isAuthenticated());
+        response.put("credentials", authentication.getCredentials());
+        response.put("details", authentication.getDetails());
+        response.put("principal", authentication.getPrincipal());
 
         // JSON 응답 반환
         return response;
