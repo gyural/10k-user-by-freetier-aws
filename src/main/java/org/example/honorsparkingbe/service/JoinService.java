@@ -63,5 +63,13 @@ public class JoinService {
         // 저장
         memberRepository.save(data);
     }
+
+    /**
+     * ID 중복확인
+     */
+    public boolean isAuthIdAvailable(String authId) {
+        return memberRepository.existsByAuthId(authId);
+    }
+
 }
 
