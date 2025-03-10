@@ -53,8 +53,6 @@ public class AlarmController {
             response.put("pagination", pagination);
 
             return ResponseEntity.ok(response);
-        } catch (IllegalStateException e) {  // 인증되지 않은 경우 예외 처리
-            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
         } catch (IllegalArgumentException e) { // 잘못된 category 값 등 처리
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
