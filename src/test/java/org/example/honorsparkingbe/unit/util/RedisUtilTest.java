@@ -53,7 +53,7 @@ public class RedisUtilTest {
 
   @BeforeAll
   static void setUp() {
-    System.setProperty("spring.data.redis.host", redis.getContainerIpAddress());
+    System.setProperty("spring.data.redis.host", redis.getHost());
     System.setProperty("spring.data.redis.port", redis.getFirstMappedPort().toString());
   }
 
