@@ -14,11 +14,16 @@ import java.util.Collection;
 import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
+    private static final long serialVersionUID = 1L;
 
     private final MemberEntity memberEntity;
 
     public CustomUserDetails(MemberEntity memberEntity) {
         this.memberEntity = memberEntity;
+    }
+
+    public Long getId() {
+        return memberEntity.getId();
     }
 
     // 사용자의 권한 목록 반환

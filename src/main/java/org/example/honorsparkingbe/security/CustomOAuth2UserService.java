@@ -37,6 +37,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2Response oAuth2Response = null;
 
         String role = "ROLE_USER";
+        Long memberId = null;
 
         // Provider마다 데이터를 주는 방식이 다르기에 다르게 처리(8강)
         if (registrationId.equals("naver")) {
@@ -64,6 +65,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 memberEntity.setLoginPlatform(LoginPlatform.NAVER);
 
                 memberRepository.save(memberEntity);
+                memberId = memberEntity.getId();
+            }else{
+                memberId = existData.getId();
             }
         }
         else if (registrationId.equals("google")) {
@@ -83,6 +87,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 memberEntity.setLoginPlatform(LoginPlatform.GOOGLE);
 
                 memberRepository.save(memberEntity);
+                memberId = memberEntity.getId();
+            }else{
+                memberId = existData.getId();
             }
         }
         else if (registrationId.equals("kakao")) {
@@ -109,11 +116,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 memberEntity.setPhoneNumber(kakaoResponse.getPhoneNumber());
 
                 memberRepository.save(memberEntity);
+                memberId = memberEntity.getId();
+            }else{
+                memberId = existData.getId();
             }
         }
         else {
             return null;
         }
-        return new CustomOAuth2User(oAuth2Response, role);
+        return new CustomOAuth2User(oAuth2Response, role, memberId);
     }
 }

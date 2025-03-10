@@ -1,6 +1,7 @@
 package org.example.honorsparkingbe.service;
 
 
+import jakarta.transaction.Transactional;
 import org.example.honorsparkingbe.domain.entity.CarEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.CarType;
@@ -28,6 +29,7 @@ public class JoinService {
     /**
      * 회원가입 기본 로직
      */
+    @Transactional
     public void joinProcess(JoinDTO joinDTO) {
 
         // accountId 중복 확인
@@ -40,7 +42,7 @@ public class JoinService {
         CarEntity carEntity = new CarEntity();
         carEntity.setCarNumber(joinDTO.getCarNumber());
         carEntity.setCarType(CarType.NOT_DEFINED); // 기본값 설정 (차량 종류)
-        carEntity.setElectric(false);        // 기본값 설정 (전기차 여부)
+        carEntity.setIsElectric(false);        // 기본값 설정 (전기차 여부)
         carEntity.setEntranceTime(null);     // 입차 시간 초기화
 
         carRepository.save(carEntity);
@@ -61,5 +63,13 @@ public class JoinService {
         // 저장
         memberRepository.save(data);
     }
+
+    /**
+     * ID 중복확인
+     */
+    public boolean isAuthIdAvailable(String authId) {
+        return memberRepository.existsByAuthId(authId);
+    }
+
 }
 

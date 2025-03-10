@@ -7,10 +7,7 @@ package org.example.honorsparkingbe.controller;
 import org.example.honorsparkingbe.dto.JoinDTO;
 import org.example.honorsparkingbe.service.JoinService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -36,5 +33,15 @@ public class JoinController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(409).body(e.getMessage());
         }
+    }
+
+    /**
+     * 아이디 중복 확인
+     * GET api/v1/auth/check-authId?authId={}
+     */
+    @GetMapping("/auth/check-authId")
+    public ResponseEntity<Boolean> checkAuthId(@RequestParam("authId") String authId) {
+        Boolean isAvailable= joinService.isAuthIdAvailable(authId);
+        return ResponseEntity.ok(isAvailable);
     }
 }

@@ -2,14 +2,15 @@ package org.example.honorsparkingbe.repository;
 
 import org.example.honorsparkingbe.domain.entity.ParkingHistoryEntity;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDateTime;
+import java.util.List;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface ParkingHistoryRepository extends JpaRepository<ParkingHistoryEntity, Long> {
@@ -21,4 +22,15 @@ public interface ParkingHistoryRepository extends JpaRepository<ParkingHistoryEn
             Pageable pageable
     );
 
+  @Transactional
+  @Modifying
+  @Query("UPDATE ParkingHistoryEntity p SET p.deleteAt = :deleteAt WHERE p.id IN :ids")
+  void softDeleteAtByIds(@Param("deleteAt") LocalDateTime deleteAt, @Param("ids") List<Long> ids);
+
+  @Query("SELECT p FROM ParkingHistoryEntity p WHERE p.id IN :idList AND p.memberEntity.id = :memberId")
+  List<ParkingHistoryEntity> findByIdsAndMember(@Param("idList") List<Long> idList,
+      @Param("memberId") Long memberId);
+
+  void deleteAllByDeleteAtBefore(LocalDateTime deleteAt);
+    ParkingHistoryEntity findFirstByMemberEntityIdOrderByEntranceTimeDesc(Long memberId);
 }

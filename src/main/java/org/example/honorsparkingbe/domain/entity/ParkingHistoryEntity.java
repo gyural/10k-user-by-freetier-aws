@@ -1,8 +1,7 @@
 package org.example.honorsparkingbe.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.example.honorsparkingbe.domain.enums.PaymentType;
 
 import java.time.LocalDateTime;
@@ -11,6 +10,9 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table( name = "parkingHistory")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 
 
 public class ParkingHistoryEntity {
@@ -19,20 +21,20 @@ public class ParkingHistoryEntity {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
-        @OneToOne
-        @JoinColumn(name = "carId", unique = true, nullable = false)
+        @ManyToOne  // 이것도 왜 1대1?
+        @JoinColumn(name = "carId", nullable = false) // 왜 unique인지 모르겠어서 제거(그러면 기록을 저장 못하니까)
         private CarEntity carEntity;
 
-        @OneToOne
-        @JoinColumn(name = "memberId", unique = true, nullable = false)
+        @ManyToOne
+        @JoinColumn(name = "memberId", nullable = false)
         private MemberEntity memberEntity;
 
         @ManyToOne
-        @JoinColumn(name = "parkingZoneId", unique = true, nullable = false)
+        @JoinColumn(name = "parkingZoneId", nullable = false)
         private ParkingZoneEntity parkingZoneEntity;
 
-        @OneToOne
-        @JoinColumn(name = "cardId", unique = true)
+        @ManyToOne
+        @JoinColumn(name = "cardId")
         private CardEntity cardEntity;
 
         @Column(nullable = false)
@@ -44,7 +46,9 @@ public class ParkingHistoryEntity {
         @Column(nullable = false)
         private PaymentType paymentType;
 
-        @ManyToOne
-        @JoinColumn(name = "payId", nullable = false)
-        private PayEntity payEntity;
+  @ManyToOne
+  @JoinColumn(name = "payId")
+  private PayEntity payEntity;
+
+  private LocalDateTime deleteAt;
 }

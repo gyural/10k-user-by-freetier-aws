@@ -6,8 +6,9 @@ package org.example.honorsparkingbe.config;
  */
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.honorsparkingbe.security.CustomOAuth2LoginSuccessHandler;
+import java.util.List;
 import org.example.honorsparkingbe.security.CustomFormLoginSuccessHandler;
+import org.example.honorsparkingbe.security.CustomOAuth2LoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.session.web.http.CookieSerializer;
+import org.springframework.session.web.http.DefaultCookieSerializer;
+
 
 @Configuration
 @EnableWebSecurity
@@ -42,20 +48,28 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * Spring Security 관련 설정
-     */
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+  /**
+   * Spring Security 관련 설정
+   */
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    // 접근 설정
+    http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화
+        .authorizeHttpRequests((auth) -> auth
+            .requestMatchers("/api/v1/", "/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm",
+                "/swagger-ui/**", "/v3/api-docs/**", "api/v1/auth/check-authId").permitAll()
+            .requestMatchers("/api/v1/admin").hasRole("ADMIN")                  // 해당 role만 접근 가능
+            .requestMatchers("/api/v1/my/**").hasAnyRole("ADMIN", "USER") // /api/v1/my/**만 허용
+            .anyRequest().authenticated()
+        )
 
-        // 접근 설정
-        http
-                .cors(Customizer.withDefaults()) // CORS 활성화 -- 250119 추가(이상 시 삭제)
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("api/v1/","/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm").permitAll()
-                        .requestMatchers("/api/v1/admin").hasRole("ADMIN")                  // 해당 role만 접근 가능
-                        .requestMatchers("/api/v1/my/**").hasAnyRole("ADMIN", "USER") // /api/v1/my/**만 허용
-                        .anyRequest().authenticated());
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint((request, response, authException) -> {
+              response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                  "Unauthorized"); // 비인가 접근 시 401 반환
+            })
+        );
 
         http
                 .formLogin((formLogin) -> formLogin
@@ -106,5 +120,40 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+  /**
+   * CORS 설정을 Security Filter Chain에서 사용할 수 있도록 구성
+   */
+  @Bean
+  public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    CorsConfiguration config = new CorsConfiguration();
+
+    config.setAllowCredentials(true);
+    config.setAllowedOriginPatterns(List.of( // 프론트엔드 도메인 허용
+        "http://localhost:3000",
+        "https://honorsparking-web.vercel.app"
+    ));
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드 설정
+    config.setAllowedHeaders(List.of("*")); // 모든 요청 헤더 허용
+    config.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
+
+    source.registerCorsConfiguration("/**", config);
+    return source;
+  }
+
+  /**
+   * 쿠키를 크로스 사이트 요청에서도 사용할 수 있도록
+   * SameSite=None; Secure 설정 추가
+   */
+  @Bean
+  public CookieSerializer cookieSerializer() {
+        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+        serializer.setCookieName("SESSION"); // 세션 쿠키 이름
+        serializer.setCookiePath("/");
+        serializer.setUseSecureCookie(true); // HTTPS에서만 쿠키 전송 (http에서는 쿠키 전송이 안되므로 개발 환경에서는 false로 설정)
+        serializer.setSameSite("None"); // 크로스 사이트 요청에서 쿠키 허용
+        return serializer;
+  }
 
 }

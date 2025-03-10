@@ -1,16 +1,32 @@
 package org.example.honorsparkingbe.domain.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.example.honorsparkingbe.domain.enums.LoginPlatform;
 import org.example.honorsparkingbe.domain.enums.MemberRole;
 
 import java.io.Serializable;
 
 @Entity
-@Table( name = "member")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Table(name = "member")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 
 public class MemberEntity implements Serializable {
@@ -25,17 +41,17 @@ public class MemberEntity implements Serializable {
     private CarEntity carEntity;
 
     @Enumerated(EnumType.STRING)
-    // @Column(nullable = false)
+    @Column(nullable = false)
     private LoginPlatform loginPlatform;
 
     @Enumerated(EnumType.STRING)
-    // @Column(nullable = false)
+    @Column(nullable = false)
     private MemberRole role;
 
-    // @Column(nullable = false, length = 60)
+    @Column(nullable = false, length = 60)
     private String userName;
 
-    // @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String authId;
 
     // @Column(nullable = false)
