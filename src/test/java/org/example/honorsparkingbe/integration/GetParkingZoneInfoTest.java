@@ -1,55 +1,15 @@
 package org.example.honorsparkingbe.integration;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Map;
-import org.example.honorsparkingbe.domain.entity.MemberEntity;
-import org.example.honorsparkingbe.domain.enums.MemberRole;
-import org.example.honorsparkingbe.security.CustomUserDetails;
-import org.junit.jupiter.api.BeforeEach;
+import org.example.honorsparkingbe.dto.response.ParkingZoneListResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
-@ActiveProfiles("integration")
 public class GetParkingZoneInfoTest extends InitIntegrationTest {
-
-  private MemberEntity memberEntity;
-
-  @BeforeEach
-  public void securityContext() {
-    memberEntity = MemberEntity.builder()
-        .password("password")
-        .role(MemberRole.ROLE_USER)
-        .userName("testUserName")
-        .id(100L)
-        .build();
-
-    // CustomUserDetails 생성
-    CustomUserDetails customUserDetails = new CustomUserDetails(memberEntity);
-
-    // SecurityContext에 설정
-    SecurityContext context = SecurityContextHolder.createEmptyContext();
-    context.setAuthentication(new UsernamePasswordAuthenticationToken(customUserDetails, null,
-        customUserDetails.getAuthorities()));
-    SecurityContextHolder.setContext(context);
-
-  }
-
-  @Autowired
-  WebApplicationContext wac;
-
-  @Autowired
-  WebTestClient client;
 
   @Test
   @DisplayName("주차 구역 정보를 성공적으로 조회한다.")
@@ -60,16 +20,33 @@ public class GetParkingZoneInfoTest extends InitIntegrationTest {
         "longitude", 126.978
     );
 
+    // then
     client.get()
         .uri(uriBuilder -> uriBuilder.path("/api/v1/parkingzone/list")
             .queryParam("latitude", queryParams.get("latitude"))
             .queryParam("longitude", queryParams.get("longitude"))
             .build())
+        .cookie("SESSION", sessionToken)
         .accept(MediaType.APPLICATION_JSON)
         .exchange()
-        .expectStatus().is4xxClientError();
-//        .expectHeader().contentType(MediaType.APPLICATION_JSON);
+        .expectStatus().isOk()
+        .expectBody(ParkingZoneListResponse.class)
+        .consumeWith(response -> {
+          ParkingZoneListResponse body = response.getResponseBody();
 
+          // parkingZones가 null이 아니고 비어있지 않은지 검증
+          assertNotNull(body.getParkingZones());
+//          assertFalse(body.getParkingZones().isEmpty());
+
+          // pagination 필드가 null이 아닌지 검증
+          assertNotNull(body.getPagination());
+
+          // pagination 정보에 대한 검증
+          assertTrue(body.getPagination().getCurrentPage() >= 0);
+          assertTrue(body.getPagination().getTotalPages() >= 0);
+          assertTrue(body.getPagination().getPagePerItem() >= 0);
+          assertTrue(body.getPagination().getTotalItems() >= 0);
+        });
   }
 
 }
