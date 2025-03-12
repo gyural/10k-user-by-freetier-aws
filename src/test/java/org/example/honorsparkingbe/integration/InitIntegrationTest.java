@@ -39,7 +39,7 @@ import org.testcontainers.utility.DockerImageName;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(locations = "classpath:config/application-integration-test.yml")
+@TestPropertySource(locations = "classpath:application-integration-test.yml")
 public class InitIntegrationTest {
 
   // WebTestClient를 주입받아 HTTP 요청을 테스트할 수 있도록 설정
