@@ -1,8 +1,7 @@
 package org.example.honorsparkingbe.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.example.honorsparkingbe.domain.enums.IsRead;
 import org.example.honorsparkingbe.domain.enums.AlarmType;
 
@@ -12,6 +11,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table( name = "alarm")
 public class AlarmEntity {
 

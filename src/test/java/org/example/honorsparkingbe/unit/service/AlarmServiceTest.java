@@ -29,7 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.junit.jupiter.api.Assertions;
 
-class AlarmServiceTest {
+public class AlarmServiceTest {
 
     @Mock
     private AlarmRepository alarmRepository;
