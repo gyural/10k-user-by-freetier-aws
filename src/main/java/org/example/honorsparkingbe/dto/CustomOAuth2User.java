@@ -8,16 +8,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-public class CustomOAuth2User implements OAuth2User, Serializable { // serial!!!!!!!!!!
+public class CustomOAuth2User implements OAuth2User, Serializable {
 
-    private static final long serialVersionUID = 1L; // !!!!!!!!!!!!!!!!!!!!
+    private static final long serialVersionUID = 1L;
     private final OAuth2Response oAuth2Response;
     private final String role;
+    private final Long id;
 
-    public CustomOAuth2User(OAuth2Response oAuth2Response, String role) {
+    public CustomOAuth2User(OAuth2Response oAuth2Response, String role, Long id) {
 
         this.oAuth2Response = oAuth2Response;
         this.role = role;
+        this.id = id;
     }
 
     @Override
@@ -54,7 +56,10 @@ public class CustomOAuth2User implements OAuth2User, Serializable { // serial!!!
         return oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
     }
 
-    // 추가: OAuth2Response 반환 메서드
+    public Long getId() {
+        return this.id;
+    }
+
     public OAuth2Response getOAuth2Response() {
         return this.oAuth2Response;
     }

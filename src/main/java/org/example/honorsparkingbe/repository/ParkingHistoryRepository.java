@@ -23,4 +23,5 @@ public interface ParkingHistoryRepository extends JpaRepository<ParkingHistoryEn
       @Param("memberId") Long memberId);
 
   void deleteAllByDeleteAtBefore(LocalDateTime deleteAt);
+    ParkingHistoryEntity findFirstByMemberEntityIdOrderByEntranceTimeDesc(Long memberId);
 }

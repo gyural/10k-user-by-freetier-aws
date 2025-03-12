@@ -1,12 +1,24 @@
 package org.example.honorsparkingbe.domain.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.honorsparkingbe.domain.enums.IsRead;
 import org.example.honorsparkingbe.domain.enums.AlarmType;
-
-
-import java.time.LocalDateTime;
+import org.example.honorsparkingbe.domain.enums.IsRead;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
@@ -14,12 +26,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table( name = "alarm")
+@Table(name = "alarm")
 public class AlarmEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 알람 고유 ID
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id; // 알람 고유 ID
 
 //    @OneToOne
 //    @JoinColumn(name = "memberId", referencedColumnName = "id", unique = true)
@@ -27,17 +39,18 @@ public class AlarmEntity {
 
     @ManyToOne
     @JoinColumn(name = "member_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private MemberEntity memberEntity; // Member와 N:1 관계
 
-    private String content; // 알람 내용
+  private String content; // 알람 내용
 
-    @Enumerated(EnumType.STRING)
-    private IsRead isRead; // 알람 상태 (UNREAD, READ)
+  @Enumerated(EnumType.STRING)
+  private IsRead isRead; // 알람 상태 (UNREAD, READ)
 
-    @Enumerated(EnumType.STRING)
-    private AlarmType alarmType; // 알람 유형 (INOUT, RESERVE, PAYMENT)
+  @Enumerated(EnumType.STRING)
+  private AlarmType alarmType; // 알람 유형 (INOUT, RESERVE, PAYMENT)
 
-    private LocalDateTime createdAt; // 생성 시간
+  private LocalDateTime createdAt; // 생성 시간
 
-    private LocalDateTime readAt; // 읽은 시간 (null일 수 있음)
+  private LocalDateTime readAt; // 읽은 시간 (null일 수 있음)
 }

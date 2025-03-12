@@ -24,7 +24,6 @@ import org.example.honorsparkingbe.domain.enums.CarType;
 @AllArgsConstructor
 @Table(name = "car")
 @Builder
-
 public class CarEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
