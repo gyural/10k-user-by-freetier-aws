@@ -15,55 +15,44 @@ import java.util.Map;
 
 import org.example.honorsparkingbe.controller.AlarmController;
 import org.example.honorsparkingbe.service.AlarmService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.junit.jupiter.api.Disabled;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@WebMvcTest(AlarmController.class) // 컨트롤러 로드
-@ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)  // Mockito 환경 확장
-class AlarmControllerTest {
+@ExtendWith(MockitoExtension.class) // Mockito 테스트 환경 확장
+public class AlarmControllerTest {
 
-    @Autowired
+    @InjectMocks
+    private AlarmController alarmController; // @InjectMocks 사용
+
+    @Mock
+    private AlarmService alarmService; // @Mock으로 모킹
+
     private MockMvc mockMvc;
 
-    @MockBean
-    private AlarmService alarmService; // 서비스 계층을 Mocking (Repository 호출 방지)
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(alarmController).build();
+    }
 
     /**
+     * 인증이 필요한 테스트들은 AlarmControllerAuthTest로 이전
+     * --------------------------------------------------
      * 1. 알람 목록 조회 테스트 (GET /api/v1/alarmAll)
+     * 4. 알람 전체 삭제 테스트 (DELETE /api/v1/alarm/all)
+     * --------------------------------------------------
      */
-    @Test
-    @DisplayName("알람 목록 조회 성공")
-    @WithMockUser(username = "testuser", roles = {"USER"})
-    void testGetAlarms_Success() throws Exception {
-        // Given
-        Map<String, Object> mockResponse = Map.of(
-                "pagination", Map.of("currentPage", 1), // 0페이지가 입력되면 +1을 적용하는 로직
-                "alarms", List.of(Map.of("id", 1L, "content", "Test Alarm"))
-        );
-
-        when(alarmService.getAlarms(any(Long.class), any(), any(Integer.class), any(Integer.class)))
-                .thenReturn(mockResponse);
-
-        // When & Then
-        mockMvc.perform(get("/api/v1/alarmAll")
-                        .param("category", "info") // category 파라미터
-                        .param("page", "1") // page 파라미터, API 요청 시 page=1 설정
-                        .param("size", "10")) // size 파라미터
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.pagination.currentPage").value(2)) // 기존 1 → 2로 수정
-                .andExpect(jsonPath("$.alarms[0].content").value("Test Alarm"));
-    }
 
     /**
      * 2. 알람 읽음 처리 테스트 (PUT /api/v1/alarm)
@@ -168,22 +157,22 @@ class AlarmControllerTest {
                 .andExpect(jsonPath("$.deletedIds.length()").value(0)); // 삭제된 항목이 없어야 함
     }
 
-    /**
-     * 4. 알람 전체 삭제 테스트 (DELETE /api/v1/alarm/all)
-     */
-    @Test
-    @DisplayName("알람 전체 삭제 성공")
-    @WithMockUser(username = "testuser", roles = {"USER"})
-    void testDeleteAllAlarms_Success() throws Exception {
-        Map<String, Object> mockResponse = Map.of("success", true, "deletedCount", 10);
-
-        when(alarmService.deleteAllAlarms(any(Long.class))).thenReturn(mockResponse);
-
-        mockMvc.perform(delete("/api/v1/alarm/all").with(csrf()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.deletedCount").value(10));
-    }
+//    /**
+//     * 4. 알람 전체 삭제 테스트 (DELETE /api/v1/alarm/all)
+//     */
+//    @Test
+//    @DisplayName("알람 전체 삭제 성공")
+//    @WithMockUser(username = "testuser", roles = {"USER"})
+//    void testDeleteAllAlarms_Success() throws Exception {
+//        Map<String, Object> mockResponse = Map.of("success", true, "deletedCount", 10);
+//
+//        when(alarmService.deleteAllAlarms(any(Long.class))).thenReturn(mockResponse);
+//
+//        mockMvc.perform(delete("/api/v1/alarm/all").with(csrf()))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.success").value(true))
+//                .andExpect(jsonPath("$.deletedCount").value(10));
+//    }
 
     /**
      * 5. 인증되지 않은 사용자의 요청 (401 Unauthorized)
