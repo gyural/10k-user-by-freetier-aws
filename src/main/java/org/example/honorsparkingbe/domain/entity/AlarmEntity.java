@@ -12,6 +12,9 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import org.example.honorsparkingbe.domain.enums.IsRead;
 import org.example.honorsparkingbe.domain.enums.AlarmType;
 import org.example.honorsparkingbe.domain.enums.IsRead;
 import org.hibernate.annotations.OnDelete;
@@ -20,6 +23,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "alarm")
 public class AlarmEntity {
 
@@ -27,10 +33,14 @@ public class AlarmEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id; // 알람 고유 ID
 
-  @OneToOne
-  @JoinColumn(name = "memberId", referencedColumnName = "id", unique = true)
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  private MemberEntity memberEntity; // Member와 1:1 관계
+//    @OneToOne
+//    @JoinColumn(name = "memberId", referencedColumnName = "id", unique = true)
+//    private MemberEntity memberEntity; // Member와 1:1 관계
+
+    @ManyToOne
+    @JoinColumn(name = "member_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private MemberEntity memberEntity; // Member와 N:1 관계
 
   private String content; // 알람 내용
 
