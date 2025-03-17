@@ -25,7 +25,7 @@ public class ParkingHistoryController {
   private final ParkingHistoryService parkingHistoryService;
 
 
-@GetMapping("/history")
+@GetMapping
 public ResponseEntity<ParkingHistoryResponse> getParkingHistory(@Valid @ModelAttribute ParkingHistoryRequest request) {
 
     ParkingHistoryResponse response = parkingHistoryService.getParkingHistory(request);
