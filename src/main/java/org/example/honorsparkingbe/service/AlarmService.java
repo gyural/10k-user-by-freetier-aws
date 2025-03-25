@@ -33,7 +33,7 @@ public class AlarmService {
     // 회원 알람 불러오기
     // GET /api/v1/alarmAll
     public Map<String, Object> getAlarms(Long memberId, String category, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
         Page<AlarmEntity> alarmPage;
         if (category != null) {

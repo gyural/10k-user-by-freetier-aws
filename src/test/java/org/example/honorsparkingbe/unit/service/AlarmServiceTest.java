@@ -53,7 +53,7 @@ public class AlarmServiceTest {
     void testGetAlarms_Success() {
         // Given
         Long memberId = 1L;
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
 
         List<AlarmEntity> alarmEntities = List.of(
                 createAlarm(1L, "테스트 알람", IsRead.UNREAD, AlarmType.INOUT),
@@ -94,7 +94,7 @@ public class AlarmServiceTest {
     void testGetAlarms_NoAlarms_ShouldReturnEmptyList() {
         // Given
         Long memberId = 1L;
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
 
         Page<AlarmEntity> emptyPage = new PageImpl<>(List.of(), pageable, 0);
         when(alarmRepository.findByMemberEntityId(memberId, pageable)).thenReturn(emptyPage);
@@ -194,7 +194,7 @@ public class AlarmServiceTest {
     void testGetAlarms_Pagination() {
         // Given
         Long memberId = 1L;
-        Pageable pageable = PageRequest.of(1, 5, Sort.by("createdAt").descending()); // 1페이지, 5개씩 가져오기
+        Pageable pageable = PageRequest.of(1, 5, Sort.by("id").descending()); // 1페이지, 5개씩 가져오기
 
         List<AlarmEntity> alarmEntities = List.of(
                 createAlarm(6L, "알람1", IsRead.UNREAD, AlarmType.INOUT),
