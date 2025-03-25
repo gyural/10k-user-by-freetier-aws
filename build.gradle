@@ -34,6 +34,9 @@ dependencies {
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation 'org.springframework.boot:spring-boot-starter-logging'
 
+    // MS DB driver
+    implementation 'com.microsoft.sqlserver:mssql-jdbc:8.2.2.jre8'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
@@ -64,6 +67,8 @@ dependencies {
     implementation 'com.redis.testcontainers:testcontainers-redis:1.6.4'
     // WebTestClient사용을 위한 import
     implementation 'org.springframework.boot:spring-boot-starter-webflux:3.4.0'
+
+    implementation 'commons-net:commons-net:3.9.0' // FTP 클라이언트
 
 }
 
