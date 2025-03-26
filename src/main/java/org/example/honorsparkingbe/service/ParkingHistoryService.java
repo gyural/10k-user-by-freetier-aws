@@ -6,7 +6,6 @@ import org.example.honorsparkingbe.dto.request.ParkingHistoryRequest;
 import org.example.honorsparkingbe.dto.response.ParkingHistoryResponse;
 import org.example.honorsparkingbe.dto.response.ParkingHistoryResponse.ParkingHistoryItem;
 import org.example.honorsparkingbe.dto.response.PaginationResponse;
-import org.example.honorsparkingbe.repository.ParkingHistoryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -19,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Set;
 import org.example.honorsparkingbe.dto.DeleteParkingHistoryDTO;
 import org.example.honorsparkingbe.dto.response.ParkingHistoryDeleteResponse;
+import org.example.honorsparkingbe.repository.internal.ParkingHistoryRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 

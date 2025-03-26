@@ -1,4 +1,4 @@
-package org.example.honorsparkingbe.repository;
+package org.example.honorsparkingbe.repository.internal;
 
 import org.example.honorsparkingbe.domain.entity.ParkingHistoryEntity;
 import org.springframework.data.domain.Page;
@@ -32,5 +32,6 @@ public interface ParkingHistoryRepository extends JpaRepository<ParkingHistoryEn
       @Param("memberId") Long memberId);
 
   void deleteAllByDeleteAtBefore(LocalDateTime deleteAt);
-    ParkingHistoryEntity findFirstByMemberEntityIdOrderByEntranceTimeDesc(Long memberId);
+
+  ParkingHistoryEntity findFirstByMemberEntityIdOrderByEntranceTimeDesc(Long memberId);
 }

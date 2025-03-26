@@ -13,7 +13,7 @@ import org.example.honorsparkingbe.domain.entity.PayEntity;
 import org.example.honorsparkingbe.dto.request.ParkingHistoryRequest;
 import org.example.honorsparkingbe.dto.response.ParkingHistoryResponse;
 import org.example.honorsparkingbe.dto.response.ParkingHistoryResponse.ParkingHistoryItem;
-import org.example.honorsparkingbe.repository.ParkingHistoryRepository;
+import org.example.honorsparkingbe.repository.internal.ParkingHistoryRepository;
 import org.example.honorsparkingbe.service.ParkingHistoryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
