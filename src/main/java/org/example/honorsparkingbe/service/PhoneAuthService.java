@@ -58,6 +58,8 @@ public class PhoneAuthService {
         String savedCode = redisTemplate.opsForValue().get(key);
 
         if (savedCode != null && savedCode.equals(inputCode)) {
+
+            // 인증 성공 시, Redis에서 인증번호 삭제
             redisTemplate.delete(key);
 
             Long memberId = getCurrentMemberId();  // 현재 로그인한 사용자 ID 가져오기
