@@ -5,8 +5,8 @@ import org.example.honorsparkingbe.domain.entity.AlarmEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.AlarmType;
 import org.example.honorsparkingbe.dto.AlarmResponse;
-import org.example.honorsparkingbe.repository.AlarmRepository;
-import org.example.honorsparkingbe.repository.MemberRepository;
+import org.example.honorsparkingbe.repository.internal.AlarmRepository;
+import org.example.honorsparkingbe.repository.internal.MemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

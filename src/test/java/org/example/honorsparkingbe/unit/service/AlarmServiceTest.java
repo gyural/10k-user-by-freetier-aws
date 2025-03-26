@@ -6,15 +6,13 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.example.honorsparkingbe.domain.entity.AlarmEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.AlarmType;
 import org.example.honorsparkingbe.domain.enums.IsRead;
-import org.example.honorsparkingbe.dto.AlarmResponse;
-import org.example.honorsparkingbe.repository.AlarmRepository;
-import org.example.honorsparkingbe.repository.MemberRepository;
+import org.example.honorsparkingbe.repository.internal.AlarmRepository;
+import org.example.honorsparkingbe.repository.internal.MemberRepository;
 import org.example.honorsparkingbe.service.AlarmService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
