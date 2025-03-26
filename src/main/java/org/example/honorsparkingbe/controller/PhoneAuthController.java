@@ -26,8 +26,13 @@ public class PhoneAuthController {
      */
     @PostMapping("/send")
     public ResponseEntity<String> sendAuthCode(@RequestBody PhoneAuthRequest request) {
-        phoneAuthService.sendAuthCode(request.getPhoneNumber());
-        return ResponseEntity.ok("인증번호 전송 완료");
+
+        try {
+            phoneAuthService.sendAuthCode(request.getPhoneNumber());
+            return ResponseEntity.ok("인증번호 전송 완료");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409 Conflict
+        }
     }
 
     /**
@@ -38,6 +43,7 @@ public class PhoneAuthController {
      */
     @PostMapping("/verify")
     public ResponseEntity<String> verifyAuthCode(@RequestBody PhoneAuthVerifyRequest request) {
+
         boolean result = phoneAuthService.verifyAuthCode(
                 request.getPhoneNumber(),
                 request.getAuthCode()

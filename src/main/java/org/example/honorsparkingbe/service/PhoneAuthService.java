@@ -38,6 +38,15 @@ public class PhoneAuthService {
      * @param phoneNumber
      */
     public void sendAuthCode(String phoneNumber) {
+
+        Long memberId = getCurrentMemberId();
+        MemberEntity member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalStateException("회원 정보 없음"));
+
+        if (member.getPhoneNumber() != null) {
+            throw new IllegalStateException("이미 인증된 사용자입니다.");
+        }
+
         String authCode = generateCode();
         saveAuthCodeToRedis(phoneNumber, authCode);
 
