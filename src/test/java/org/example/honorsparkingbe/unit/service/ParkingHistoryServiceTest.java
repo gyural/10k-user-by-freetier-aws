@@ -40,8 +40,8 @@ class ParkingHistoryServiceTest {
     ParkingHistoryRequest request = new ParkingHistoryRequest();
     request.setPage(0);
     request.setNumber(0);
-    request.setStartTime("202401010000");
-    request.setEndTime("202412312359");
+    request.setStartTime("2025-03-27T14:45:00");
+    request.setEndTime("2025-03-29T14:45:00");
 
     // 빈 결과를 반환하도록 Mock 설정
     Page<ParkingHistoryEntity> mockPage = new PageImpl<>(Collections.emptyList(),
@@ -65,8 +65,8 @@ class ParkingHistoryServiceTest {
     ParkingHistoryRequest request = new ParkingHistoryRequest();
     request.setPage(3);
     request.setNumber(5);
-    request.setStartTime("202401010000");
-    request.setEndTime("202412312359");
+    request.setStartTime("2024-02-21T14:45:00");
+    request.setEndTime("2026-03-27T14:45:00");
 
     // 빈 결과를 반환하도록 Mock 설정
     Page<ParkingHistoryEntity> mockPage = new PageImpl<>(Collections.emptyList(),
@@ -123,8 +123,8 @@ class ParkingHistoryServiceTest {
     ParkingHistoryRequest request = new ParkingHistoryRequest();
     request.setPage(1);   // 1페이지
     request.setNumber(5);  // 페이지 당 5개 항목
-    request.setStartTime("202401010000");  // 시작 시간: 2024-01-01 00:00
-    request.setEndTime("202412312359");    // 종료 시간: 2024-12-31 23:59
+    request.setStartTime("2024-03-27T14:45:00");  // 시작 시간: 2024-01-01 00:00
+    request.setEndTime("2025-03-27T14:45:00");    // 종료 시간: 2024-12-31 23:59
 
     // 변환된 날짜
     LocalDateTime EntranceTime = LocalDateTime.of(2024, 1, 1, 0, 0);

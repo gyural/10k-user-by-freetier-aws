@@ -42,7 +42,7 @@ public class ParkingHistoryService {
             ? LocalDateTime.parse(request.getEndTime())
             : LocalDateTime.now().plusYears(50);  // 기본값: 50년 후까지 조회
 
-// 주차 이력 조회
+        // 주차 이력 조회
         Page<ParkingHistoryEntity> parkingHistoryPage = parkingHistoryRepository
             .findByEntranceTimeBetween(startTime, endTime, PageRequest.of(page, size));
 
