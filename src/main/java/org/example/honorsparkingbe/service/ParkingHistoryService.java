@@ -34,19 +34,19 @@ public class ParkingHistoryService {
         int page = request.getPage() > 0 ? request.getPage() - 1 : 0; // PageRequest는 0부터 시작 삼항연산자
         int size = request.getNumber() > 0 ? request.getNumber() : 10;
 
-        // 날짜 변환 (YYYYMMDDHHMM → LocalDateTime)
-        LocalDateTime startTime = parseDateTime(request.getStartTime(), LocalDateTime.MIN);
-        LocalDateTime endTime = parseDateTime(request.getEndTime(), LocalDateTime.MAX);
-        System.out.println(startTime);
-        System.out.println(endTime);
-        // 주차 이력 조회
+        LocalDateTime startTime = request.getStartTime() != null
+            ? LocalDateTime.parse(request.getStartTime())
+            : LocalDateTime.now().minusYears(50);  // 기본값: 50년 전부터 조회
+
+        LocalDateTime endTime = request.getEndTime() != null
+            ? LocalDateTime.parse(request.getEndTime())
+            : LocalDateTime.now().plusYears(50);  // 기본값: 50년 후까지 조회
+
+// 주차 이력 조회
         Page<ParkingHistoryEntity> parkingHistoryPage = parkingHistoryRepository
-                .findByEntranceTimeBetween(
-                        LocalDateTime.now().minusYears(50)
-                        , LocalDateTime.now().plusYears(50), PageRequest.of(page, size));
+            .findByEntranceTimeBetween(startTime, endTime, PageRequest.of(page, size));
 
 
-        System.out.println(parkingHistoryPage.getContent().size());
         // DTO 변환
         List<ParkingHistoryItem> parkingHistories = parkingHistoryPage.getContent().stream()
             .map(history -> new ParkingHistoryItem(
