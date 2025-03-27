@@ -49,14 +49,14 @@ public class ParkingHistoryService {
         System.out.println(parkingHistoryPage.getContent().size());
         // DTO 변환
         List<ParkingHistoryItem> parkingHistories = parkingHistoryPage.getContent().stream()
-                .map(history -> new ParkingHistoryItem(
-                        history.getId(),
-                        history.getParkingZoneEntity().getZoneName(),
-                        history.getEntranceTime(),
-                        history.getExitTime(),
-                        history.getPayEntity().getAmount()
-                ))
-                .collect(Collectors.toList());
+            .map(history -> new ParkingHistoryItem(
+                history.getId(),
+                history.getParkingZoneEntity() != null ? history.getParkingZoneEntity().getZoneName() : "알 수 없음", // null 처리
+                history.getEntranceTime() != null ? history.getEntranceTime() : null, // null 그대로 유지 (혹은 LocalDateTime.MIN)
+                history.getExitTime() != null ? history.getExitTime() : null, // null 그대로 유지 (혹은 "출차 기록 없음")
+                history.getPayEntity() != null ? history.getPayEntity().getAmount() : 0 // null 처리 후 기본값 0
+            ))
+            .collect(Collectors.toList());
         System.out.println(parkingHistories.size());
         // 페이징 정보 생성
         PaginationResponse pagination = new PaginationResponse(
