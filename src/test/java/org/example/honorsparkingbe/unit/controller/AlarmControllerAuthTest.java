@@ -99,10 +99,25 @@ public class AlarmControllerAuthTest {
                 .andExpect(jsonPath("$.alarms[0].content").value("Test Alarm"));
     }
 
+    /**
+     * 읽지 않은 알람 존재 여부 조회 (GET /api/v1/alarmUnread)
+     */
+    @Test
+    @DisplayName("읽지 않은 알람 존재 여부 조회")
+    @WithMockUser(username = "testuser", roles = {"USER"})
+    void testGetUnreadAlarms_Success() throws Exception {
+        when(alarmService.hasUnreadAlarms(any(Long.class))).thenReturn(true);
+
+        mockMvc.perform(get("/api/v1/alarmUnread"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.hasUnread").value(true));
+    }
 
 
 
-/**
+
+
+    /**
  * 4. 알람 전체 삭제 테스트 (DELETE /api/v1/alarm/all)
  */
     @Test
@@ -118,5 +133,7 @@ public class AlarmControllerAuthTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.deletedCount").value(10));
     }
+
+
 
 }

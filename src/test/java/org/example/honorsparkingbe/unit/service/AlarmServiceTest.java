@@ -185,6 +185,25 @@ public class AlarmServiceTest {
     }
 
     /**
+     * 8. 읽지 않은 알람 존재 여부 반환
+     */
+    @Test
+    @DisplayName("읽지 않은 알람 존재 여부 반환")
+    void testHasUnreadAlarms_Success() {
+        // Given
+        Long memberId = 1L;
+        when(alarmRepository.existsByMemberEntityIdAndIsRead(eq(memberId), eq(IsRead.UNREAD)))
+                .thenReturn(true);
+
+        // When
+        boolean result = alarmService.hasUnreadAlarms(memberId);
+
+        // Then
+        assertThat(result).isTrue();
+    }
+
+
+    /**
      * 페이지네이션 적용 여부 확인
      */
     @Test
