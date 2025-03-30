@@ -58,6 +58,11 @@ public class AlarmController {
         }
     }
 
+    /**
+     * 읽지 않은 알림이 있는지 확인
+     * GET /api/v1/alarmUnread
+     * @return
+     */
     @GetMapping("/alarmUnread")
     public ResponseEntity<Map<String, Object>> getUnreadAlarms() {
         try{
