@@ -59,6 +59,23 @@ public class AlarmController {
     }
 
     /**
+     * 읽지 않은 알림이 있는지 확인
+     * GET /api/v1/alarmUnread
+     * @return
+     */
+    @GetMapping("/alarmUnread")
+    public ResponseEntity<Map<String, Object>> getUnreadAlarms() {
+        try{
+            Long memberId = getCurrentMemberId();
+            boolean hasUnread= alarmService.hasUnreadAlarms(memberId);
+            return ResponseEntity.ok(Map.of("hasUnread", hasUnread));
+        }catch (Exception e){
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
+    /**
      * 회원 알람 읽기
      * PUT /api/v1/alarm
      * @param requestBody
