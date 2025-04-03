@@ -40,4 +40,21 @@ public class SecurityUtil {
               "Unexpected principal type: " + principal.getClass().getName());
     }
   }
+
+  public static Boolean getCurrentUserLoginPlatform(){
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || authentication.getPrincipal() == "anonymousUser") {
+      return null; // 비로그인 상태
+    }
+
+    Object principal = authentication.getPrincipal();
+    if (principal instanceof CustomOAuth2User) {
+      return false;
+    } else if (principal instanceof CustomUserDetails) {
+      return true;
+    } else {
+      throw new IllegalStateException(
+              "Unexpected principal type: " + principal.getClass().getName());
+    }
+  }
 }

@@ -1,5 +1,6 @@
 package org.example.honorsparkingbe.controller;
 
+import org.example.honorsparkingbe.dto.mypage.ChangeUserPasswordRequestDTO;
 import org.example.honorsparkingbe.dto.mypage.GetUserInfoResponseDTO;
 import org.example.honorsparkingbe.dto.mypage.UpdateUserCarNumberRequestDTO;
 import org.example.honorsparkingbe.dto.mypage.UpdateUserInfoRequestDTO;
@@ -49,6 +50,7 @@ public class MyPageController {
 
     /**
      * 현재 로그인된 사용자 정보 변경(전화번호, 이메일)
+     * PUT /api/v1/mypage/username/info
      * @param request
      * @return
      */
@@ -58,9 +60,27 @@ public class MyPageController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 차량 번호 변경
+     * PUT /api/v1/mypage/username/car
+     * @param request
+     * @return
+     */
     @PutMapping("/car")
     public ResponseEntity<Void> updateUserCarNumber(@RequestBody UpdateUserCarNumberRequestDTO request){
         myPageService.updateUserCarNumber(request);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 비밀번호 변경
+     * PUT /api/v1/mypage/username/password
+     * @param request
+     * @return
+     */
+    @PutMapping("/info/password")
+    public ResponseEntity<Void> changeUserPassword(@RequestBody ChangeUserPasswordRequestDTO request){
+        myPageService.changeUserPassword(request);
         return ResponseEntity.ok().build();
     }
 

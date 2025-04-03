@@ -2,12 +2,14 @@ package org.example.honorsparkingbe.service;
 
 import org.example.honorsparkingbe.domain.entity.CarEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
+import org.example.honorsparkingbe.dto.mypage.ChangeUserPasswordRequestDTO;
 import org.example.honorsparkingbe.dto.mypage.GetUserInfoResponseDTO;
 import org.example.honorsparkingbe.dto.mypage.UpdateUserCarNumberRequestDTO;
 import org.example.honorsparkingbe.dto.mypage.UpdateUserInfoRequestDTO;
 import org.example.honorsparkingbe.repository.internal.CarRepository;
 import org.example.honorsparkingbe.repository.internal.MemberRepository;
 import org.example.honorsparkingbe.security.util.SecurityUtil;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,10 +19,12 @@ public class MyPageService {
 
     private final MemberRepository memberRepository;
     private final CarRepository carRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public MyPageService(MemberRepository memberRepository, CarRepository carRepository) {
+    public MyPageService(MemberRepository memberRepository, CarRepository carRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.memberRepository = memberRepository;
         this.carRepository = carRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public GetUserInfoResponseDTO getUserInfo() {
@@ -80,5 +84,21 @@ public class MyPageService {
         car.setCreatedAt(now);
         car.setCarNumber(request.getCarNumber());
         carRepository.save(car);
+    }
+
+    public void changeUserPassword(ChangeUserPasswordRequestDTO request) {
+        Long userId= SecurityUtil.getCurrentUserId();
+
+        MemberEntity user= memberRepository.findById(userId)
+                .orElseThrow(()->new IllegalArgumentException("해당 사용자 정보가 DB에 없음"));
+
+        // 일반로그인 계정인지 확인해야 함
+        Boolean flag= SecurityUtil.getCurrentUserLoginPlatform();
+        if(flag==false) {
+            throw new IllegalStateException("소셜 로그인 계정은 비밀번호 변경 불가");
+        }
+
+        user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
+        memberRepository.save(user);
     }
 }
