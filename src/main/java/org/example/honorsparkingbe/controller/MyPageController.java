@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/mypage")
 public class MyPageController {
@@ -24,10 +27,13 @@ public class MyPageController {
      * @return
      */
     @GetMapping("/username")
-    public String getUsername() {
+    public ResponseEntity<Map<String, String>> getUsername() {
         String username= SecurityUtil.getCurrentUsername();
-        System.out.println(username);
-        return "test";
+
+        Map<String, String> response = new HashMap<>();
+        response.put("username", username);
+
+        return ResponseEntity.ok(response);
     }
 
 }
