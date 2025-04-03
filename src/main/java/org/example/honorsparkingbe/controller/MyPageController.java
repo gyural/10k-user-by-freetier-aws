@@ -1,12 +1,11 @@
 package org.example.honorsparkingbe.controller;
 
 import org.example.honorsparkingbe.dto.mypage.GetUserInfoResponseDTO;
+import org.example.honorsparkingbe.dto.mypage.UpdateUserInfoRequestDTO;
 import org.example.honorsparkingbe.security.util.SecurityUtil;
 import org.example.honorsparkingbe.service.MyPageService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,10 +40,21 @@ public class MyPageController {
      * GET /api/v1/mypage/username/info
      * @return
      */
-    @GetMapping("/username/info")
+    @GetMapping("/info")
     public ResponseEntity<GetUserInfoResponseDTO> getUserInfo() {
         GetUserInfoResponseDTO response= myPageService.getUserInfo();
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 현재 로그인된 사용자 정보 변경(전화번호, 이메일)
+     * @param request
+     * @return
+     */
+    @PutMapping("/info")
+    public ResponseEntity<Void> updateUserInfo(@RequestBody UpdateUserInfoRequestDTO request) {
+        myPageService.updateUserInfo(request);
+        return ResponseEntity.ok().build();
     }
 
 
