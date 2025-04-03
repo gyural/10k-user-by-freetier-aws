@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.example.honorsparkingbe.domain.entity.AlarmEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.AlarmType;
+import org.example.honorsparkingbe.domain.enums.IsRead;
 import org.example.honorsparkingbe.dto.AlarmResponse;
 import org.example.honorsparkingbe.repository.internal.AlarmRepository;
 import org.example.honorsparkingbe.repository.internal.MemberRepository;
@@ -62,6 +63,12 @@ public class AlarmService {
                         "totalItems", alarmPage.getTotalElements()
                 )
         );
+    }
+
+    // 안 읽은 알람 존재 여부 확인
+    // GET /api/v1/alarmUnread
+    public boolean hasUnreadAlarms(Long memberId) {
+        return alarmRepository.existsByMemberEntityIdAndIsRead(memberId, IsRead.UNREAD);
     }
 
     // 회원 알람 읽기
