@@ -1,6 +1,7 @@
 package org.example.honorsparkingbe.controller;
 
 import org.example.honorsparkingbe.dto.mypage.GetUserInfoResponseDTO;
+import org.example.honorsparkingbe.dto.mypage.UpdateUserCarNumberRequestDTO;
 import org.example.honorsparkingbe.dto.mypage.UpdateUserInfoRequestDTO;
 import org.example.honorsparkingbe.security.util.SecurityUtil;
 import org.example.honorsparkingbe.service.MyPageService;
@@ -57,6 +58,11 @@ public class MyPageController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/car")
+    public ResponseEntity<Void> updateUserCarNumber(@RequestBody UpdateUserCarNumberRequestDTO request){
+        myPageService.updateUserCarNumber(request);
+        return ResponseEntity.ok().build();
+    }
 
 
 }
