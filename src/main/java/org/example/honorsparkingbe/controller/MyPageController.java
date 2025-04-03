@@ -1,6 +1,6 @@
 package org.example.honorsparkingbe.controller;
 
-import org.example.honorsparkingbe.dto.mypage.GetUserNameResponseDTO;
+import org.example.honorsparkingbe.dto.mypage.GetUserInfoResponseDTO;
 import org.example.honorsparkingbe.security.util.SecurityUtil;
 import org.example.honorsparkingbe.service.MyPageService;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +28,25 @@ public class MyPageController {
      */
     @GetMapping("/username")
     public ResponseEntity<Map<String, String>> getUsername() {
-        String username= SecurityUtil.getCurrentUsername();
+        String username= SecurityUtil.getCurrentUsername(); // static이라 의존성 주입 x, 클래스 직접 호출
 
         Map<String, String> response = new HashMap<>();
         response.put("username", username);
 
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * 현재 로그인된 사용자의 정보 출력
+     * GET /api/v1/mypage/username/info
+     * @return
+     */
+    @GetMapping("/username/info")
+    public ResponseEntity<GetUserInfoResponseDTO> getUserInfo() {
+        GetUserInfoResponseDTO response= myPageService.getUserInfo();
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }
