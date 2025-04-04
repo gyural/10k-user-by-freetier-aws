@@ -1,16 +1,12 @@
 package org.example.honorsparkingbe.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.repository.internal.MemberRepository;
 import org.example.honorsparkingbe.util.CoolSmsUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
 
 import java.time.Duration;
 
@@ -18,10 +14,9 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class PhoneAuthService {
 
-
     private final StringRedisTemplate redisTemplate;
-    private final MemberRepository memberRepository;
     private final CoolSmsUtil coolSmsUtil;
+    private final MemberRepository memberRepository;
 
     @Value("${coolsms.from}")
     private String from;
@@ -39,13 +34,17 @@ public class PhoneAuthService {
      */
     public void sendAuthCode(String phoneNumber) {
 
-        Long memberId = getCurrentMemberId();
-        MemberEntity member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalStateException("회원 정보 없음"));
+        // 중복 인증 요청 방지
+//        String verifiedKey = "verified:" + phoneNumber;
+//        if (Boolean.TRUE.equals(redisTemplate.hasKey(verifiedKey))) {
+//            throw new IllegalStateException("이미 인증을 완료한 번호입니다.");
+//        }
 
-        if (member.getPhoneNumber() != null) {
-            throw new IllegalStateException("이미 인증된 사용자입니다.");
+        // 이미 가입된 전화번호인지 확인
+        if (memberRepository.existsByPhoneNumber(phoneNumber)) {
+            throw new IllegalStateException("이미 가입된 전화번호입니다.");
         }
+
 
         String authCode = generateCode();
         saveAuthCodeToRedis(phoneNumber, authCode);
@@ -71,12 +70,9 @@ public class PhoneAuthService {
             // 인증 성공 시, Redis에서 인증번호 삭제
             redisTemplate.delete(key);
 
-            Long memberId = getCurrentMemberId();  // 현재 로그인한 사용자 ID 가져오기
-            MemberEntity member = memberRepository.findById(memberId)
-                    .orElseThrow(() -> new IllegalStateException("회원 정보 없음"));
-
-            member.setPhoneNumber(phoneNumber);
-            memberRepository.save(member);
+            // 인증 완료된 전화번호로 상태 기록
+//            String verifiedKey = "verified:" + phoneNumber;
+//            redisTemplate.opsForValue().set(verifiedKey, "true", Duration.ofMinutes(1));  // 인증 완료 상태 저장
 
             return true;
         }
@@ -84,42 +80,6 @@ public class PhoneAuthService {
         return false;
     }
 
-    // 전화번호 인증 기능은 "로그인한 사용자의 전화번호를 저장하는 것" 자체가 목적이기 때문에
-    // 서비스 코드에서 SecurityContextHolder 사용하는 방식이 더 자연스럽고 실무에서 흔하다고 함. (Chat GPT)
-
-    /**
-     * 현재 로그인한 사용자의 memberId 가져오기
-     * 일반 로그인: UserDetails에서 authId 가져와서 memberId 조회
-     * 소셜 로그인: OAuth2User에서 socialId 가져와서 memberId 조회
-     * @return
-     */
-    private Long getCurrentMemberId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("User is not authenticated");
-        }
-
-        Object principal = authentication.getPrincipal();
-
-        if (principal instanceof UserDetails userDetails) {
-            return findMemberIdByAuthId(userDetails.getUsername());
-        }
-
-        if (principal instanceof OAuth2User oAuth2User) {
-            String authId = (String) oAuth2User.getAttribute("sub");
-            return findMemberIdByAuthId(authId);
-        }
-
-        throw new IllegalStateException("Invalid user authentication data");
-    }
-
-    /**
-     * 로그인 사용자의 authId로 memberId 조회
-     */
-    private Long findMemberIdByAuthId(String authId) {
-        return memberRepository.findByAuthId(authId).getId();
-    }
 
     /**
      * 6자리 랜덤 인증번호 생성

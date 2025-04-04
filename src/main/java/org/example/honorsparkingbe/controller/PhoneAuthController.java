@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/phone-auth")
 @RequiredArgsConstructor
@@ -22,7 +25,7 @@ public class PhoneAuthController {
      * SMS 전송
      * POST /api/v1/phone-auth/send
      * @param request
-     * @return
+     * @return status 200, status 409, status 500
      */
     @PostMapping("/send")
     public ResponseEntity<String> sendAuthCode(@RequestBody PhoneAuthRequest request) {
@@ -32,6 +35,9 @@ public class PhoneAuthController {
             return ResponseEntity.ok("인증번호 전송 완료");
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409 Conflict
+        } catch (Exception e) {
+            log.error("인증번호 전송 실패", e);  // 예외 내용과 스택트레이스 함께 로그에 남김
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("문자 전송 실패");
         }
     }
 
@@ -39,7 +45,7 @@ public class PhoneAuthController {
      * 인증번호 확인
      * POST /api/v1/phone-auth/verify
      * @param request
-     * @return
+     * @return status 200, status 400
      */
     @PostMapping("/verify")
     public ResponseEntity<String> verifyAuthCode(@RequestBody PhoneAuthVerifyRequest request) {
