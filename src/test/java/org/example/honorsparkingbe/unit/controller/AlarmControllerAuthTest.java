@@ -122,7 +122,7 @@ public class AlarmControllerAuthTest {
  */
     @Test
     @DisplayName("알람 전체 삭제 성공")
-    @WithMockUser(username = "testuser", roles = {"USER"}) // ✅ 인증된 사용자 추가
+    @WithMockUser(username = "testuser", roles = {"USER"}) // 인증된 사용자 추가
     void testDeleteAllAlarms_Success() throws Exception {
         Map<String, Object> mockResponse = Map.of("success", true, "deletedCount", 10);
 
