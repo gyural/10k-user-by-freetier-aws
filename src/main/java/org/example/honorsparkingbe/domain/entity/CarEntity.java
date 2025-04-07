@@ -1,13 +1,7 @@
 package org.example.honorsparkingbe.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -46,4 +40,22 @@ public class CarEntity implements Serializable {
 
   // 전기차 여부
   private Boolean isElectric;
+
+  @Column(nullable = false)
+  private LocalDateTime createdAt;
+
+  @PrePersist
+  protected void onCreate() {
+    if (this.createdAt == null) {
+      this.createdAt = LocalDateTime.now();
+    }
+  }
+
+  public CarEntity(Long id, LocalDateTime entranceTime, String carNumber, CarType carType, Boolean isElectric) {
+    this.id = id;
+    this.entranceTime = entranceTime;
+    this.carNumber = carNumber;
+    this.carType = carType;
+    this.isElectric = isElectric;
+  }
 }
