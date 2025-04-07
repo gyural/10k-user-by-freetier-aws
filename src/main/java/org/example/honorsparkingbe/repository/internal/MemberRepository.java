@@ -1,6 +1,8 @@
 package org.example.honorsparkingbe.repository.internal;
 
+import java.util.List;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
@@ -15,4 +17,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
   // 전화번호 인증 시 이미 가입된 번호인지 확인
   boolean existsByPhoneNumber(String phoneNumber);
 
+
+  @EntityGraph(attributePaths = {"carEntity"})
+  List<MemberEntity> findAllByCarEntity_CarNumberIn(List<String> carNumbers);
 }
