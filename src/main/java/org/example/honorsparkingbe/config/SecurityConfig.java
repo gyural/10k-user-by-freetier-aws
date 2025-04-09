@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
@@ -106,10 +107,13 @@ public class SecurityConfig {
 
     // CSRF(Cross Site Request Forgery: 사이트 간 요청 위조)
     if (!"prod".equals(activeProfile)) {
-      http.csrf(auth -> auth.disable()); // 개발 환경에서 CSRF 비활성화
+      http.csrf(auth -> auth.disable());
     } else {
-      http.csrf(Customizer.withDefaults()); // 프로덕션 환경에서는 CSRF 활성화
+      http.csrf(csrf -> csrf
+              .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // ✅ 쿠키로 CSRF 토큰 제공
+      );
     }
+    // http.csrf(auth -> auth.disable());
 
     http
         .httpBasic((basic) -> basic.disable());
