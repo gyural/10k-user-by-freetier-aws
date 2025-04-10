@@ -13,10 +13,10 @@ import org.example.honorsparkingbe.repository.internal.CarRepository;
 import org.example.honorsparkingbe.repository.internal.MemberRepository;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,9 +38,10 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(locations = "classpath:application-integration-test.yml")
 public class InitIntegrationTest {
+
+  protected static final Logger logger = LoggerFactory.getLogger(InitIntegrationTest.class);
 
   // WebTestClient를 주입받아 HTTP 요청을 테스트할 수 있도록 설정
   @Autowired
@@ -52,7 +53,6 @@ public class InitIntegrationTest {
   private static final int REDIS_PORT = 6379;
 
   @Container
-  @ServiceConnection
   static public GenericContainer<?> redis = new GenericContainer<>(
       DockerImageName.parse(REDIS_IMAGE))
       .withExposedPorts(REDIS_PORT)
@@ -70,6 +70,14 @@ public class InitIntegrationTest {
     System.setProperty("spring.datasource.url", mysql.getJdbcUrl());
     System.setProperty("spring.datasource.username", mysql.getUsername());
     System.setProperty("spring.datasource.password", mysql.getPassword());
+    System.setProperty("api.key", "valid-api-key");
+    System.setProperty("spring.jpa.hibernate.ddl-auto", "create");
+    System.setProperty("spring.jpa.hibernate.naming.implicit-strategy",
+        "org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl");
+    System.setProperty("spring.jpa.hibernate.naming.physical-strategy",
+        "org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl");
+
+    logger.info("MySQL URL : {}", mysql.getJdbcUrl());
   }
 
   @AfterAll
