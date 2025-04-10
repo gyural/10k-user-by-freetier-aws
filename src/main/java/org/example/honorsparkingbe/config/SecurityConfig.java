@@ -64,6 +64,7 @@ public class SecurityConfig {
         .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화
         .authorizeHttpRequests((auth) -> auth
             .requestMatchers(
+                    "/api/v1/csrf-token",
                     "/api/v1/",
                     "/api/v1/auth/login/**",
                     "/api/v1/auth/join",
@@ -110,7 +111,7 @@ public class SecurityConfig {
       http.csrf(auth -> auth.disable());
     } else {
       http.csrf(csrf -> csrf
-              .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // ✅ 쿠키로 CSRF 토큰 제공
+              .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
       );
     }
     // http.csrf(auth -> auth.disable());
