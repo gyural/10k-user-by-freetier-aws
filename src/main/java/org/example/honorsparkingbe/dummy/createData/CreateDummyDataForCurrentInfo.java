@@ -1,8 +1,14 @@
 package org.example.honorsparkingbe.dummy.createData;
 
 import jakarta.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.example.honorsparkingbe.domain.entity.*;
+import org.example.honorsparkingbe.domain.entity.CarEntity;
+import org.example.honorsparkingbe.domain.entity.MemberEntity;
+import org.example.honorsparkingbe.domain.entity.ParkingFeeRuleEntity;
+import org.example.honorsparkingbe.domain.entity.ParkingHistoryEntity;
+import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
 import org.example.honorsparkingbe.domain.enums.CarType;
 import org.example.honorsparkingbe.domain.enums.LoginPlatform;
 import org.example.honorsparkingbe.domain.enums.MemberRole;
@@ -16,9 +22,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,11 +47,11 @@ public class CreateDummyDataForCurrentInfo {
     System.out.println("Inserting dummy data for the first time...");
 
     // Car 데이터 추가
-    CarEntity car1 = CarEntity.builder().carNumber("12ga 3456").carType(CarType.COMPACT)
+    CarEntity car1 = CarEntity.builder().carNumber("12가3456").carType(CarType.COMPACT)
         .isElectric(false).build();
-    CarEntity car2 = CarEntity.builder().carNumber("30na 6789").carType(CarType.MIDSIZE)
+    CarEntity car2 = CarEntity.builder().carNumber("12나3456").carType(CarType.MIDSIZE)
         .isElectric(true).build();
-    CarEntity car3 = CarEntity.builder().carNumber("56da 9012").carType(CarType.FULLSIZE)
+    CarEntity car3 = CarEntity.builder().carNumber("12다3456").carType(CarType.FULLSIZE)
         .isElectric(false).build();
     carRepository.saveAll(List.of(car1, car2, car3));
 
@@ -79,15 +82,15 @@ public class CreateDummyDataForCurrentInfo {
         .orElseThrow(() -> new RuntimeException("ParkingZone ID 3 not found"));
 
     // ParkingHistory 데이터 추가
-    ParkingHistoryEntity history1 = ParkingHistoryEntity.builder()
+    ParkingHistoryEntity history1 = ParkingHistoryEntity.builder().id(1L)
         .carEntity(car1).memberEntity(member1).parkingZoneEntity(parkingZone1)
         .entranceTime(LocalDateTime.of(2025, 2, 10, 8, 30))
         .exitTime(LocalDateTime.of(2025, 2, 10, 10, 30)).paymentType(PaymentType.ON_SITE).build();
-    ParkingHistoryEntity history2 = ParkingHistoryEntity.builder()
+    ParkingHistoryEntity history2 = ParkingHistoryEntity.builder().id(2L)
         .carEntity(car2).memberEntity(member2).parkingZoneEntity(parkingZone1)
         .entranceTime(LocalDateTime.of(2025, 2, 10, 9, 15))
         .exitTime(LocalDateTime.of(2025, 2, 10, 11, 00)).paymentType(PaymentType.KIOSK).build();
-    ParkingHistoryEntity history3 = ParkingHistoryEntity.builder()
+    ParkingHistoryEntity history3 = ParkingHistoryEntity.builder().id(3L)
         .carEntity(car2).memberEntity(member2).parkingZoneEntity(parkingZone2)
         .entranceTime(LocalDateTime.of(2025, 2, 10, 10, 0)).exitTime(null)
         .paymentType(PaymentType.NONE).build();

@@ -138,17 +138,20 @@ public class ParkingHistoryRepositoryTest {
     );
     testPay1 = payRepository.save(
         PayEntity.builder()
+            .id(1L)
             .memberEntity(testMember1)
             .build()
     );
     testPay2 = payRepository.save(
         PayEntity.builder()
+            .id(2L)
             .memberEntity(testMember2)
             .build()
     );
 
     // Given
     history1 = ParkingHistoryEntity.builder()
+        .id(1L)
         .deleteAt(null)
         .entranceTime(LocalDateTime.now())
         .carEntity(testCar1)
@@ -158,6 +161,7 @@ public class ParkingHistoryRepositoryTest {
         .payEntity(testPay1)
         .build();
     history2 = ParkingHistoryEntity.builder()
+        .id(2L)
         .deleteAt(null)
         .entranceTime(LocalDateTime.now())
         .carEntity(testCar2)
@@ -167,6 +171,7 @@ public class ParkingHistoryRepositoryTest {
         .payEntity(testPay2)
         .build();
     preSoftDeletedHistory = ParkingHistoryEntity.builder()
+        .id(3L)
         .deleteAt(LocalDateTime.now())
         .entranceTime(LocalDateTime.now())
         .entranceTime(LocalDateTime.now())
@@ -177,6 +182,7 @@ public class ParkingHistoryRepositoryTest {
         .payEntity(testPay2)
         .build();
     memberHistoryButNotDeletRequest = ParkingHistoryEntity.builder()
+        .id(4L)
         .deleteAt(LocalDateTime.now())
         .entranceTime(LocalDateTime.now())
         .entranceTime(LocalDateTime.now())

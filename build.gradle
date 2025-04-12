@@ -36,6 +36,10 @@ dependencies {
     implementation 'org.json:json:20230227'
     implementation 'com.github.docker-java:docker-java:3.3.0'
 
+    // coolsms 관련
+    implementation 'net.nurigo:sdk:4.2.7'
+
+
     // MS DB driver
     implementation 'com.microsoft.sqlserver:mssql-jdbc:8.2.2.jre8'
 
@@ -79,5 +83,17 @@ tasks.named('test') {
 }
 
 test {
+    useJUnitPlatform()
     systemProperty 'spring.profiles.active', 'test'
+
+    testLogging {
+        // 모든 테스트 이벤트 출력
+        events "failed"
+
+        // 예외 전체 출력
+        exceptionFormat "full"
+        showExceptions true
+        showCauses true
+        showStackTraces true
+    }
 }
