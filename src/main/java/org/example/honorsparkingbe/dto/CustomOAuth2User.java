@@ -1,11 +1,13 @@
 package org.example.honorsparkingbe.dto;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class CustomOAuth2User implements OAuth2User, Serializable {
@@ -30,7 +32,7 @@ public class CustomOAuth2User implements OAuth2User, Serializable {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
+        System.out.println("✅ getAuthorities() called! 내부 role = " + role);
         Collection<GrantedAuthority> collection = new ArrayList<>();
 
         collection.add(new GrantedAuthority() {
@@ -41,9 +43,13 @@ public class CustomOAuth2User implements OAuth2User, Serializable {
                 return role;
             }
         });
-
         return collection;
     }
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        System.out.println("✅ getAuthorities() called! 내부 role = " + role);
+//        return List.of(new SimpleGrantedAuthority(this.role));
+//    }
 
     @Override
     public String getName() {
