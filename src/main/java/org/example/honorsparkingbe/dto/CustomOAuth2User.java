@@ -32,7 +32,7 @@ public class CustomOAuth2User implements OAuth2User, Serializable {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        System.out.println("✅ getAuthorities() called! 내부 role = " + role);
+        System.out.println("getAuthorities() called! 내부 role = " + role);
         Collection<GrantedAuthority> collection = new ArrayList<>();
 
         collection.add(new GrantedAuthority() {
@@ -45,11 +45,6 @@ public class CustomOAuth2User implements OAuth2User, Serializable {
         });
         return collection;
     }
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        System.out.println("✅ getAuthorities() called! 내부 role = " + role);
-//        return List.of(new SimpleGrantedAuthority(this.role));
-//    }
 
     @Override
     public String getName() {

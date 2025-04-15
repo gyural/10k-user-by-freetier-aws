@@ -38,8 +38,6 @@ public class RoleService {
         memberRepository.save(member);
 
         // 2. 세션 갱신
-        // 2. 현재 인증 객체 꺼냄
-        // 기존 인증 정보
         Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
         Object principal = currentAuth.getPrincipal();
 
@@ -58,7 +56,7 @@ public class RoleService {
 
             SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-            // 🔥 여기! Redis 세션까지 갱신되도록 HttpSession에 보관된 SecurityContext 갱신
+            // Redis 세션까지 갱신되도록 HttpSession에 보관된 SecurityContext 갱신
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
         }
     }
