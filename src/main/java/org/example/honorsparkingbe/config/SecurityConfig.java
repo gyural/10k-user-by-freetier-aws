@@ -73,7 +73,8 @@ public class SecurityConfig {
                     "/confirm",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
-                    "api/v1/auth/check-authId"
+                    "api/v1/auth/check-authId",
+                    "api/v1/expo/**"
             ).permitAll()
             .requestMatchers("/api/v1/", "/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm",
                 "/swagger-ui/**", "/v3/api-docs/**", "api/v1/auth/check-authId",
