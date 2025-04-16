@@ -1,24 +1,15 @@
 package org.example.honorsparkingbe.service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.example.honorsparkingbe.domain.entity.CarEntity;
-import org.example.honorsparkingbe.domain.entity.MemberEntity;
-import org.example.honorsparkingbe.domain.entity.ParkingHistoryEntity;
-import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
-import org.example.honorsparkingbe.domain.entity.PayEntity;
+import org.example.honorsparkingbe.domain.entity.*;
 import org.example.honorsparkingbe.domain.enums.PaymentType;
 import org.example.honorsparkingbe.dto.request.SyncInoutRequest;
 import org.example.honorsparkingbe.dto.response.SyncInoutResponse;
 import org.example.honorsparkingbe.dto.response.SyncInoutResponse.ParkingEntry;
-import org.example.honorsparkingbe.repository.internal.CarRepository;
-import org.example.honorsparkingbe.repository.internal.MemberRepository;
-import org.example.honorsparkingbe.repository.internal.ParkingHistoryRepository;
-import org.example.honorsparkingbe.repository.internal.ParkingZoneRepository;
-import org.example.honorsparkingbe.repository.internal.PayRepository;
+import org.example.honorsparkingbe.repository.internal.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +23,8 @@ public class SyncInoutService {
   private final ParkingZoneRepository parkingZoneRepository;
   private final MemberRepository memberRepository;
   private final PayRepository payRepository;
+  private final ExpoRepository expoRepository;
+  private final ExpoPushService expoPushService;
 
   @Transactional
   public SyncInoutResponse syncParkingHistory(SyncInoutRequest request) {
@@ -116,6 +109,34 @@ public class SyncInoutService {
       System.out.println(e.getMessage());
       throw new RuntimeException("주차 기록 저장 중 오류 발생", e);
     }
+
+    // DB에 값이 잘 들어갔다면 실행
+    // 알림 전송의 상황판단(exitTime null 확인), 알맞은 정보 수집(userId, pushToken), 메시지 구성
+    for (ParkingHistoryEntity entity : parkingHistoryEntities) {
+      MemberEntity member = entity.getMemberEntity();
+      String userId = member.getAuthId();  // expo push 토큰 조회용
+
+      LocalDateTime exitTime = entity.getExitTime(); // ✅ 이렇게만 써도 됨
+
+      Optional<ExpoEntity> expo = expoRepository.findByUserId(userId);
+      if (expo.isEmpty()) continue;
+
+      String pushToken = expo.get().getPushToken();
+
+      boolean isEntry = (exitTime == null);
+      String title = isEntry ? "🚗 차량 입차" : "🚗 차량 출차";
+      String body = member.getUserName() + "님 차량이 " + (isEntry ? "입차" : "출차") + "되었습니다.";
+
+      Map<String, Object> data = new HashMap<>();
+      data.put("type", isEntry ? "entry" : "exit");
+      data.put("carNumber", entity.getCarEntity().getCarNumber()); // 필요하면 여기서 꺼냄
+      data.put("timestamp", entity.getEntranceTime().toString());
+      data.put("uri", "/parking");
+
+      expoPushService.sendPushNotification(pushToken, title, body, data);
+    }
+
+
 
     return SyncInoutResponse.builder()
         .ValidNonExitEntries(
