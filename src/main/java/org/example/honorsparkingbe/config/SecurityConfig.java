@@ -83,6 +83,7 @@ public class SecurityConfig {
             .requestMatchers("/api/v1/my/**").hasAnyRole("ADMIN", "USER") // /api/v1/my/**만 허용
             .anyRequest().authenticated()
         )
+
         .addFilterBefore(apiKeyAuthFilter,
             UsernamePasswordAuthenticationFilter.class) // API Key 필터 추가
 

@@ -111,15 +111,16 @@ public class SyncInoutService {
     }
 
     // DB에 값이 잘 들어갔다면 실행
-    // 알림 전송의 상황판단(exitTime null 확인), 알맞은 정보 수집(userId, pushToken), 메시지 구성
+    // -- 알림 전송의 상황판단(exitTime null 확인), 알맞은 정보 수집(userId, pushToken), 메시지 구성
     for (ParkingHistoryEntity entity : parkingHistoryEntities) {
       MemberEntity member = entity.getMemberEntity();
       String userId = member.getAuthId();  // expo push 토큰 조회용
 
-      LocalDateTime exitTime = entity.getExitTime(); // ✅ 이렇게만 써도 됨
+      LocalDateTime exitTime = entity.getExitTime();
 
       Optional<ExpoEntity> expo = expoRepository.findByUserId(userId);
       if (expo.isEmpty()) continue;
+      System.out.println("userId = " + userId +", expo = " + expo.get().getPushToken());
 
       String pushToken = expo.get().getPushToken();
 
@@ -129,7 +130,7 @@ public class SyncInoutService {
 
       Map<String, Object> data = new HashMap<>();
       data.put("type", isEntry ? "entry" : "exit");
-      data.put("carNumber", entity.getCarEntity().getCarNumber()); // 필요하면 여기서 꺼냄
+      data.put("carNumber", entity.getCarEntity().getCarNumber());
       data.put("timestamp", entity.getEntranceTime().toString());
       data.put("uri", "/parking");
 
