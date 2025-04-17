@@ -1,5 +1,6 @@
 package org.example.honorsparkingbe.config;
 
+import org.example.honorsparkingbe.dto.NotificationQueueItem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +36,19 @@ public class RedisConfig {
     template.setKeySerializer(new StringRedisSerializer()); // Redis 키 직렬화
     template.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // JSON 직렬화 사용
     // template.setValueSerializer(new JdkSerializationRedisSerializer()); // JDK 직렬화 사용.
+    return template;
+  }
+
+  @Bean
+  public RedisTemplate<String, NotificationQueueItem> notificationRedisTemplate(
+      RedisConnectionFactory redisConnectionFactory) {
+    RedisTemplate<String, NotificationQueueItem> template = new RedisTemplate<>();
+    template.setConnectionFactory(redisConnectionFactory);
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setConnectionFactory(redisConnectionFactory);
+    template.setKeySerializer(new StringRedisSerializer()); // Redis 키 직렬화
+    template.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // JSON 직렬화 사용
+
     return template;
   }
 }
