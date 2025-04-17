@@ -4,11 +4,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+//@EnableScheduling
 public class HonorsParkingBeApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(HonorsParkingBeApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(HonorsParkingBeApplication.class, args);
+  }
 
 }
 

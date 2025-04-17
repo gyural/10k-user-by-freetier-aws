@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.example.honorsparkingbe.domain.enums.NotiChannel;
@@ -126,6 +127,7 @@ public class RedisUtilTest {
             .carNumber("123가1234")
             .notiEventType(NotiEventType.ENTRY)
             .notiChannel(NotiChannel.KAKAO)
+            .entranceTime(LocalDateTime.now())
             .build()
     );
 
@@ -147,6 +149,7 @@ public class RedisUtilTest {
         .carNumber("123가1234")
         .notiEventType(NotiEventType.ENTRY)
         .notiChannel(NotiChannel.KAKAO)
+        .entranceTime(LocalDateTime.now())
         .build();
 
     NotificationQueueItem item2 = NotificationQueueItem.builder()
@@ -154,6 +157,7 @@ public class RedisUtilTest {
         .carNumber("123가1234")
         .notiEventType(NotiEventType.ENTRY)
         .notiChannel(NotiChannel.KAKAO)
+        .entranceTime(LocalDateTime.now())
         .build();
 
     NotificationQueueItem item3 = NotificationQueueItem.builder()
@@ -161,6 +165,7 @@ public class RedisUtilTest {
         .carNumber("123가1234")
         .notiEventType(NotiEventType.ENTRY)
         .notiChannel(NotiChannel.KAKAO)
+        .entranceTime(LocalDateTime.now())
         .build();
 
     List<NotificationQueueItem> items = List.of(item1, item2, item3);
@@ -186,6 +191,7 @@ public class RedisUtilTest {
         .carNumber("333가3333")
         .notiEventType(NotiEventType.ENTRY)
         .notiChannel(NotiChannel.KAKAO)
+        .entranceTime(LocalDateTime.now())
         .build();
     forVerifyRedisTemplate.opsForList().rightPush("notification:queue", item);
 
@@ -213,6 +219,7 @@ public class RedisUtilTest {
         .carNumber("333가3333")
         .notiEventType(NotiEventType.ENTRY)
         .notiChannel(NotiChannel.KAKAO)
+        .entranceTime(LocalDateTime.now())
         .build();
     forVerifyRedisTemplate.opsForList()
         .rightPushAll("notification:queue", List.of(item, item, item, item));

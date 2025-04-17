@@ -1,5 +1,8 @@
 package org.example.honorsparkingbe.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.example.honorsparkingbe.dto.NotificationQueueItem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -41,13 +44,23 @@ public class RedisConfig {
 
   @Bean
   public RedisTemplate<String, NotificationQueueItem> notificationRedisTemplate(
-      RedisConnectionFactory redisConnectionFactory) {
+      RedisConnectionFactory redisConnectionFactory
+  ) {
+    // ObjectMapper 직접 생성 (Bean으로 등록 X)
+    BasicPolymorphicTypeValidator validator = BasicPolymorphicTypeValidator.builder()
+        .allowIfSubType(Object.class)
+        .build();
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.activateDefaultTyping(validator, ObjectMapper.DefaultTyping.NON_FINAL);
+
     RedisTemplate<String, NotificationQueueItem> template = new RedisTemplate<>();
     template.setConnectionFactory(redisConnectionFactory);
     template.setKeySerializer(new StringRedisSerializer());
-    template.setConnectionFactory(redisConnectionFactory);
-    template.setKeySerializer(new StringRedisSerializer()); // Redis 키 직렬화
-    template.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // JSON 직렬화 사용
+
+    // 커스텀 ObjectMapper를 사용하는 Serializer 설정
+    template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
 
     return template;
   }
