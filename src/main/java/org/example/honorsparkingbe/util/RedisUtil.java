@@ -38,17 +38,17 @@ public class RedisUtil {
 
   // Notification 큐(notification:queue) 관련 기능
   // 1. 단일 객체 enqueue
-  public void notienqueue(NotificationQueueItem value) {
+  public void notiEnqueue(NotificationQueueItem value) {
     notificationRedisTemplate.opsForList().rightPush(QUEUE_KEY, value);
   }
 
   // 2. 여러 객체 한 번에 enqueue
-  public void notienqueueAll(List<NotificationQueueItem> values) {
+  public void notiEnqueueAll(List<NotificationQueueItem> values) {
     notificationRedisTemplate.opsForList().rightPushAll(QUEUE_KEY, values);
   }
 
   // 3. 하나 dequeue (왼쪽 pop)
-  public NotificationQueueItem notidequeue() {
+  public NotificationQueueItem notiDequeue() {
     return notificationRedisTemplate.opsForList().leftPop(QUEUE_KEY);
   }
 

@@ -120,7 +120,7 @@ public class RedisUtilTest {
     Long BeforeSize = forVerifyRedisTemplate.opsForList().size("notification:queue");
 
     // When
-    redisUtil.notienqueue(
+    redisUtil.notiEnqueue(
         NotificationQueueItem.builder()
             .phoneNumber("01012341234")
             .carNumber("123가1234")
@@ -166,7 +166,7 @@ public class RedisUtilTest {
     List<NotificationQueueItem> items = List.of(item1, item2, item3);
 
     // When
-    redisUtil.notienqueueAll(items);
+    redisUtil.notiEnqueueAll(items);
 
     // Then
     Long AfterSize = forVerifyRedisTemplate.opsForList().size("notification:queue");
@@ -190,7 +190,7 @@ public class RedisUtilTest {
     forVerifyRedisTemplate.opsForList().rightPush("notification:queue", item);
 
     // When
-    NotificationQueueItem dequeuedItem = redisUtil.notidequeue();
+    NotificationQueueItem dequeuedItem = redisUtil.notiDequeue();
 
     //Then
     assertNotNull(dequeuedItem);

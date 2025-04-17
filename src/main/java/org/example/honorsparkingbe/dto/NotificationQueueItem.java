@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.example.honorsparkingbe.domain.enums.NotiChannel;
 import org.example.honorsparkingbe.domain.enums.NotiEventType;
 
@@ -14,6 +15,7 @@ import org.example.honorsparkingbe.domain.enums.NotiEventType;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class NotificationQueueItem {
 
   NotiChannel notiChannel;
@@ -22,4 +24,6 @@ public class NotificationQueueItem {
   String phoneNumber;
   String carNumber;
   LocalDateTime entranceTime;
+
+  Integer retryCount;
 }
