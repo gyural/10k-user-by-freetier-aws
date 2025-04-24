@@ -149,6 +149,7 @@ public class SyncInoutService {
       boolean isEntry = (exitTime == null);
       String title = isEntry ? "🚗 차량 입차" : "🚗 차량 출차";
       String body = member.getUserName() + "님 차량이 " + (isEntry ? "입차" : "출차") + "되었습니다.";
+      System.out.println(title);
 
       Map<String, Object> data = new HashMap<>();
       data.put("type", isEntry ? "entry" : "exit");
