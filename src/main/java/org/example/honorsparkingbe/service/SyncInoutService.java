@@ -126,51 +126,84 @@ public class SyncInoutService {
     // 7. ParkingHistory를 저장 시도 하고 실패시에 에러를 던짐
     try {
       parkingHistoryRepository.bulkInsertAndUpdate(parkingHistoryEntities);
-      enqueueRedisNotification(filteredNewMemberInoutList, carNumberToMemberMap);
+      enqueueRedisNotification(filteredNewMemberInoutList, carNumberToMemberMap); // 카카오 알림용
+      enqueuePushNotifications(parkingHistoryEntities); // 아래 주석처리하고 추가한 부분 - expo 푸시 알림용
     } catch (Exception e) {
       System.out.println(e.getMessage());
       throw new RuntimeException("주차 기록 저장 중 오류 발생", e);
     }
 
     // DB에 값이 잘 들어갔다면 실행
-    // -- 알림 전송의 상황판단(exitTime null 확인), 알맞은 정보 수집(userId, pushToken), 메시지 구성
+    return SyncInoutResponse.builder()
+            .ValidNonExitEntries(
+                    parkingHistoryEntities.stream()
+                            .map(parkingHistoryEntity ->
+                                    ParkingEntry.builder().id(parkingHistoryEntity.getId()).build())
+                            .collect(Collectors.toList())
+            )
+            .build();
+
+//    // -- 알림 전송의 상황판단(exitTime null 확인), 알맞은 정보 수집(userId, pushToken), 메시지 구성
+//    for (ParkingHistoryEntity entity : parkingHistoryEntities) {
+//      MemberEntity member = entity.getMemberEntity();
+//      String userId = member.getAuthId();  // expo push 토큰 조회용
+//
+//      LocalDateTime exitTime = entity.getExitTime();
+//
+//      Optional<ExpoEntity> expo = expoRepository.findByUserId(userId);
+//      if (expo.isEmpty()) continue;
+//      System.out.println("userId = " + userId +", expo = " + expo.get().getPushToken());
+//
+//      String pushToken = expo.get().getPushToken();
+//
+//      boolean isEntry = (exitTime == null);
+//      String title = isEntry ? "🚗 차량 입차" : "🚗 차량 출차";
+//      String body = member.getUserName() + "님 차량이 " + (isEntry ? "입차" : "출차") + "되었습니다.";
+//      System.out.println(title);
+//
+//      Map<String, Object> data = new HashMap<>();
+//      data.put("type", isEntry ? "entry" : "exit");
+//      data.put("carNumber", entity.getCarEntity().getCarNumber());
+//      data.put("timestamp", entity.getEntranceTime().toString());
+//      data.put("uri", "/parking");
+//
+//      expoPushService.sendPushNotification(pushToken, title, body, data);
+//    }
+  }
+
+  private void enqueuePushNotifications(List<ParkingHistoryEntity> parkingHistoryEntities) {
+    List<NotificationQueueItem> pushQueueItems = new ArrayList<>();
+
     for (ParkingHistoryEntity entity : parkingHistoryEntities) {
       MemberEntity member = entity.getMemberEntity();
-      String userId = member.getAuthId();  // expo push 토큰 조회용
+      String userId = member.getAuthId();
 
-      LocalDateTime exitTime = entity.getExitTime();
-
+      // expo 토큰이 있는지 확인
       Optional<ExpoEntity> expo = expoRepository.findByUserId(userId);
       if (expo.isEmpty()) continue;
-      System.out.println("userId = " + userId +", expo = " + expo.get().getPushToken());
 
       String pushToken = expo.get().getPushToken();
 
-      boolean isEntry = (exitTime == null);
+      // 츨차시간 여부를 확인하여 입차, 출차 결정
+      boolean isEntry = entity.getExitTime() == null;
       String title = isEntry ? "🚗 차량 입차" : "🚗 차량 출차";
       String body = member.getUserName() + "님 차량이 " + (isEntry ? "입차" : "출차") + "되었습니다.";
-      System.out.println(title);
 
-      Map<String, Object> data = new HashMap<>();
-      data.put("type", isEntry ? "entry" : "exit");
-      data.put("carNumber", entity.getCarEntity().getCarNumber());
-      data.put("timestamp", entity.getEntranceTime().toString());
-      data.put("uri", "/parking");
-
-      expoPushService.sendPushNotification(pushToken, title, body, data);
+      pushQueueItems.add(NotificationQueueItem.builder()
+              .notiChannel(NotiChannel.PUSH)
+              .notiEventType(isEntry ? NotiEventType.ENTRY : NotiEventType.EXIT)
+              .carNumber(entity.getCarEntity().getCarNumber())
+              .entranceTime(entity.getEntranceTime())
+              .pushToken(pushToken)
+              .notiTitle(title)
+              .notiBody(body)
+              .retryCount(0)
+              .build());
     }
 
-
-
-    return SyncInoutResponse.builder()
-        .ValidNonExitEntries(
-            parkingHistoryEntities.stream()
-                .map(parkingHistoryEntity ->
-                    ParkingEntry.builder().id(parkingHistoryEntity.getId()).build())
-                .collect(Collectors.toList())  // List<Long>으로 수집
-        )
-        .build();
+    redisUtil.notiEnqueueAll(pushQueueItems);
   }
+
 
   /**
    * @param filteredNewMemberInoutList
@@ -298,8 +331,6 @@ public class SyncInoutService {
               .retryCount(0)
               .build()
       );
-
-
     }
 
     redisUtil.notiEnqueueAll(newNotificationQueueItems);
