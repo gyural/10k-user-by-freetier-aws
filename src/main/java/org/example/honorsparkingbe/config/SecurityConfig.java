@@ -6,6 +6,7 @@ package org.example.honorsparkingbe.config;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Set;
 import org.example.honorsparkingbe.security.ApiKeyAuthFilter;
 import org.example.honorsparkingbe.security.CustomFormLoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2LoginSuccessHandler;
@@ -13,7 +14,6 @@ import org.example.honorsparkingbe.security.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,6 +35,8 @@ public class SecurityConfig {
   private final CustomOAuth2UserService customOAuth2UserService;
   private final String activeProfile;
   private final ApiKeyAuthFilter apiKeyAuthFilter;
+
+  private static final Set<String> CSRF_REQUIRED_PROFILES = Set.of("prod", "performanceTest");
 
   public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, Environment environment,
       ApiKeyAuthFilter apiKeyAuthFilter) {
@@ -109,11 +111,11 @@ public class SecurityConfig {
                 .userService(customOAuth2UserService)));
 
     // CSRF(Cross Site Request Forgery: 사이트 간 요청 위조)
-    if (!"prod".equals(activeProfile)) {
+    if (!CSRF_REQUIRED_PROFILES.contains(activeProfile)) {
       http.csrf(auth -> auth.disable());
     } else {
       http.csrf(csrf -> csrf
-              .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+          .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
       );
     }
     // http.csrf(auth -> auth.disable());
