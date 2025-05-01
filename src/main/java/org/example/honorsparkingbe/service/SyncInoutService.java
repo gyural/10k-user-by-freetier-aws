@@ -178,29 +178,29 @@ public class SyncInoutService {
       MemberEntity member = entity.getMemberEntity();
       String userId = member.getAuthId();
 
-      // expo 토큰이 있는지 확인
-      Optional<ExpoEntity> expo = expoRepository.findByUserId(userId);
-      if (expo.isEmpty()) continue;
+      // expo 토큰이 있는지 확인(여러 기기 처리를 위해 List로 변경)
+      List<ExpoEntity> expoList = expoRepository.findAllByUserId(userId);
+      if (expoList.isEmpty()) continue;
 
-      String pushToken = expo.get().getPushToken();
 
       // 츨차시간 여부를 확인하여 입차, 출차 결정
       boolean isEntry = entity.getExitTime() == null;
       String title = isEntry ? "🚗 차량 입차" : "🚗 차량 출차";
       String body = member.getUserName() + "님 차량이 " + (isEntry ? "입차" : "출차") + "되었습니다.";
 
-      pushQueueItems.add(NotificationQueueItem.builder()
-              .notiChannel(NotiChannel.PUSH)
-              .notiEventType(isEntry ? NotiEventType.ENTRY : NotiEventType.EXIT)
-              .carNumber(entity.getCarEntity().getCarNumber())
-              .entranceTime(entity.getEntranceTime())
-              .pushToken(pushToken)
-              .notiTitle(title)
-              .notiBody(body)
-              .retryCount(0)
-              .build());
-    }
-
+      for (ExpoEntity expoEntity : expoList) {
+        pushQueueItems.add(NotificationQueueItem.builder()
+                .notiChannel(NotiChannel.PUSH)
+                .notiEventType(isEntry ? NotiEventType.ENTRY : NotiEventType.EXIT)
+                .carNumber(entity.getCarEntity().getCarNumber())
+                .entranceTime(entity.getEntranceTime())
+                .pushToken(expoEntity.getPushToken())
+                .notiTitle(title)
+                .notiBody(body)
+                .retryCount(0)
+                .build());
+        }
+      }
     redisUtil.notiEnqueueAll(pushQueueItems);
   }
 

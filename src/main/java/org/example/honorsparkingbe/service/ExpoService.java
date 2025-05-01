@@ -41,4 +41,16 @@ public class ExpoService {
 
         expoRepository.deleteByUserId(member.getAuthId());
     }
+
+    @Transactional
+    public void deletePushToken(ExpoRequestDTO request) {
+        String userId = request.getUserId();
+        String pushToken = request.getPushToken();
+
+        if(userId == null || pushToken == null) {
+            throw new IllegalArgumentException("userId and pushToken must not be null");
+        }
+
+        expoRepository.deleteByUserIdAndPushToken(userId, pushToken);
+    }
 }

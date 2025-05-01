@@ -19,7 +19,7 @@ public class RedisNotificationWorker {
   private final RedisUtil redisUtil;
   private final KakaoNotificationTalkService kakaoNotificationTalkService;
   private final Logger logger = Logger.getLogger(RedisNotificationWorker.class.getName());
-  private final ExpoPushService expoPushService; // RedisNotificationWorker 상단에 추가
+  private final ExpoPushService expoPushService;
 
 
   static Integer BATCH_SIZE = 1000;
