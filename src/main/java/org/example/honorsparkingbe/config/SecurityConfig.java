@@ -66,16 +66,17 @@ public class SecurityConfig {
         .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화
         .authorizeHttpRequests((auth) -> auth
             .requestMatchers(
-                "/api/v1/csrf-token",
-                "/api/v1/",
-                "/api/v1/auth/login/**",
-                "/api/v1/auth/join",
-                "/api/v1/phone-auth/send",
-                "/api/v1/phone-auth/verify",
-                "/confirm",
-                "/swagger-ui/**",
-                "/v3/api-docs/**",
-                "api/v1/auth/check-authId"
+                    "/api/v1/csrf-token",
+                    "/api/v1/",
+                    "/api/v1/auth/login/**",
+                    "/api/v1/auth/join",
+                    "/api/v1/phone-auth/send",
+                    "/api/v1/phone-auth/verify",
+                    "/confirm",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "api/v1/auth/check-authId",
+                    "api/v1/expo/**"
             ).permitAll()
             .requestMatchers("/api/v1/", "/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm",
                 "/swagger-ui/**", "/v3/api-docs/**", "api/v1/auth/check-authId",
@@ -84,6 +85,7 @@ public class SecurityConfig {
             .requestMatchers("/api/v1/my/**").hasAnyRole("ADMIN", "USER") // /api/v1/my/**만 허용
             .anyRequest().authenticated()
         )
+
         .addFilterBefore(apiKeyAuthFilter,
             UsernamePasswordAuthenticationFilter.class) // API Key 필터 추가
 
