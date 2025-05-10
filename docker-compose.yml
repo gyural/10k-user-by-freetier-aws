@@ -51,8 +51,4 @@ volumes:
 
 networks:
   my-network:
-<<<<<<< HEAD
     driver: bridge
-=======
-    driver: bridge
->>>>>>> 38ce04b (fix: 시스템 출력 주석처리 및 docker-compose 스크립트 안정성 추가)
