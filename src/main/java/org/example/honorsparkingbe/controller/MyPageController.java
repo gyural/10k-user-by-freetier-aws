@@ -84,5 +84,18 @@ public class MyPageController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 사용자 role을 ROLE_USER로 변경
+     * PUT /api/v1/mypage/role/user
+     * @return
+     */
+    @PutMapping("/role/user")
+    public ResponseEntity<String> updateUserRoleToUser() {
+        myPageService.updateUserRoleToUser();
+        return ResponseEntity.ok("역할이 ROLE_USER로 변경되었습니다.");
+    }
+
+
+
 
 }

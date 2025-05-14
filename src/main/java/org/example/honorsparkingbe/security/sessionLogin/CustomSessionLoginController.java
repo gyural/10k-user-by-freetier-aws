@@ -73,6 +73,17 @@ public class CustomSessionLoginController {
                 context
         );
 
-        return ResponseEntity.ok("Logged in with session ID");
+        // 권한(Role) 가져오기
+        String role = context.getAuthentication().getAuthorities()
+                .stream()
+                .findFirst()
+                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                .orElse("뭔가 문제있음. 이상한 값이 들어가 있음");
+
+        // dto 만들기 힘들다.
+        return ResponseEntity.ok(Map.of(
+                "message", "Logged in with session ID",
+                "role", role
+        ));
     }
 }

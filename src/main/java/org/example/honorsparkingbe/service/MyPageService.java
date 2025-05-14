@@ -2,6 +2,7 @@ package org.example.honorsparkingbe.service;
 
 import org.example.honorsparkingbe.domain.entity.CarEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
+import org.example.honorsparkingbe.domain.enums.MemberRole;
 import org.example.honorsparkingbe.dto.mypage.ChangeUserPasswordRequestDTO;
 import org.example.honorsparkingbe.dto.mypage.GetUserInfoResponseDTO;
 import org.example.honorsparkingbe.dto.mypage.UpdateUserCarNumberRequestDTO;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class MyPageService {
@@ -99,6 +101,16 @@ public class MyPageService {
         }
 
         user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
+        memberRepository.save(user);
+    }
+
+    public void updateUserRoleToUser() {
+        Long userId = SecurityUtil.getCurrentUserId();
+
+        MemberEntity user = memberRepository.findById(Objects.requireNonNull(userId))
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자 정보가 DB에 없음"));
+
+        user.setRole(MemberRole.ROLE_USER);
         memberRepository.save(user);
     }
 }
