@@ -51,6 +51,13 @@ public class CustomSessionLoginController2 {
         // 현재 SecurityContextHolder에 적용
         SecurityContextHolder.setContext(context);
 
+        // ✅ 이후 요청에서도 인증 상태가 유지되도록 현재 세션에 저장
+        request.getSession(true).setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                context
+        );
+
+
         return ResponseEntity.ok("Logged in with session ID");
     }
 }
