@@ -48,6 +48,9 @@ public class CustomSessionLoginController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No authentication info");
         }
 
+        // 기존 세션 만료 (Redis에서 삭제) $$$$$$$
+        sessionRepository.deleteById(sessionId); // ❗ 기존 세션 무효화
+
         // 현재 SecurityContextHolder에 적용
         SecurityContextHolder.setContext(context);
 
