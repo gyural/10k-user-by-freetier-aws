@@ -11,6 +11,7 @@ import org.example.honorsparkingbe.security.ApiKeyAuthFilter;
 import org.example.honorsparkingbe.security.CustomFormLoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2LoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2UserService;
+import org.example.honorsparkingbe.util.AesUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -35,16 +36,18 @@ public class SecurityConfig {
   private final CustomOAuth2UserService customOAuth2UserService;
   private final String activeProfile;
   private final ApiKeyAuthFilter apiKeyAuthFilter;
+  private final AesUtil aesUtil;
 
   private static final Set<String> CSRF_REQUIRED_PROFILES = Set.of("prod", "performanceTest");
 
   public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, Environment environment,
-      ApiKeyAuthFilter apiKeyAuthFilter) {
+      ApiKeyAuthFilter apiKeyAuthFilter ,AesUtil aesUtil) {
 
     this.customOAuth2UserService = customOAuth2UserService;
     this.activeProfile = environment.getProperty("spring.profiles.active",
         "default"); // 현재 프로필 가져오기
     this.apiKeyAuthFilter = apiKeyAuthFilter;
+    this.aesUtil = aesUtil;
   }
 
   /**
@@ -108,7 +111,7 @@ public class SecurityConfig {
         .oauth2Login((oauth2) -> oauth2
             .loginPage("/login")
             //.defaultSuccessUrl("/api/v1/session/info", true) // 소셜 로그인 성공 후 이동 경로
-            .successHandler(new CustomOAuth2LoginSuccessHandler()) // OAuth2 성공 핸들러 등록 (json 반환을 위해)
+            .successHandler(new CustomOAuth2LoginSuccessHandler(aesUtil)) // OAuth2 성공 핸들러 등록 (json 반환을 위해)
             .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
                 .userService(customOAuth2UserService)));
 

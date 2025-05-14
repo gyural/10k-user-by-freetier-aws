@@ -1,6 +1,7 @@
 package org.example.honorsparkingbe.security.sessionLogin;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.example.honorsparkingbe.util.AesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,12 @@ import java.util.Map;
 @RestController
 public class CustomSessionLoginController {
 
+    private final AesUtil aesUtil;
+
+    public CustomSessionLoginController(AesUtil aesUtil) {
+        this.aesUtil = aesUtil;
+    }
+
     @Autowired
     private FindByIndexNameSessionRepository<? extends Session> sessionRepository;
 
@@ -26,6 +33,12 @@ public class CustomSessionLoginController {
     public ResponseEntity<?> loginWithSessionId(@RequestBody Map<String, String> body, HttpServletRequest request) {
         String sessionId = body.get("sessionId");
         if (sessionId == null) return ResponseEntity.badRequest().build();
+
+        try {
+            sessionId = aesUtil.decrypt(sessionId); // 복호화
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid encrypted session ID");
+        }
 
         // Redis에서 세션 가져오기
         System.out.println("여기까지 ok"+ sessionId);
@@ -48,8 +61,8 @@ public class CustomSessionLoginController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No authentication info");
         }
 
-        // 기존 세션 만료 (Redis에서 삭제) $$$$$$$
-        sessionRepository.deleteById(sessionId); // ❗ 기존 세션 무효화
+        // 기존 세션 만료 (Redis에서 삭제)
+        sessionRepository.deleteById(sessionId); // 기존 세션 무효화
 
         // 현재 SecurityContextHolder에 적용
         SecurityContextHolder.setContext(context);
