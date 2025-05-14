@@ -1,10 +1,13 @@
 package org.example.honorsparkingbe.dto.response;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.honorsparkingbe.dto.ParkingZoneWithMatchedInfoDTO;
 
 @Getter
 @Setter
@@ -14,9 +17,16 @@ import lombok.Setter;
 public class ParkingZoneSearchResponse {
 
   Meta meta;
-  PaginationResponse paginationResponse;
+  List<ParkingZoneWithMatchedInfoDTO> parkingZones;
 
+  @Data
+  @Builder
   public static class Meta {
-    
+
+    String keyword;
+    Boolean isEnd;
+    PaginationResponse paginationResponse;
+
   }
+
 }

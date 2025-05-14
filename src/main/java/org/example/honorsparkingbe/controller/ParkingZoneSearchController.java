@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.honorsparkingbe.dto.GetParkingZoneByKeywordDTO;
 import org.example.honorsparkingbe.dto.request.ParkingZoneSearchRequest;
 import org.example.honorsparkingbe.dto.response.ParkingZoneSearchResponse;
+import org.example.honorsparkingbe.security.util.SecurityUtil;
 import org.example.honorsparkingbe.service.ParkingZoneSearchService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,9 @@ public class ParkingZoneSearchController {
       @ModelAttribute @Valid ParkingZoneSearchRequest request) {
 
     return ResponseEntity.ok(parkingZoneSearchService.getParkingZonesByKeyword(
-        GetParkingZoneByKeywordDTO.builder().keyword(request.getKeyword()).build()));
+        GetParkingZoneByKeywordDTO.builder()
+            .keyword(request.getKeyword())
+            .memberId(SecurityUtil.getCurrentUserId())
+            .build()));
   }
 }

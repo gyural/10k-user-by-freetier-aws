@@ -8,4 +8,6 @@ import lombok.Data;
 public class GetParkingZoneByKeywordDTO {
 
   private String keyword;
+  private Long memberId;
+  private Integer page;
 }
