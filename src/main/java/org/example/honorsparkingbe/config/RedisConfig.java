@@ -17,9 +17,6 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-//@ConfigurationProperties(
-//    prefix = "spring.data.redis"
-//)
 public class RedisConfig {
 
   @Value("${spring.data.redis.port}")
@@ -34,55 +31,24 @@ public class RedisConfig {
     return new LettuceConnectionFactory(new RedisStandaloneConfiguration(host, port));
   }
 
-//  @Bean
-//  public RedisTemplate<String, Object> redisTemplate(
-//      RedisConnectionFactory redisConnectionFactory) {
-//    RedisTemplate<String, Object> template = new RedisTemplate<>();
-//    template.setConnectionFactory(redisConnectionFactory);
-//    template.setKeySerializer(new StringRedisSerializer()); // Redis 키 직렬화
-//    template.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // JSON 직렬화 사용
-//    // template.setValueSerializer(new JdkSerializationRedisSerializer()); // JDK 직렬화 사용.
-//    return template;
-//  }
 
-//  @Bean
-//  public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-//    BasicPolymorphicTypeValidator validator = BasicPolymorphicTypeValidator.builder()
-//            .allowIfSubType(Object.class)
-//            .build();
-//
-//    ObjectMapper objectMapper = new ObjectMapper();
-//    objectMapper.registerModule(new JavaTimeModule());
-//    objectMapper.activateDefaultTyping(validator, ObjectMapper.DefaultTyping.NON_FINAL);
-//
-//    RedisTemplate<String, Object> template = new RedisTemplate<>();
-//    template.setConnectionFactory(redisConnectionFactory);
-//    template.setKeySerializer(new StringRedisSerializer());
-//
-//    // ❗ 타입 정보를 포함하는 커스텀 ObjectMapper로 직렬화/역직렬화
-//    // template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
-//    template.setValueSerializer(new JdkSerializationRedisSerializer());
-//
-//    return template;
-//  }
 @Bean
 @Primary
 public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
   RedisTemplate<String, Object> template = new RedisTemplate<>();
   template.setConnectionFactory(redisConnectionFactory);
 
-  // ✅ Key 및 해시 키 직렬화기는 String 기반으로
+  // Key 및 해시 키 직렬화기는 String 기반으로
   template.setKeySerializer(new StringRedisSerializer());
   template.setHashKeySerializer(new StringRedisSerializer());
 
-  // ✅ 값 및 해시 값 직렬화기는 JDK 직렬화로
+  // 값 및 해시 값 직렬화기는 JDK 직렬화로
   JdkSerializationRedisSerializer jdkSerializer = new JdkSerializationRedisSerializer();
   template.setValueSerializer(jdkSerializer);
-  template.setHashValueSerializer(jdkSerializer); // ❗ 필수
+  template.setHashValueSerializer(jdkSerializer);
 
   return template;
 }
-
 
 
   @Bean
