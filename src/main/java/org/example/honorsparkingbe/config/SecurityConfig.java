@@ -76,7 +76,10 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "api/v1/auth/check-authId",
-                    "api/v1/expo/**"
+                    "api/v1/expo/**",
+                    "api/v1/auth/issue-cookie",
+                    "api/v1/auth/custom-session-login",
+                    "api/v1/auth/custom-session-login2"
             ).permitAll()
             .requestMatchers("/api/v1/", "/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm",
                 "/swagger-ui/**", "/v3/api-docs/**", "api/v1/auth/check-authId",
@@ -115,6 +118,8 @@ public class SecurityConfig {
       http.csrf(auth -> auth.disable());
     } else {
       http.csrf(csrf -> csrf
+          .ignoringRequestMatchers("/api/v1/auth/custom-session-login")
+          .ignoringRequestMatchers("/api/v1/auth/custom-session-login2")
           .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
       );
     }

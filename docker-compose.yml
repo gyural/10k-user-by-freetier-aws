@@ -26,33 +26,29 @@ services:
     networks:
       - my-network
 
-  backend:
-    container_name: honorsParking
-    depends_on:
-      - db
-      - redis
-    image: gyural/honors-parking-buildx:latest
-    #    platform: linux/amd64
-    platform: linux/arm64
-    ports:
-      - "8080:8080"
-    environment:
-      DB_URL: jdbc:mysql://db:3306/parking
-      DB_USERNAME: user
-      DB_PASSWORD: 1234
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      SPRING_PROFILES_ACTIVE: performanceTest
-    networks:
-      - my-network
+#  backend:
+#    container_name: honorsParking
+#    depends_on:
+#      - db
+#      - redis
+#    image: gyural/honors-parking-buildx:latest
+#    #    platform: linux/amd64
+#    platform: linux/arm64
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      DB_URL: jdbc:mysql://db:3306/parking
+#      DB_USERNAME: user
+#      DB_PASSWORD: 1234
+#      REDIS_HOST: redis
+#      REDIS_PORT: 6379
+#      SPRING_PROFILES_ACTIVE: performanceTest
+#    networks:
+#      - my-network
 
 volumes:
   mysql-data:
 
 networks:
   my-network:
-<<<<<<< HEAD
-    driver: bridge
-=======
-    driver: bridge
->>>>>>> 38ce04b (fix: 시스템 출력 주석처리 및 docker-compose 스크립트 안정성 추가)
+

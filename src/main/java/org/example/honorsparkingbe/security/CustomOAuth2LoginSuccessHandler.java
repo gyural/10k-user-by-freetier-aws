@@ -17,6 +17,8 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         // 로그인 성공 후 프론트엔드로 리디렉트
+        String sessionId = request.getSession().getId();
+        System.out.println("✅ OAuth2 로그인 성공 - 세션 ID: " + sessionId);
         response.sendRedirect("http://localhost:3000/");
         // response.sendRedirect("https://honorsparking-web.vercel.app/");
 //        CustomOAuth2User user = (CustomOAuth2User) authentication.getPrincipal();
