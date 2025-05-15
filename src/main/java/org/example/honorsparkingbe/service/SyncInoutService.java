@@ -127,7 +127,14 @@ public class SyncInoutService {
     try {
       parkingHistoryRepository.bulkInsertAndUpdate(parkingHistoryEntities);
       enqueueRedisNotification(filteredNewMemberInoutList, carNumberToMemberMap); // 카카오 알림용
-      enqueuePushNotifications(parkingHistoryEntities); // 아래 주석처리하고 추가한 부분 - expo 푸시 알림용
+
+      // DB에 expo 토큰이 하나도 없을 때 에러 발생 후 전체 롤백되는데, 이를 방지하기 위해 따로 try-catch(긴급조치 - 추후 수정 예정)
+      try {
+        enqueuePushNotifications(parkingHistoryEntities); // 실패해도 catch로 무시
+      } catch (Exception pushEx) {
+        System.out.println("⚠️ 푸시 알림 실패: " + pushEx.getMessage());
+      }
+
     } catch (Exception e) {
       System.out.println(e.getMessage());
       throw new RuntimeException("주차 기록 저장 중 오류 발생", e);
