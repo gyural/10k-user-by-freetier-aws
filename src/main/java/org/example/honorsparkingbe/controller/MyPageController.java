@@ -73,6 +73,23 @@ public class MyPageController {
     }
 
     /**
+     * 비밀번호 검증
+     * POST /api/v1/mypage/username/password/check
+     * @param request
+     * @return
+     */
+    @PostMapping("/info/password/check")
+    public ResponseEntity<Map<String, Boolean>> checkUserPassword(@RequestBody ChangeUserPasswordRequestDTO request) {
+        boolean isMatch = myPageService.checkUserPassword(request.getPassword());
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("matched", isMatch);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    /**
      * 비밀번호 변경
      * PUT /api/v1/mypage/username/password
      * @param request

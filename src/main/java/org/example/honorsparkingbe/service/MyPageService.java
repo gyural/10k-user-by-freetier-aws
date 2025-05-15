@@ -88,6 +88,20 @@ public class MyPageService {
         carRepository.save(car);
     }
 
+    public boolean checkUserPassword(String currentPassword) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        MemberEntity user = memberRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자 정보가 DB에 없음"));
+
+        // 소셜 로그인 계정은 비밀번호가 없을 수 있음
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new IllegalStateException("비밀번호 확인은 일반 로그인 사용자만 가능합니다.");
+        }
+
+        return bCryptPasswordEncoder.matches(currentPassword, user.getPassword());
+    }
+
+
     public void changeUserPassword(ChangeUserPasswordRequestDTO request) {
         Long userId= SecurityUtil.getCurrentUserId();
 
