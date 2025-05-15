@@ -25,7 +25,7 @@ public class ParkingZoneSearchResponse {
 
     String keyword;
     Boolean isEnd;
-    PaginationResponse paginationResponse;
+    PaginationResponse pagination;
 
   }
 

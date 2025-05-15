@@ -1,12 +1,12 @@
 package org.example.honorsparkingbe.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.example.honorsparkingbe.domain.entity.FavoriteParkingZoneEntity;
 import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
 import org.example.honorsparkingbe.dto.GetParkingZoneByKeywordDTO;
 import org.example.honorsparkingbe.dto.ParkingFeeRuleDTO;
@@ -40,20 +40,22 @@ public class ParkingZoneSearchService {
         .stream().toList();
     // 1. Favorite parkingZone id가져와서 set에 저장
     Set<Long> favoriteParkingZoneIds = favoriteParkingZoneRepository
-        .findAllByMemberEntity_Id(dto.getMemberId()).stream().map(FavoriteParkingZoneEntity::getId)
-        .collect(Collectors.toSet());
+        .findAllByMemberEntity_Id(dto.getMemberId()).stream().map(
+            fz -> fz.getParkingZoneEntity().getId()).collect(Collectors.toSet());
 
     // 2. ParkingZoneWithMatchedInfoDTO로 변환
     List<ParkingZoneWithMatchedInfoDTO> parkingZoneResult = zones.stream()
         .map(zone -> {
           List<MatchedInfoElement> matchedInfos = new ArrayList<>();
 
-          Map<String, String> fieldToValueMap = Map.of(
-              "zoneName", zone.getZoneName(),
-              "cityName", zone.getCityEntity().getName(),
-              "districtName", zone.getDistrictEntity().getName(),
-              "eupMyeonDongName", zone.getEupMyeonDongEntity().getName()
-          );
+          Map<String, String> fieldToValueMap = new LinkedHashMap<>();
+          fieldToValueMap.put("zoneName", zone.getZoneName());
+          fieldToValueMap.put("cityName", zone.getCityEntity().getName());
+          fieldToValueMap.put("districtName", zone.getDistrictEntity().getName());
+          fieldToValueMap.put("eupMyeonDongName", zone.getEupMyeonDongEntity().getName());
+          fieldToValueMap.put("address", zone.getCityEntity().getName() + " " +
+              zone.getDistrictEntity().getName() + " " +
+              zone.getEupMyeonDongEntity().getName());
 
           for (Map.Entry<String, String> entry : fieldToValueMap.entrySet()) {
             String field = entry.getKey();
@@ -79,7 +81,10 @@ public class ParkingZoneSearchService {
               .cityName(fieldToValueMap.get("cityName"))
               .districtName(fieldToValueMap.get("districtName"))
               .eupMyeonDongName(fieldToValueMap.get("eupMyeonDongName"))
+              .address(fieldToValueMap.get("address"))
               .electricCarSpaceCount(zone.getElectricCarSpaceCount())
+              .latitude(zone.getLatitude())
+              .longitude(zone.getLongitude())
               .size(zone.getSize())
               .maxCost(zone.getMaxCost())
               .parkingFeeRules(
@@ -101,6 +106,8 @@ public class ParkingZoneSearchService {
     // 3. page DTO생성
     Long totalDatas = parkingZoneRepository.countByKeyword(keyword);
     long totalPages = totalDatas == 0 ? 0 : totalDatas / 10 + 1;
+    boolean isEnd = totalPages == currentPage + 1;
+    isEnd = totalPages == 0 || isEnd;
     PaginationResponse paginationResponse = PaginationResponse.builder()
         .currentPage(currentPage)
         .totalPages(totalDatas == 0 ? 0 : totalDatas / 10 + 1)
@@ -110,9 +117,9 @@ public class ParkingZoneSearchService {
 
     return ParkingZoneSearchResponse.builder()
         .meta(Meta.builder()
-            .isEnd(totalPages == currentPage)
+            .isEnd(isEnd)
             .keyword(keyword)
-            .paginationResponse(paginationResponse)
+            .pagination(paginationResponse)
             .build())
         .parkingZones(parkingZoneResult)
         .build();

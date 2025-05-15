@@ -21,7 +21,7 @@ public class ParkingZoneWithMatchedInfoDTO {
   private Integer maxCost;
   private List<ParkingFeeRuleDTO> parkingFeeRules;  // 요금 정보
   private String thumbnail;
-
+  private String address;
 
   @Data
   @Builder

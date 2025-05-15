@@ -33,5 +33,6 @@ public interface FavoriteParkingZoneRepository extends
 
   int countByMemberEntity_Id(Long memberId);
 
+  @EntityGraph(attributePaths = {"parkingZoneEntity.id"})
   Set<FavoriteParkingZoneEntity> findAllByMemberEntity_Id(Long memberId);
 }
