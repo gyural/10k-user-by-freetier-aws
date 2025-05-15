@@ -80,6 +80,7 @@ public class ParkingZoneSearchControllerTest {
 
     GetParkingZoneByKeywordDTO expectedDTO = GetParkingZoneByKeywordDTO.builder()
         .keyword(targetKeyword)
+        .memberId(100L)
         .build();
 
     //Then

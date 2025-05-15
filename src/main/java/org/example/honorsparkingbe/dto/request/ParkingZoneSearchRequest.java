@@ -10,4 +10,5 @@ public class ParkingZoneSearchRequest {
 
   @NotNull(message = "keyword 쿼리 파라매터는 필수입니다.")
   private String keyword;
+  private Integer page;
 }

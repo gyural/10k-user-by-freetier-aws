@@ -29,6 +29,7 @@ public class ParkingZoneSearchController {
         GetParkingZoneByKeywordDTO.builder()
             .keyword(request.getKeyword())
             .memberId(SecurityUtil.getCurrentUserId())
+            .page(request.getPage())
             .build()));
   }
 }

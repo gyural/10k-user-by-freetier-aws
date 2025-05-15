@@ -56,10 +56,6 @@ public interface ParkingZoneRepository extends JpaRepository<ParkingZoneEntity, 
       @Param("offset") int offset,
       @Param("excludeIds") List<Long> excludeIds);
 
-  @EntityGraph(attributePaths = {"cityEntity", "districtEntity", "eupMyeonDongEntity",
-      "parkingFeeRuleEntities"})
-  List<ParkingZoneEntity> findAllByKeyWord(String keyword);
-
   @EntityGraph(attributePaths = {
       "cityEntity",
       "districtEntity",
