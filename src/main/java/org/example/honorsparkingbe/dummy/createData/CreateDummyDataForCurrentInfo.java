@@ -2,6 +2,7 @@ package org.example.honorsparkingbe.dummy.createData;
 
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.honorsparkingbe.domain.entity.CarEntity;
@@ -74,6 +75,29 @@ public class CreateDummyDataForCurrentInfo {
         .phoneNumber("01012341234").role(MemberRole.ROLE_USER).userName("name3").carEntity(car3)
         .build();
     memberRepository.saveAll(List.of(member1, member2, member3));
+
+    // Member 데이터 추가 (BCrypt 적용) - 차량 없이 100명 ===================================
+    List<MemberEntity> dummyMembers = new ArrayList<>();
+
+    for (int i = 1; i <= 1000; i++) {
+      String id = String.format("%04d", i); // 0001 ~ 0100
+      MemberEntity member = MemberEntity.builder()
+              .authId(id)
+              .birthday("01-01")
+              .birthdayYear(1990)
+              .email("user" + id + "@example.com")
+              .loginPlatform(LoginPlatform.NORMAL)
+              .password(passwordEncoder.encode(id)) // 비밀번호도 0001 ~ 0100
+              .phoneNumber("0101234" + id)
+              .role(MemberRole.ROLE_USER)
+              .userName("name" + id)
+              .build();
+
+      dummyMembers.add(member);
+    }
+
+    memberRepository.saveAll(dummyMembers); // ===================================================
+
 
     // ParkingZone ID를 사용하여 엔티티 조회
     ParkingZoneEntity parkingZone1 = parkingZoneRepository.findById(1L)
