@@ -29,18 +29,7 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
         String encryptedSessionId = aesUtil.encrypt(sessionId);
         System.out.println("✅ OAuth2 로그인 성공 - 세션 ID: " + sessionId);
 
-        response.sendRedirect("http://localhost:3000/oauth2/success?sessionId=" + encryptedSessionId);
-
-
-//        response.sendRedirect("http://localhost:3000/");
-        // response.sendRedirect("https://honorsparking-web.vercel.app/");
-//        CustomOAuth2User user = (CustomOAuth2User) authentication.getPrincipal();
-//        String role= user.getAuthorities().iterator().next().getAuthority();
-//
-//        if("ROLE_USER".equals(role)){
-//            response.sendRedirect("https://honorsparking-web.vercel.app/");
-//        }else{
-//            response.sendRedirect("https://honorsparking-web.vercel.app/hello");
-//        }
+        // response.sendRedirect("http://localhost:3000/oauth2/success?sessionId=" + encryptedSessionId);
+        response.sendRedirect("https://honorsparking-web.vercel.app/sessionlogin?sessionId=" + encryptedSessionId);
     }
 }
