@@ -27,7 +27,6 @@ import org.hibernate.annotations.OnDeleteAction;
     }
 )
 @Builder
-
 public class FavoriteParkingZoneEntity {
 
   @Id
