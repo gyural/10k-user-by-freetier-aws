@@ -2,6 +2,7 @@ package org.example.honorsparkingbe.dummy.createData;
 
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.honorsparkingbe.domain.entity.CarEntity;
@@ -74,6 +75,7 @@ public class CreateDummyDataForCurrentInfo {
         .phoneNumber("01012341234").role(MemberRole.ROLE_USER).userName("name3").carEntity(car3)
         .build();
     memberRepository.saveAll(List.of(member1, member2, member3));
+
 
     // ParkingZone ID를 사용하여 엔티티 조회
     ParkingZoneEntity parkingZone1 = parkingZoneRepository.findById(1L)

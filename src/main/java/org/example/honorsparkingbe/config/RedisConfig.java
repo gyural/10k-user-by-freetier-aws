@@ -7,17 +7,16 @@ import org.example.honorsparkingbe.dto.NotificationQueueItem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-//@ConfigurationProperties(
-//    prefix = "spring.data.redis"
-//)
 public class RedisConfig {
 
   @Value("${spring.data.redis.port}")
@@ -27,20 +26,30 @@ public class RedisConfig {
   public String host;
 
   @Bean
+  @Primary // 250514
   public RedisConnectionFactory redisConnectionFactory() {
     return new LettuceConnectionFactory(new RedisStandaloneConfiguration(host, port));
   }
 
-  @Bean
-  public RedisTemplate<String, Object> redisTemplate(
-      RedisConnectionFactory redisConnectionFactory) {
-    RedisTemplate<String, Object> template = new RedisTemplate<>();
-    template.setConnectionFactory(redisConnectionFactory);
-    template.setKeySerializer(new StringRedisSerializer()); // Redis 키 직렬화
-    template.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // JSON 직렬화 사용
-    // template.setValueSerializer(new JdkSerializationRedisSerializer()); // JDK 직렬화 사용.
-    return template;
-  }
+
+@Bean
+@Primary
+public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+  RedisTemplate<String, Object> template = new RedisTemplate<>();
+  template.setConnectionFactory(redisConnectionFactory);
+
+  // Key 및 해시 키 직렬화기는 String 기반으로
+  template.setKeySerializer(new StringRedisSerializer());
+  template.setHashKeySerializer(new StringRedisSerializer());
+
+  // 값 및 해시 값 직렬화기는 JDK 직렬화로
+  JdkSerializationRedisSerializer jdkSerializer = new JdkSerializationRedisSerializer();
+  template.setValueSerializer(jdkSerializer);
+  template.setHashValueSerializer(jdkSerializer);
+
+  return template;
+}
+
 
   @Bean
   public RedisTemplate<String, NotificationQueueItem> notificationRedisTemplate(
