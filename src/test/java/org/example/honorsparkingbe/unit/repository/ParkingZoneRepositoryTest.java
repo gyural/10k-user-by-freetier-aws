@@ -1,10 +1,12 @@
 package org.example.honorsparkingbe.unit.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.example.honorsparkingbe.domain.entity.CityEntity;
 import org.example.honorsparkingbe.domain.entity.DistrictEntity;
@@ -20,6 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -248,4 +252,39 @@ public class ParkingZoneRepositoryTest {
 //    assertThat(result).extracting(ParkingZoneEntity::getZoneName)
 //        .containsExactly("서울 주차장", "대전 주차장", "부산 주차장");  // 주차장 이름이 포함되어야 함
 //  }
+
+  @Test
+  @DisplayName("키워드 검색 레포지토리 메서드 검증")
+  void testSearchByKeyword() {
+
+    Page<ParkingZoneEntity> res1 = parkingZoneRepository.searchByKeyword("주차장",
+        PageRequest.of(0, 10));
+    Page<ParkingZoneEntity> res2 = parkingZoneRepository.searchByKeyword("서울",
+        PageRequest.of(0, 10));
+
+    assertThat(res1).isNotNull();
+    assertThat(res2).isNotNull();
+    assertThat(res1.getTotalElements()).isEqualTo(3);
+    assertThat(res2.getTotalElements()).isEqualTo(1);
+
+    // 저장된 엔티티를 기준으로 비교
+    Set<ParkingZoneEntity> resultSet1 = res1.toSet();
+    Set<ParkingZoneEntity> resultSet2 = res2.toSet();
+
+    assertThat(resultSet1).containsExactlyInAnyOrder(seoulParking, busanParking, daejeonParking);
+    assertThat(resultSet2).containsExactlyInAnyOrder(seoulParking);
+  }
+
+  @Test
+  @DisplayName("키워드 포함 아이템 개수 조회 메서드 검증")
+  void testCountByKeyword() {
+    List<String> keywords = List.of("주차장", "서울", "중구");
+    Long res1 = parkingZoneRepository.countByKeyword(keywords.get(0));
+    Long res2 = parkingZoneRepository.countByKeyword(keywords.get(1));
+    Long res3 = parkingZoneRepository.countByKeyword(keywords.get(2));
+
+    assertEquals(res1, 3L);
+    assertEquals(res2, 1L);
+    assertEquals(res1, 3L);
+  }
 }

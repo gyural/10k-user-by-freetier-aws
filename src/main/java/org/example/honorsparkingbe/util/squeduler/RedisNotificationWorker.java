@@ -21,7 +21,6 @@ public class RedisNotificationWorker {
   private final Logger logger = Logger.getLogger(RedisNotificationWorker.class.getName());
   private final ExpoPushService expoPushService;
 
-
   static Integer BATCH_SIZE = 1000;
 
   @Scheduled(fixedRate = 5000)
@@ -87,4 +86,5 @@ public class RedisNotificationWorker {
       logger.warning("예외 메시지: " + e.getMessage());
     }
   }
+
 }

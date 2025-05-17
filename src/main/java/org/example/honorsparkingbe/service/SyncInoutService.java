@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SyncInoutService {
 
   private final ParkingHistoryRepository parkingHistoryRepository;
+
   private final CarRepository carRepository;
   private final ParkingZoneRepository parkingZoneRepository;
   private final MemberRepository memberRepository;
@@ -140,13 +141,13 @@ public class SyncInoutService {
 
     // DB에 값이 잘 들어갔다면 실행
     return SyncInoutResponse.builder()
-            .ValidNonExitEntries(
-                    parkingHistoryEntities.stream()
-                            .map(parkingHistoryEntity ->
-                                    ParkingEntry.builder().id(parkingHistoryEntity.getId()).build())
-                            .collect(Collectors.toList())
-            )
-            .build();
+        .ValidNonExitEntries(
+            parkingHistoryEntities.stream()
+                .map(parkingHistoryEntity ->
+                    ParkingEntry.builder().id(parkingHistoryEntity.getId()).build())
+                .collect(Collectors.toList())  // List<Long>으로 수집
+        )
+        .build();
   }
 
   private void enqueuePushNotifications(List<ParkingHistoryEntity> parkingHistoryEntities) {
@@ -309,6 +310,8 @@ public class SyncInoutService {
               .retryCount(0)
               .build()
       );
+
+
     }
 
     redisUtil.notiEnqueueAll(newNotificationQueueItems);
