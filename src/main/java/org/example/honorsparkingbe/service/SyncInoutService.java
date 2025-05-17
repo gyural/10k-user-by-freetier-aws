@@ -37,14 +37,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class SyncInoutService {
 
   private final ParkingHistoryRepository parkingHistoryRepository;
-
   private final CarRepository carRepository;
   private final ParkingZoneRepository parkingZoneRepository;
   private final MemberRepository memberRepository;
   private final PayRepository payRepository;
   private final ExpoRepository expoRepository;
   private final ExpoPushService expoPushService;
-
   private final RedisUtil redisUtil;
 
   @Transactional
@@ -149,33 +147,6 @@ public class SyncInoutService {
                             .collect(Collectors.toList())
             )
             .build();
-
-//    // -- 알림 전송의 상황판단(exitTime null 확인), 알맞은 정보 수집(userId, pushToken), 메시지 구성
-//    for (ParkingHistoryEntity entity : parkingHistoryEntities) {
-//      MemberEntity member = entity.getMemberEntity();
-//      String userId = member.getAuthId();  // expo push 토큰 조회용
-//
-//      LocalDateTime exitTime = entity.getExitTime();
-//
-//      Optional<ExpoEntity> expo = expoRepository.findByUserId(userId);
-//      if (expo.isEmpty()) continue;
-//      System.out.println("userId = " + userId +", expo = " + expo.get().getPushToken());
-//
-//      String pushToken = expo.get().getPushToken();
-//
-//      boolean isEntry = (exitTime == null);
-//      String title = isEntry ? "🚗 차량 입차" : "🚗 차량 출차";
-//      String body = member.getUserName() + "님 차량이 " + (isEntry ? "입차" : "출차") + "되었습니다.";
-//      System.out.println(title);
-//
-//      Map<String, Object> data = new HashMap<>();
-//      data.put("type", isEntry ? "entry" : "exit");
-//      data.put("carNumber", entity.getCarEntity().getCarNumber());
-//      data.put("timestamp", entity.getEntranceTime().toString());
-//      data.put("uri", "/parking");
-//
-//      expoPushService.sendPushNotification(pushToken, title, body, data);
-//    }
   }
 
   private void enqueuePushNotifications(List<ParkingHistoryEntity> parkingHistoryEntities) {
