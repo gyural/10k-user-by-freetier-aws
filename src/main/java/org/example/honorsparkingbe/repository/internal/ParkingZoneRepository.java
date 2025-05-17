@@ -2,6 +2,8 @@ package org.example.honorsparkingbe.repository.internal;
 
 import java.util.List;
 import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -54,5 +56,28 @@ public interface ParkingZoneRepository extends JpaRepository<ParkingZoneEntity, 
       @Param("offset") int offset,
       @Param("excludeIds") List<Long> excludeIds);
 
+  @EntityGraph(attributePaths = {
+      "cityEntity",
+      "districtEntity",
+      "eupMyeonDongEntity",
+      "parkingFeeRuleEntities"
+  })
+  @Query("""
+          SELECT p FROM ParkingZoneEntity p
+          WHERE LOWER(p.zoneName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+             OR LOWER(p.cityEntity.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+             OR LOWER(p.districtEntity.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+             OR LOWER(p.eupMyeonDongEntity.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+      """)
+  Page<ParkingZoneEntity> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+  @Query("""
+          SELECT COUNT(p) FROM ParkingZoneEntity p
+          WHERE LOWER(p.zoneName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+             OR LOWER(p.cityEntity.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+             OR LOWER(p.districtEntity.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+             OR LOWER(p.eupMyeonDongEntity.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+      """)
+  Long countByKeyword(@Param("keyword") String keyword);
 }
 
