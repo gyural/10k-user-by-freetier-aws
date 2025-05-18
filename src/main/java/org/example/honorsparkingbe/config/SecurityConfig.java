@@ -177,5 +177,4 @@ public class SecurityConfig {
     serializer.setSameSite("None"); // 크로스 사이트 요청에서 쿠키 허용
     return serializer;
   }
-
 }
