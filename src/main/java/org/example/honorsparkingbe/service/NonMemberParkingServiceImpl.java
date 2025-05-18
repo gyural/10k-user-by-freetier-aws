@@ -24,7 +24,7 @@ public class NonMemberParkingServiceImpl implements NonMemberParkingService {
     @Value("${sync.url}")
     private String syncServerUrl;
 
-    @Value("${sync.api-key}")
+    @Value("${api.key}")
     private String apiKey;
 
     @Value("${sync.header-name}")

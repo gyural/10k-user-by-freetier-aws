@@ -25,6 +25,7 @@ public class SyncInoutResponse {
     private Long id;
 
     // 비회원 차량 조회를 위해 필요한 필드
+    // 응답 타입 유사하므로 기존의 dto 확장하여 활용. 이후 분리 가능
     private String vehicleNumber;
     private String parkingZoneName;
     private LocalDateTime entryTime;
