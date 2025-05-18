@@ -103,7 +103,15 @@ public class SecurityConfig {
     http
         .formLogin((formLogin) -> formLogin
             .loginProcessingUrl("/api/v1/auth/login") // 로그인 처리 경로
-            .successHandler(new CustomFormLoginSuccessHandler()) // 커스텀 성공 핸들러 등록(json 반환)
+                .usernameParameter("authId")           // ✅ 이 줄 추가
+                .passwordParameter("password")
+                .successHandler(new CustomFormLoginSuccessHandler()) // 커스텀 성공 핸들러 등록(json 반환)
+                .failureHandler((request, response, exception) -> {
+                  exception.printStackTrace(); // ✅ 콘솔에 자세한 에러 로그 출력
+                  response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                  response.setContentType("application/json");
+                  response.getWriter().write("{\"error\": \"" + exception.getMessage() + "\"}");
+                })
             .permitAll() // 로그인 페이지 접근 허용
         )
 
