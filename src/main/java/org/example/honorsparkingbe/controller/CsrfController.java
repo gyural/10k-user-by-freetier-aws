@@ -22,6 +22,8 @@ import java.util.Map;
 public class CsrfController {
     @GetMapping("/csrf-token")
     public Map<String, String> getCsrfToken(HttpServletRequest request, HttpServletResponse response) {
+        request.getSession();
+
         CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
         // return csrfToken.getToken(); // CSRF 토큰 값을 반환
 
