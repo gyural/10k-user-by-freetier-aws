@@ -63,21 +63,34 @@ public class NonMemberParkingServiceImpl implements NonMemberParkingService {
 
     @Override
     public NonMemberParkingResponse getParkingStatus(String vehicleNumber) {
-        // 위의 메서드 재사용
         SyncInoutResponse syncResponse = getInoutByVehicleNumber(
                 NonMemberParkingRequest.builder()
                         .vehicleNumber(vehicleNumber)
                         .build()
         );
 
-        boolean isParked = syncResponse != null &&
+        if (syncResponse != null &&
                 syncResponse.getValidNonExitEntries() != null &&
-                !syncResponse.getValidNonExitEntries().isEmpty();
+                !syncResponse.getValidNonExitEntries().isEmpty()) {
+
+            // 최신 주차 정보 하나만 가져옴 (가장 최근이라고 가정)
+            var entry = syncResponse.getValidNonExitEntries().get(0);
+
+            return NonMemberParkingResponse.builder()
+                    .vehicleNumber(vehicleNumber)
+                    .parkingZoneName(entry.getParkingZoneName())
+                    .entryTime(entry.getEntryTime())
+                    .currentFee(entry.getCurrentFee())
+                    .build();
+        }
 
         return NonMemberParkingResponse.builder()
-                .isParked(isParked)
-                .message(isParked ? "현재 주차 중입니다." : "주차 기록이 없습니다.")
+                .vehicleNumber(vehicleNumber)
+                .parkingZoneName(null)
+                .entryTime(null)
+                .currentFee(0)
                 .build();
     }
+
 }
   //6 end
