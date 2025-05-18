@@ -10,10 +10,11 @@ import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails, Serializable {
     private static final long serialVersionUID = 1L;
 
     private final MemberEntity memberEntity;

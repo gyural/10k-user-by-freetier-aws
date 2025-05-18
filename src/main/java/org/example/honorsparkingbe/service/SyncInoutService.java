@@ -1,11 +1,14 @@
 package org.example.honorsparkingbe.service;
 
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.example.honorsparkingbe.domain.entity.*;
 import org.example.honorsparkingbe.domain.entity.CarEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.entity.ParkingHistoryEntity;
@@ -19,6 +22,7 @@ import org.example.honorsparkingbe.dto.request.SyncInoutRequest;
 import org.example.honorsparkingbe.dto.request.SyncInoutRequest.Inout;
 import org.example.honorsparkingbe.dto.response.SyncInoutResponse;
 import org.example.honorsparkingbe.dto.response.SyncInoutResponse.ParkingEntry;
+import org.example.honorsparkingbe.repository.internal.*;
 import org.example.honorsparkingbe.repository.internal.CarRepository;
 import org.example.honorsparkingbe.repository.internal.MemberRepository;
 import org.example.honorsparkingbe.repository.internal.ParkingHistoryRepository;
@@ -33,11 +37,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class SyncInoutService {
 
   private final ParkingHistoryRepository parkingHistoryRepository;
+
   private final CarRepository carRepository;
   private final ParkingZoneRepository parkingZoneRepository;
   private final MemberRepository memberRepository;
   private final PayRepository payRepository;
-
+  private final ExpoRepository expoRepository;
+  private final ExpoPushService expoPushService;
   private final RedisUtil redisUtil;
 
   @Transactional
@@ -119,12 +125,21 @@ public class SyncInoutService {
     // 7. ParkingHistory를 저장 시도 하고 실패시에 에러를 던짐
     try {
       parkingHistoryRepository.bulkInsertAndUpdate(parkingHistoryEntities);
-      enqueueRedisNotification(filteredNewMemberInoutList, carNumberToMemberMap);
+      enqueueRedisNotification(filteredNewMemberInoutList, carNumberToMemberMap); // 카카오 알림용
+
+      // DB에 expo 토큰이 하나도 없을 때 에러 발생 후 전체 롤백되는데, 이를 방지하기 위해 따로 try-catch(긴급조치 - 추후 수정 예정)
+      try {
+        enqueuePushNotifications(parkingHistoryEntities); // 실패해도 catch로 무시
+      } catch (Exception pushEx) {
+        System.out.println("⚠️ 푸시 알림 실패: " + pushEx.getMessage());
+      }
+
     } catch (Exception e) {
       System.out.println(e.getMessage());
       throw new RuntimeException("주차 기록 저장 중 오류 발생", e);
     }
 
+    // DB에 값이 잘 들어갔다면 실행
     return SyncInoutResponse.builder()
         .ValidNonExitEntries(
             parkingHistoryEntities.stream()
@@ -134,6 +149,40 @@ public class SyncInoutService {
         )
         .build();
   }
+
+  private void enqueuePushNotifications(List<ParkingHistoryEntity> parkingHistoryEntities) {
+    List<NotificationQueueItem> pushQueueItems = new ArrayList<>();
+
+    for (ParkingHistoryEntity entity : parkingHistoryEntities) {
+      MemberEntity member = entity.getMemberEntity();
+      String userId = member.getAuthId();
+
+      // expo 토큰이 있는지 확인(여러 기기 처리를 위해 List로 변경)
+      List<ExpoEntity> expoList = expoRepository.findAllByUserId(userId);
+      if (expoList.isEmpty()) continue;
+
+
+      // 츨차시간 여부를 확인하여 입차, 출차 결정
+      boolean isEntry = entity.getExitTime() == null;
+      String title = isEntry ? "🚗 차량 입차" : "🚗 차량 출차";
+      String body = member.getUserName() + "님 차량이 " + (isEntry ? "입차" : "출차") + "되었습니다.";
+
+      for (ExpoEntity expoEntity : expoList) {
+        pushQueueItems.add(NotificationQueueItem.builder()
+                .notiChannel(NotiChannel.PUSH)
+                .notiEventType(isEntry ? NotiEventType.ENTRY : NotiEventType.EXIT)
+                .carNumber(entity.getCarEntity().getCarNumber())
+                .entranceTime(entity.getEntranceTime())
+                .pushToken(expoEntity.getPushToken())
+                .notiTitle(title)
+                .notiBody(body)
+                .retryCount(0)
+                .build());
+        }
+      }
+    redisUtil.notiEnqueueAll(pushQueueItems);
+  }
+
 
   /**
    * @param filteredNewMemberInoutList
@@ -185,6 +234,8 @@ public class SyncInoutService {
               .build();
         })
         .collect(Collectors.toList()); // ParkingHistoryEntity 리스트로 반환
+
+
   }
 
   /**

@@ -1,5 +1,6 @@
 package org.example.honorsparkingbe.repository.internal;
 
+import java.util.Set;
 import org.example.honorsparkingbe.domain.entity.FavoriteParkingZoneEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,4 +32,7 @@ public interface FavoriteParkingZoneRepository extends
   int deleteByMemberEntity_IdAndParkingZoneEntity_Id(Long memberId, Long parkingZoneId);
 
   int countByMemberEntity_Id(Long memberId);
+
+  @EntityGraph(attributePaths = {"parkingZoneEntity.id"})
+  Set<FavoriteParkingZoneEntity> findAllByMemberEntity_Id(Long memberId);
 }
