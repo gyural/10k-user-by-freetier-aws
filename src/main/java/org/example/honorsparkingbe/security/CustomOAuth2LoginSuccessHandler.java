@@ -30,6 +30,6 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
         System.out.println("✅ OAuth2 로그인 성공 - 세션 ID: " + sessionId);
 
         // response.sendRedirect("http://localhost:3000/oauth2/success?sessionId=" + encryptedSessionId);
-        response.sendRedirect("https://honorsparking-web.vercel.app/sessionlogin?sessionId=" + encryptedSessionId);
+        response.sendRedirect("https://honorsparking-web.vercel.app/signup/extra?sessionId=" + encryptedSessionId);
     }
 }
