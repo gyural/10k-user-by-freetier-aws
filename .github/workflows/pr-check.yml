@@ -32,6 +32,12 @@ jobs:
           mkdir -p ./src/main/resources/config
           echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/config/application.yml
 
+      # ✅ 루트에 config import용 application.yml 생성 (cicd 테스트 통과용)
+      - name: application.yml import용 루트 파일 만들기
+        run: |
+          mkdir -p ./src/main/resources
+          echo -e "spring:\n  config:\n    import: \"config/application.yml\"" > ./src/main/resources/application.yml
+
       # application.properties 파일 생성
       - name: application.properties 파일 만들기
         run: |
