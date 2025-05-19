@@ -3,16 +3,13 @@ package org.example.honorsparkingbe.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.honorsparkingbe.dto.request.NonMemberParkingRequest;
-import org.example.honorsparkingbe.dto.request.SyncInoutRequest;
-import org.example.honorsparkingbe.dto.request.SyncInoutRequest.Inout;
+import org.example.honorsparkingbe.dto.request.SyncNonMemberInoutRequest;
 import org.example.honorsparkingbe.dto.response.NonMemberParkingResponse;
-import org.example.honorsparkingbe.dto.response.SyncInoutResponse;
+import org.example.honorsparkingbe.dto.response.SyncNonMemberInoutResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Collections;
 
 @Slf4j
 @Service
@@ -31,17 +28,10 @@ public class NonMemberParkingServiceImpl implements NonMemberParkingService {
     private String apiHeaderName;
 
     @Override
-    public SyncInoutResponse getInoutByVehicleNumber(NonMemberParkingRequest request) {
-        // 요청 본문 구성
-        Inout inout = Inout.builder()
+    public SyncNonMemberInoutResponse getInoutByVehicleNumber(NonMemberParkingRequest request) {
+        // 요청 DTO 구성
+        SyncNonMemberInoutRequest syncRequest = SyncNonMemberInoutRequest.builder()
                 .vehicleNumber(request.getVehicleNumber())
-                .entryId(null)
-                .entryTime(null)
-                .parkinglotId(null)
-                .build();
-
-        SyncInoutRequest syncRequest = SyncInoutRequest.builder()
-                .inoutList(Collections.singletonList(inout))
                 .build();
 
         // 헤더 설정
@@ -49,11 +39,11 @@ public class NonMemberParkingServiceImpl implements NonMemberParkingService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(apiHeaderName, apiKey);
 
-        HttpEntity<SyncInoutRequest> entity = new HttpEntity<>(syncRequest, headers);
+        HttpEntity<SyncNonMemberInoutRequest> entity = new HttpEntity<>(syncRequest, headers);
 
         try {
-            ResponseEntity<SyncInoutResponse> response = restTemplate.postForEntity(
-                    syncServerUrl, entity, SyncInoutResponse.class);
+            ResponseEntity<SyncNonMemberInoutResponse> response = restTemplate.postForEntity(
+                    syncServerUrl, entity, SyncNonMemberInoutResponse.class);
             return response.getBody();
         } catch (Exception e) {
             log.error("싱크 서버 요청 중 오류 발생: {}", e.getMessage(), e);
@@ -63,34 +53,30 @@ public class NonMemberParkingServiceImpl implements NonMemberParkingService {
 
     @Override
     public NonMemberParkingResponse getParkingStatus(String vehicleNumber) {
-        SyncInoutResponse syncResponse = getInoutByVehicleNumber(
+        SyncNonMemberInoutResponse response = getInoutByVehicleNumber(
                 NonMemberParkingRequest.builder()
                         .vehicleNumber(vehicleNumber)
                         .build()
         );
 
-        if (syncResponse != null &&
-                syncResponse.getValidNonExitEntries() != null &&
-                !syncResponse.getValidNonExitEntries().isEmpty()) {
-
-            // 최신 주차 정보 하나만 가져옴 (가장 최근이라고 가정)
-            var entry = syncResponse.getValidNonExitEntries().get(0);
-
+        if (response != null && response.getEntryTime() != null) {
             return NonMemberParkingResponse.builder()
-                    .vehicleNumber(vehicleNumber)
-                    .parkingZoneName(entry.getParkingZoneName())
-                    .entryTime(entry.getEntryTime())
-                    .currentFee(entry.getCurrentFee())
+                    .vehicleNumber(response.getVehicleNumber())
+                    .parkingLotLocation(response.getParkingLotLocation())
+                    .entryTime(response.getEntryTime())
+                    .totalParkingMinutes(response.getTotalParkingMinutes())
+                    .currentFee(response.getCurrentFee())
+                    .entryPhotoUrl(response.getEntryPhotoUrl())
                     .build();
         }
 
         return NonMemberParkingResponse.builder()
                 .vehicleNumber(vehicleNumber)
-                .parkingZoneName(null)
+                .parkingLotLocation(null)
                 .entryTime(null)
+                .totalParkingMinutes(0)
                 .currentFee(0)
+                .entryPhotoUrl(null)
                 .build();
     }
-
 }
-  //6 end

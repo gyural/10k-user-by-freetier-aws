@@ -1,17 +1,15 @@
 package org.example.honorsparkingbe.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NonMemberParkingResponse {
+@Builder
+public class SyncNonMemberInoutResponse {
     private String vehicleNumber;
     private String parkingLotLocation;
     private LocalDateTime entryTime;
@@ -19,5 +17,3 @@ public class NonMemberParkingResponse {
     private Integer currentFee;
     private String entryPhotoUrl;
 }
-
-//4
