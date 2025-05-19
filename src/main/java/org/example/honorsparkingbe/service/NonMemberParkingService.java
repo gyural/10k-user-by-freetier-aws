@@ -1,12 +1,13 @@
 package org.example.honorsparkingbe.service;
 
 import org.example.honorsparkingbe.dto.request.NonMemberParkingRequest;
-import org.example.honorsparkingbe.dto.response.NonMemberParkingResponse;
-import org.example.honorsparkingbe.dto.response.SyncNonMemberInoutResponse;
+import org.example.honorsparkingbe.dto.response.NonMemberParkingListResponse;
+import org.example.honorsparkingbe.dto.response.SyncNonMemberInoutListResponse;
 
 public interface NonMemberParkingService {
-    SyncNonMemberInoutResponse getInoutByVehicleNumber(NonMemberParkingRequest request);
 
-    NonMemberParkingResponse getParkingStatus(String vehicleNumber);
+    SyncNonMemberInoutListResponse getInoutByVehicleNumber(NonMemberParkingRequest request);
+
+    NonMemberParkingListResponse getParkingStatus(String vehicleNumber);
 }
 //5
