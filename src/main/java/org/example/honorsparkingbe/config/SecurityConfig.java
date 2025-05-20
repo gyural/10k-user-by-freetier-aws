@@ -81,7 +81,8 @@ public class SecurityConfig {
                     "api/v1/auth/check-authId",
                     "api/v1/expo/**",
                     "api/v1/auth/issue-cookie",
-                    "api/v1/auth/custom-session-login"
+                    "api/v1/auth/custom-session-login",
+                    "/api/v1/parking/nonmember" // 비회원 차량조회
             ).permitAll()
             .requestMatchers("/api/v1/", "/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm",
                 "/swagger-ui/**", "/v3/api-docs/**", "api/v1/auth/check-authId",
