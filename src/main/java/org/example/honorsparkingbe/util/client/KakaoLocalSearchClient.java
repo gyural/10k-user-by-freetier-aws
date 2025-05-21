@@ -31,7 +31,7 @@ public class KakaoLocalSearchClient {
         .build();
   }
 
-  static String SEARCH_PATH = "/local/search/keyword";
+  static String SEARCH_PATH = "v2/local/search/keyword";
   static String AuthorizationHeader = "Authorization";
   private final Logger logger = LoggerFactory.getLogger(FavoriteParkingZoneService.class);
 
