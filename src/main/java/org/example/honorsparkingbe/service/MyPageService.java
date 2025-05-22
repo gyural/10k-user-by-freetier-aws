@@ -71,21 +71,33 @@ public class MyPageService {
                 .orElseThrow(()->new IllegalArgumentException("해당 사용자 정보가 DB에 없음"));
 
         CarEntity car= user.getCarEntity();
-        if (car == null) {
-            throw new IllegalStateException("아직 등록된 차량 없음");
-        }
-
-        // 30일 확인
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime lastUpdate = car.getCreatedAt();
 
-        if(lastUpdate!=null && lastUpdate.isAfter(now.minusDays(30))) {
-            throw new IllegalArgumentException("차량 번호는 30일에 한 번 변경 가능");
+        if (car == null) {
+            CarEntity newCar = CarEntity.builder()
+                    .carNumber(request.getCarNumber())
+                    .createdAt(now)
+                    .build();
+
+            carRepository.save(newCar);
+
+            // 연관관계 설정
+            user.setCarEntity(newCar);
+            memberRepository.save(user); // 사용자에 차량 정보 반영
+        }else{
+            // 차량이 있는 경우: 30일 내 수정 제한
+            LocalDateTime lastUpdate = car.getCreatedAt();
+
+            if (lastUpdate != null && lastUpdate.isAfter(now.minusDays(30))) {
+                throw new IllegalArgumentException("차량 번호는 30일에 한 번 변경 가능");
+            }
+
+            car.setCarNumber(request.getCarNumber());
+            car.setCreatedAt(now); // 갱신 시간
+            carRepository.save(car);
         }
 
-        car.setCreatedAt(now);
-        car.setCarNumber(request.getCarNumber());
-        carRepository.save(car);
+
     }
 
     public boolean checkUserPassword(String currentPassword) {
