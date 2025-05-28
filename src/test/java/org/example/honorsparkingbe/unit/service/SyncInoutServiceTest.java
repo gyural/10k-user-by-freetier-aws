@@ -37,7 +37,7 @@ import org.example.honorsparkingbe.repository.internal.ParkingHistoryRepository;
 import org.example.honorsparkingbe.repository.internal.ParkingZoneRepository;
 import org.example.honorsparkingbe.repository.internal.PayRepository;
 import org.example.honorsparkingbe.service.SyncInoutService;
-import org.example.honorsparkingbe.util.RedisUtil;
+import org.example.honorsparkingbe.util.NotificationQueueRedisUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,7 +69,7 @@ public class SyncInoutServiceTest {
   @Mock
   private PayRepository payRepository;
   @Mock
-  private RedisUtil redisUtil;
+  private NotificationQueueRedisUtil redisUtil;
 
   CarEntity entryOnlyCar;
   CarEntity exitedCar;

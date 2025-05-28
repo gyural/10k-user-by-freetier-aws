@@ -3,52 +3,41 @@ package org.example.honorsparkingbe.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 import org.example.honorsparkingbe.dto.NotificationQueueItem;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
 
-  @Value("${spring.data.redis.port}")
-  public int port;
+  private final RedisProperties redisProperties;
 
-  @Value("${spring.data.redis.host}")
-  public String host;
 
   @Bean
-  @Primary // 250514
-  public RedisConnectionFactory redisConnectionFactory() {
-    return new LettuceConnectionFactory(new RedisStandaloneConfiguration(host, port));
+  public LettuceConnectionFactory redisConnectionFactory() {
+    RedisStandaloneConfiguration standaloneConfig = new RedisStandaloneConfiguration();
+    standaloneConfig.setHostName(redisProperties.getHost());
+    standaloneConfig.setPort(redisProperties.getPort());
+    standaloneConfig.setPassword(RedisPassword.of(redisProperties.getPassword()));
+
+    LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+        .build();
+
+    return new LettuceConnectionFactory(standaloneConfig, clientConfig);
   }
-
-
-@Bean
-@Primary
-public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-  RedisTemplate<String, Object> template = new RedisTemplate<>();
-  template.setConnectionFactory(redisConnectionFactory);
-
-  // Key 및 해시 키 직렬화기는 String 기반으로
-  template.setKeySerializer(new StringRedisSerializer());
-  template.setHashKeySerializer(new StringRedisSerializer());
-
-  // 값 및 해시 값 직렬화기는 JDK 직렬화로
-  JdkSerializationRedisSerializer jdkSerializer = new JdkSerializationRedisSerializer();
-  template.setValueSerializer(jdkSerializer);
-  template.setHashValueSerializer(jdkSerializer);
-
-  return template;
-}
 
 
   @Bean
@@ -72,5 +61,16 @@ public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisC
     template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
 
     return template;
+  }
+
+  @Bean
+  public RedisTemplate<String, Object> redisTemplate() {
+    final RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    redisTemplate.setKeySerializer(new StringRedisSerializer());
+    redisTemplate.setHashKeySerializer(new GenericToStringSerializer<>(Object.class));
+    redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
+    redisTemplate.setValueSerializer(new StringRedisSerializer());
+    redisTemplate.setConnectionFactory(redisConnectionFactory());
+    return redisTemplate;
   }
 }
