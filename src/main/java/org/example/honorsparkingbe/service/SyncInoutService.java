@@ -1,15 +1,13 @@
 package org.example.honorsparkingbe.service;
 
-import java.time.LocalDateTime;
-import java.util.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.example.honorsparkingbe.domain.entity.*;
 import org.example.honorsparkingbe.domain.entity.CarEntity;
+import org.example.honorsparkingbe.domain.entity.ExpoEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.entity.ParkingHistoryEntity;
 import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
@@ -22,13 +20,13 @@ import org.example.honorsparkingbe.dto.request.SyncInoutRequest;
 import org.example.honorsparkingbe.dto.request.SyncInoutRequest.Inout;
 import org.example.honorsparkingbe.dto.response.SyncInoutResponse;
 import org.example.honorsparkingbe.dto.response.SyncInoutResponse.ParkingEntry;
-import org.example.honorsparkingbe.repository.internal.*;
 import org.example.honorsparkingbe.repository.internal.CarRepository;
+import org.example.honorsparkingbe.repository.internal.ExpoRepository;
 import org.example.honorsparkingbe.repository.internal.MemberRepository;
 import org.example.honorsparkingbe.repository.internal.ParkingHistoryRepository;
 import org.example.honorsparkingbe.repository.internal.ParkingZoneRepository;
 import org.example.honorsparkingbe.repository.internal.PayRepository;
-import org.example.honorsparkingbe.util.RedisUtil;
+import org.example.honorsparkingbe.util.NotificationQueueRedisUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,8 +41,7 @@ public class SyncInoutService {
   private final MemberRepository memberRepository;
   private final PayRepository payRepository;
   private final ExpoRepository expoRepository;
-  private final ExpoPushService expoPushService;
-  private final RedisUtil redisUtil;
+  private final NotificationQueueRedisUtil redisUtil;
 
   @Transactional
   public SyncInoutResponse syncParkingHistory(SyncInoutRequest request) {
@@ -159,8 +156,9 @@ public class SyncInoutService {
 
       // expo 토큰이 있는지 확인(여러 기기 처리를 위해 List로 변경)
       List<ExpoEntity> expoList = expoRepository.findAllByUserId(userId);
-      if (expoList.isEmpty()) continue;
-
+      if (expoList.isEmpty()) {
+        continue;
+      }
 
       // 츨차시간 여부를 확인하여 입차, 출차 결정
       boolean isEntry = entity.getExitTime() == null;
@@ -169,17 +167,17 @@ public class SyncInoutService {
 
       for (ExpoEntity expoEntity : expoList) {
         pushQueueItems.add(NotificationQueueItem.builder()
-                .notiChannel(NotiChannel.PUSH)
-                .notiEventType(isEntry ? NotiEventType.ENTRY : NotiEventType.EXIT)
-                .carNumber(entity.getCarEntity().getCarNumber())
-                .entranceTime(entity.getEntranceTime())
-                .pushToken(expoEntity.getPushToken())
-                .notiTitle(title)
-                .notiBody(body)
-                .retryCount(0)
-                .build());
-        }
+            .notiChannel(NotiChannel.PUSH)
+            .notiEventType(isEntry ? NotiEventType.ENTRY : NotiEventType.EXIT)
+            .carNumber(entity.getCarEntity().getCarNumber())
+            .entranceTime(entity.getEntranceTime())
+            .pushToken(expoEntity.getPushToken())
+            .notiTitle(title)
+            .notiBody(body)
+            .retryCount(0)
+            .build());
       }
+    }
     redisUtil.notiEnqueueAll(pushQueueItems);
   }
 

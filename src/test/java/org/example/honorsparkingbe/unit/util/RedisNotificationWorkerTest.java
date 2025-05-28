@@ -13,7 +13,7 @@ import org.example.honorsparkingbe.domain.enums.NotiChannel;
 import org.example.honorsparkingbe.domain.enums.NotiEventType;
 import org.example.honorsparkingbe.dto.NotificationQueueItem;
 import org.example.honorsparkingbe.service.KakaoNotificationTalkService;
-import org.example.honorsparkingbe.util.RedisUtil;
+import org.example.honorsparkingbe.util.NotificationQueueRedisUtil;
 import org.example.honorsparkingbe.util.squeduler.RedisNotificationWorker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class RedisNotificationWorkerTest {
   private RedisNotificationWorker worker;
 
   @Mock
-  private RedisUtil redisUtil;
+  private NotificationQueueRedisUtil redisUtil;
 
   @Mock
   private KakaoNotificationTalkService kakaoNotificationTalkService;

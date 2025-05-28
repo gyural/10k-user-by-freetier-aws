@@ -8,7 +8,7 @@ import org.example.honorsparkingbe.domain.enums.NotiEventType;
 import org.example.honorsparkingbe.dto.NotificationQueueItem;
 import org.example.honorsparkingbe.service.ExpoPushService;
 import org.example.honorsparkingbe.service.KakaoNotificationTalkService;
-import org.example.honorsparkingbe.util.RedisUtil;
+import org.example.honorsparkingbe.util.NotificationQueueRedisUtil;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RedisNotificationWorker {
 
-  private final RedisUtil redisUtil;
+  private final NotificationQueueRedisUtil redisUtil;
   private final KakaoNotificationTalkService kakaoNotificationTalkService;
   private final Logger logger = Logger.getLogger(RedisNotificationWorker.class.getName());
   private final ExpoPushService expoPushService;
@@ -69,7 +69,7 @@ public class RedisNotificationWorker {
     data.put("uri", "/parking");
 
     expoPushService.sendPushNotification(
-            item.getPushToken(), item.getNotiTitle(), item.getNotiBody(), data
+        item.getPushToken(), item.getNotiTitle(), item.getNotiBody(), data
     );
   }
 

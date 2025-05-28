@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.example.honorsparkingbe.domain.enums.NotiChannel;
 import org.example.honorsparkingbe.domain.enums.NotiEventType;
 import org.example.honorsparkingbe.dto.NotificationQueueItem;
+import org.example.honorsparkingbe.util.NotificationQueueRedisUtil;
 import org.example.honorsparkingbe.util.RedisUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -53,6 +54,8 @@ public class RedisUtilTest {
 
   @Autowired
   private RedisUtil redisUtil;
+  @Autowired
+  private NotificationQueueRedisUtil notiUtil;
 
   @BeforeAll
   static void setUp() {
@@ -121,7 +124,7 @@ public class RedisUtilTest {
     Long BeforeSize = forVerifyRedisTemplate.opsForList().size("notification:queue");
 
     // When
-    redisUtil.notiEnqueue(
+    notiUtil.notiEnqueue(
         NotificationQueueItem.builder()
             .phoneNumber("01012341234")
             .carNumber("123가1234")
@@ -171,7 +174,7 @@ public class RedisUtilTest {
     List<NotificationQueueItem> items = List.of(item1, item2, item3);
 
     // When
-    redisUtil.notiEnqueueAll(items);
+    notiUtil.notiEnqueueAll(items);
 
     // Then
     Long AfterSize = forVerifyRedisTemplate.opsForList().size("notification:queue");
@@ -196,7 +199,7 @@ public class RedisUtilTest {
     forVerifyRedisTemplate.opsForList().rightPush("notification:queue", item);
 
     // When
-    NotificationQueueItem dequeuedItem = redisUtil.notiDequeue();
+    NotificationQueueItem dequeuedItem = notiUtil.notiDequeue();
 
     //Then
     assertNotNull(dequeuedItem);
@@ -212,7 +215,7 @@ public class RedisUtilTest {
   @DisplayName("Redis Notification Queue enqueue get Size 테스트")
   void testNotificationQueueGetSize() {
     //Given
-    Long BeforeSize = redisUtil.notiQueueSize();
+    Long BeforeSize = notiUtil.notiQueueSize();
 
     NotificationQueueItem item = NotificationQueueItem.builder()
         .phoneNumber("01033333333")
@@ -225,7 +228,7 @@ public class RedisUtilTest {
         .rightPushAll("notification:queue", List.of(item, item, item, item));
 
     //When
-    Long AfterSize = redisUtil.notiQueueSize();
+    Long AfterSize = notiUtil.notiQueueSize();
 
     //Then
     assertNotNull(BeforeSize);
