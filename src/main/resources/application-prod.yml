@@ -1,0 +1,12 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    properties:
+      hibernate.show_sql: false
+      hibernate.format_sql: false
+      hibernate.use_sql_comments: false
+logging:
+  level:
+    root: info  # 전체 로그 끔
