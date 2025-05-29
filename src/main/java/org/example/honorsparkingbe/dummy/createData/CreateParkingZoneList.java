@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Profile("!performanceTest")
+@Profile("dev")
 public class CreateParkingZoneList {
 
   private final CityRepository cityRepository;
