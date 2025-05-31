@@ -4,7 +4,6 @@ package org.example.honorsparkingbe.config;
  * Spring Security 설정 클래스 - 접근 권한 설정, 로그인 로그아웃 및 세션 관리, CSRF 비활성화 등
  */
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Set;
 import org.example.honorsparkingbe.security.ApiKeyAuthFilter;
@@ -41,7 +40,7 @@ public class SecurityConfig {
   private static final Set<String> CSRF_REQUIRED_PROFILES = Set.of("prod", "performanceTest");
 
   public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, Environment environment,
-      ApiKeyAuthFilter apiKeyAuthFilter ,AesUtil aesUtil) {
+      ApiKeyAuthFilter apiKeyAuthFilter, AesUtil aesUtil) {
 
     this.customOAuth2UserService = customOAuth2UserService;
     this.activeProfile = environment.getProperty("spring.profiles.active",
@@ -69,20 +68,20 @@ public class SecurityConfig {
         .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화
         .authorizeHttpRequests((auth) -> auth
             .requestMatchers(
-                    "/api/v1/csrf-token",
-                    "/api/v1/",
-                    "/api/v1/auth/login/**",
-                    "/api/v1/auth/join",
-                    "/api/v1/phone-auth/send",
-                    "/api/v1/phone-auth/verify",
-                    "/confirm",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**",
-                    "api/v1/auth/check-authId",
-                    "api/v1/expo/**",
-                    "api/v1/auth/issue-cookie",
-                    "api/v1/auth/custom-session-login",
-                    "/api/v1/parking/nonmember" // 비회원 차량조회
+                "/api/v1/csrf-token",
+                "/api/v1/",
+                "/api/v1/auth/login/**",
+                "/api/v1/auth/join",
+                "/api/v1/phone-auth/send",
+                "/api/v1/phone-auth/verify",
+                "/confirm",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "api/v1/auth/check-authId",
+                "api/v1/expo/**",
+                "api/v1/auth/issue-cookie",
+                "api/v1/auth/custom-session-login",
+                "/api/v1/parking/nonmember" // 비회원 차량조회
             ).permitAll()
             .requestMatchers("/api/v1/", "/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm",
                 "/swagger-ui/**", "/v3/api-docs/**", "api/v1/auth/check-authId",
@@ -92,14 +91,39 @@ public class SecurityConfig {
             .anyRequest().authenticated()
         )
         .addFilterBefore(apiKeyAuthFilter,
-            UsernamePasswordAuthenticationFilter.class) // API Key 필터 추가
+            UsernamePasswordAuthenticationFilter.class); // API Key 필터 추가
 
-        .exceptionHandling(exception -> exception
-            .authenticationEntryPoint((request, response, authException) -> {
-              response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                  "Unauthorized"); // 비인가 접근 시 401 반환
-            })
-        );
+//        .exceptionHandling(exception -> exception
+//            .authenticationEntryPoint((request, response, authException) -> {
+//              // 인증 실패 로그 출력
+//              System.out.println("❌ Unauthorized access detected: " + authException.getMessage());
+//
+//              // 요청 정보 출력
+//              System.out.println("🔗 Request URI: " + request.getRequestURI());
+//              System.out.println("➡️ Request Method: " + request.getMethod());
+//
+//              // 요청 헤더 출력
+//              System.out.println("📦 Request Headers:");
+//              request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+//                System.out.println("  " + headerName + ": " + request.getHeader(headerName));
+//              });
+//
+//              Cookie[] cookies = request.getCookies();
+//              System.out.println("🍪 Request Cookies:");
+//              if (cookies != null) {
+//                for (Cookie cookie : cookies) {
+//                  System.out.println("  " + cookie.getName() + " = " + cookie.getValue());
+//                }
+//              } else {
+//                System.out.println("  (No Cookies)");
+//              }
+//
+//              // 인증 예외 스택 출력
+//              authException.printStackTrace();
+//
+//              // 클라이언트에 401 반환
+//              response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+//            })
 
     http
         .formLogin((formLogin) -> formLogin
@@ -111,7 +135,8 @@ public class SecurityConfig {
         .oauth2Login((oauth2) -> oauth2
             .loginPage("/login")
             //.defaultSuccessUrl("/api/v1/session/info", true) // 소셜 로그인 성공 후 이동 경로
-            .successHandler(new CustomOAuth2LoginSuccessHandler(aesUtil)) // OAuth2 성공 핸들러 등록 (json 반환을 위해)
+            .successHandler(
+                new CustomOAuth2LoginSuccessHandler(aesUtil)) // OAuth2 성공 핸들러 등록 (json 반환을 위해)
             .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
                 .userService(customOAuth2UserService)));
 
