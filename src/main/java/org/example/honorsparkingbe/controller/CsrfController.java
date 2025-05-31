@@ -20,39 +20,41 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class CsrfController {
 
-  static String CSRF_KEY = "XSRF-TOKEN";
-
   @GetMapping("/csrf-token")
   public Map<String, String> getCsrfToken(HttpServletRequest request,
       HttpServletResponse response) {
+    // 세션을 강제로 생성 (없을 경우)
     request.getSession();
 
+    // Spring Security가 제공하는 CsrfToken
     CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
 
-    Cookie[] cookies = request.getCookies();
-    boolean alreadyExists = false;
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (CSRF_KEY.equals(cookie.getName())) {
-          alreadyExists = true;
+    // 이미 쿠키로 세팅되어 있다면 중복 설정하지 않음
+    boolean tokenCookieExists = false;
+    if (request.getCookies() != null) {
+      for (Cookie cookie : request.getCookies()) {
+        if ("XSRF-TOKEN".equals(cookie.getName())) {
+          tokenCookieExists = true;
           break;
         }
       }
     }
 
-    if (!alreadyExists) {
-      ResponseCookie cookie = ResponseCookie.from(CSRF_KEY, csrfToken.getToken())
+    // XSRF-TOKEN 쿠키가 없다면 생성
+    if (!tokenCookieExists) {
+      ResponseCookie cookie = ResponseCookie.from("XSRF-TOKEN", csrfToken.getToken())
           .path("/")
           .httpOnly(false)
           .secure(true)
           .sameSite("None")
           .build();
 
-      response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+      response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
+    // 프론트에서 헤더로 보낼 때 필요한 정보 반환
     return Map.of(
-        "headerName", csrfToken.getHeaderName(),
+        "headerName", csrfToken.getHeaderName(), // 일반적으로 X-CSRF-TOKEN
         "parameterName", csrfToken.getParameterName(),
         "token", csrfToken.getToken()
     );
