@@ -7,6 +7,7 @@ package org.example.honorsparkingbe.config;
 import java.util.List;
 import java.util.Set;
 import org.example.honorsparkingbe.security.ApiKeyAuthFilter;
+import org.example.honorsparkingbe.security.AuthWhiteList;
 import org.example.honorsparkingbe.security.CustomFormLoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2LoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2UserService;
@@ -67,25 +68,7 @@ public class SecurityConfig {
     http
         .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화
         .authorizeHttpRequests((auth) -> auth
-            .requestMatchers(
-                "/api/v1/csrf-token",
-                "/api/v1/",
-                "/api/v1/auth/login/**",
-                "/api/v1/auth/join",
-                "/api/v1/phone-auth/send",
-                "/api/v1/phone-auth/verify",
-                "/confirm",
-                "/swagger-ui/**",
-                "/v3/api-docs/**",
-                "api/v1/auth/check-authId",
-                "api/v1/expo/**",
-                "api/v1/auth/issue-cookie",
-                "api/v1/auth/custom-session-login",
-                "/api/v1/parking/nonmember" // 비회원 차량조회
-            ).permitAll()
-            .requestMatchers("/api/v1/", "/api/v1/auth/login/**", "/api/v1/auth/join", "/confirm",
-                "/swagger-ui/**", "/v3/api-docs/**", "api/v1/auth/check-authId",
-                "api/v1/sync/inout").permitAll()
+            .requestMatchers(AuthWhiteList.PERMIT_ALL_PATHS).permitAll()
             .requestMatchers("/api/v1/admin").hasRole("ADMIN")                  // 해당 role만 접근 가능
             .requestMatchers("/api/v1/my/**").hasAnyRole("ADMIN", "USER") // /api/v1/my/**만 허용
             .anyRequest().authenticated()
