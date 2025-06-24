@@ -26,7 +26,7 @@ public class PerformanceCheckInit {
   protected BCryptPasswordEncoder passwordEncoder;
 
   protected static final String[] testUserIDs = {"performTUser1", "performTUser2", "performTUser3"};
-  protected static final Integer sampleParkingZoneNum = 30;
+  protected static final Integer sampleParkingZoneNum = 1000;
   protected static final CarType defaultCarType = CarType.COMPACT;
 
   @Autowired
