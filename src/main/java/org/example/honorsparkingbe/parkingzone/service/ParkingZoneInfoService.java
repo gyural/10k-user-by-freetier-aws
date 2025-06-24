@@ -46,15 +46,21 @@ public class ParkingZoneInfoService {
   public ParkingZoneListResponse getParkingZones(ParkingZoneListRequest request, Long userId) {
     // 1. DTO에서 요구 값 추출
     Pageable pageable = createPageable(request.getPage(), 10);
-
     // 2. 즐겨찾기된 주차장 ID 목록 불러오기
     List<Long> favoriteZonesIds = getFavoriteParkingZonesID(userId);
-
     // 3. nonParkingzonesSlots -> 일반 주차장이 필요한 개수(최대 10개 이하, 최소 0개 이상)
     int nonParkingzonesSlots = Math.min(
         10,
-        Math.max(0, pageable.getPageSize() - favoriteZonesIds.size())
+        Math.max(0,
+            (pageable.getPageNumber() - 1) * pageable.getPageSize() - favoriteZonesIds.size())
     );
+
+    // favoriteZones id offset 만큼제거
+    if (nonParkingzonesSlots > 0 && nonParkingzonesSlots <= favoriteZonesIds.size()) {
+      favoriteZonesIds = favoriteZonesIds.subList(nonParkingzonesSlots, favoriteZonesIds.size());
+    } else if (nonParkingzonesSlots > favoriteZonesIds.size()) {
+      favoriteZonesIds = Collections.emptyList();
+    }
 
     // 4. 일반 주차장 ID배열 추출
     List<Long> nonFavoriteZonesIds = getNonFavoriteParkingZones(
@@ -65,7 +71,6 @@ public class ParkingZoneInfoService {
     List<Long> totalParkingZoneIds = Stream.concat(favoriteZonesIds.stream(),
             nonFavoriteZonesIds.stream())
         .collect(Collectors.toList());
-
     // 6. 최종 필요 주차장 엔티티 불러오기
     List<ParkingZoneDTO> parkingZoneDTOS = getParkingzonesByIds(
         totalParkingZoneIds,
@@ -73,7 +78,7 @@ public class ParkingZoneInfoService {
     );
 
     // 7. page관련 데이터 추출
-    Long totalItems = parkingZoneRepository.count(); // 전체 주차장 수
+    Long totalItems = parkingZoneCacheService.getTotalParkingZoneCount(); // 전체 주차장 수
     int totalPages =
         (totalItems.intValue() + pageable.getPageSize() - 1) / pageable.getPageSize(); // 총 페이지 수
 
@@ -171,12 +176,9 @@ public class ParkingZoneInfoService {
         missIds.add(id);
       }
     }
-    System.out.println("Cache miss IDs: " + missIds);
-
     if (!missIds.isEmpty()) {
       List<ParkingZoneEntity> dbResults = parkingZoneRepository.findAllByIdIn(missIds);
       for (ParkingZoneEntity entity : dbResults) {
-        System.out.println("Saving to cache: " + entity.getId());
         result.add(
             parkingZoneCacheService.putParkingZone(
                 parkingZoneDTOConverter.toDTO(
@@ -197,5 +199,7 @@ public class ParkingZoneInfoService {
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
+
+
 }
 
