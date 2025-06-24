@@ -1,4 +1,4 @@
-package org.example.honorsparkingbe.unit.repository;
+package org.example.honorsparkingbe.favoriteParkingZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,13 +14,13 @@ import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
 import org.example.honorsparkingbe.domain.enums.LoginPlatform;
 import org.example.honorsparkingbe.domain.enums.MemberRole;
+import org.example.honorsparkingbe.favoriteParkingZone.repository.FavoriteParkingZoneRepository;
+import org.example.honorsparkingbe.parkingzone.repository.ParkingZoneRepository;
 import org.example.honorsparkingbe.repository.internal.CarRepository;
 import org.example.honorsparkingbe.repository.internal.CityRepository;
 import org.example.honorsparkingbe.repository.internal.DistrictRepository;
 import org.example.honorsparkingbe.repository.internal.EupMyeonDongRepository;
-import org.example.honorsparkingbe.repository.internal.FavoriteParkingZoneRepository;
 import org.example.honorsparkingbe.repository.internal.MemberRepository;
-import org.example.honorsparkingbe.repository.internal.ParkingZoneRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -302,5 +302,22 @@ public class FavoriteParkingZoneRepositoryTest {
 
     // Then
     assertEquals(0, deletedCount, "존재하지 않는 항목에 대해 삭제는 0이어야 한다.");
+  }
+
+  @Test
+  @DisplayName("즐겨찾기 주차장 ID 목록 조회 테스트")
+  void testFindAllByMemberEntity_IdOrderByIdAscForIds() {
+    // given: 테스트용 데이터 준비
+    Long memberId = memberWith3Favorite.getId();
+
+    // when: 즐겨찾기 주차장 ID 목록 조회
+    List<Long> favoriteParkingZoneIds = favoriteParkingZoneRepository.findAllIdsByMemberEntity_IdOrderByIdAsc(
+        memberId);
+
+    // then: ID 목록이 정확하게 반환되는지 확인
+    assertThat(favoriteParkingZoneIds).hasSize(3);
+    assertThat(favoriteParkingZoneIds)
+        .containsExactlyInAnyOrder(seoulParking.getId(), busanParking.getId(),
+            daejeonParking.getId());
   }
 }

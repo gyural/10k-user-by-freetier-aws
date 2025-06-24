@@ -1,13 +1,12 @@
-package org.example.honorsparkingbe.controller;
+package org.example.honorsparkingbe.parkingzone.controller;
 
 import static org.example.honorsparkingbe.security.util.SecurityUtil.getCurrentUserId;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.honorsparkingbe.dto.ParkingZoneListDTO;
 import org.example.honorsparkingbe.dto.request.ParkingZoneListRequest;
 import org.example.honorsparkingbe.dto.response.ParkingZoneListResponse;
-import org.example.honorsparkingbe.service.ParkingZoneInfoService;
+import org.example.honorsparkingbe.parkingzone.service.ParkingZoneInfoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,13 +33,6 @@ public class ParkingZoneInfoController {
 
     Long userId = getCurrentUserId();
 
-    ParkingZoneListResponse response = parkingZoneInfoService
-        .getParkingZones(
-            ParkingZoneListDTO.builder()
-                .parkingZoneListRequest(request)
-                .userId(userId)
-                .build()
-        );
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(parkingZoneInfoService.getParkingZones(request, userId));
   }
 }

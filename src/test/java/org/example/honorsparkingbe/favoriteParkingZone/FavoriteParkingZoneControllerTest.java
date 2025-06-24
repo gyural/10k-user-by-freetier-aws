@@ -1,4 +1,4 @@
-package org.example.honorsparkingbe.unit.controller;
+package org.example.honorsparkingbe.favoriteParkingZone;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.catalina.security.SecurityConfig;
 import org.example.honorsparkingbe.Slf4jRestControllerAdvice;
-import org.example.honorsparkingbe.controller.FavoriteParkingZoneController;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.MemberRole;
 import org.example.honorsparkingbe.dto.AddFavoriteParkingZoneDTO;
@@ -21,8 +20,9 @@ import org.example.honorsparkingbe.dto.request.AddFavoriteParkingZoneRequest;
 import org.example.honorsparkingbe.dto.request.DeleteFavoriteParkingZoneRequest;
 import org.example.honorsparkingbe.dto.response.AddFavoriteParkingZoneResponse;
 import org.example.honorsparkingbe.dto.response.DeleteFavoriteParkingZoneResponse;
+import org.example.honorsparkingbe.favoriteParkingZone.controller.FavoriteParkingZoneController;
+import org.example.honorsparkingbe.favoriteParkingZone.service.FavoriteParkingZoneService;
 import org.example.honorsparkingbe.security.CustomUserDetails;
-import org.example.honorsparkingbe.service.FavoriteParkingZoneService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

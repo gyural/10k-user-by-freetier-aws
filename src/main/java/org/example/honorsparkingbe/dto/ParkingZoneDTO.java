@@ -1,6 +1,7 @@
 package org.example.honorsparkingbe.dto;
 
 
+import java.io.Serializable;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,8 +14,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ParkingZoneDTO {
+public class ParkingZoneDTO implements Serializable {
 
+  private Long id;  // 주차장 ID
   private Boolean isFavorite;
   private Double latitude;
   private Double longitude;

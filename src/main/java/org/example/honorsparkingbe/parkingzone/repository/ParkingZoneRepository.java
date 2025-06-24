@@ -1,4 +1,4 @@
-package org.example.honorsparkingbe.repository.internal;
+package org.example.honorsparkingbe.parkingzone.repository;
 
 import java.util.List;
 import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;

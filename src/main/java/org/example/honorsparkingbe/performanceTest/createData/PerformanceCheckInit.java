@@ -1,16 +1,16 @@
 package org.example.honorsparkingbe.performanceTest.createData;
 
 import org.example.honorsparkingbe.domain.enums.CarType;
+import org.example.honorsparkingbe.favoriteParkingZone.repository.FavoriteParkingZoneRepository;
+import org.example.honorsparkingbe.parkingzone.repository.ParkingZoneRepository;
 import org.example.honorsparkingbe.repository.internal.AlarmRepository;
 import org.example.honorsparkingbe.repository.internal.CarRepository;
 import org.example.honorsparkingbe.repository.internal.CityRepository;
 import org.example.honorsparkingbe.repository.internal.DistrictRepository;
 import org.example.honorsparkingbe.repository.internal.EupMyeonDongRepository;
-import org.example.honorsparkingbe.repository.internal.FavoriteParkingZoneRepository;
 import org.example.honorsparkingbe.repository.internal.MemberRepository;
 import org.example.honorsparkingbe.repository.internal.ParkingFeeRuleRepository;
 import org.example.honorsparkingbe.repository.internal.ParkingHistoryRepository;
-import org.example.honorsparkingbe.repository.internal.ParkingZoneRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
