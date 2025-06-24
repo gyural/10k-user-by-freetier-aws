@@ -15,8 +15,8 @@ import org.example.honorsparkingbe.dto.ParkingZoneWithMatchedInfoDTO.MatchedInfo
 import org.example.honorsparkingbe.dto.response.PaginationResponse;
 import org.example.honorsparkingbe.dto.response.ParkingZoneSearchResponse;
 import org.example.honorsparkingbe.dto.response.ParkingZoneSearchResponse.Meta;
-import org.example.honorsparkingbe.repository.internal.FavoriteParkingZoneRepository;
-import org.example.honorsparkingbe.repository.internal.ParkingZoneRepository;
+import org.example.honorsparkingbe.favoriteParkingZone.repository.FavoriteParkingZoneRepository;
+import org.example.honorsparkingbe.parkingzone.repository.ParkingZoneRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

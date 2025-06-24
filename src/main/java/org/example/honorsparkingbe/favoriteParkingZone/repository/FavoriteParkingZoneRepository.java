@@ -1,5 +1,6 @@
-package org.example.honorsparkingbe.repository.internal;
+package org.example.honorsparkingbe.favoriteParkingZone.repository;
 
+import java.util.List;
 import java.util.Set;
 import org.example.honorsparkingbe.domain.entity.FavoriteParkingZoneEntity;
 import org.springframework.data.domain.Page;
@@ -35,4 +36,8 @@ public interface FavoriteParkingZoneRepository extends
 
   @EntityGraph(attributePaths = {"parkingZoneEntity.id"})
   Set<FavoriteParkingZoneEntity> findAllByMemberEntity_Id(Long memberId);
+
+  @EntityGraph(attributePaths = {"parkingZoneEntity.id"})
+  @Query("SELECT f.id FROM FavoriteParkingZoneEntity f WHERE f.memberEntity.id = :memberId ORDER BY f.id ASC")
+  List<Long> findAllIdsByMemberEntity_IdOrderByIdAsc(@Param("memberId") Long memberId);
 }

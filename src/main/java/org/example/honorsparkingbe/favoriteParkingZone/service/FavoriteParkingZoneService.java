@@ -1,5 +1,6 @@
-package org.example.honorsparkingbe.service;
+package org.example.honorsparkingbe.favoriteParkingZone.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.honorsparkingbe.domain.entity.FavoriteParkingZoneEntity;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
@@ -8,9 +9,9 @@ import org.example.honorsparkingbe.dto.AddFavoriteParkingZoneDTO;
 import org.example.honorsparkingbe.dto.DeleteFavoriteParkingZoneDTO;
 import org.example.honorsparkingbe.dto.response.AddFavoriteParkingZoneResponse;
 import org.example.honorsparkingbe.dto.response.DeleteFavoriteParkingZoneResponse;
-import org.example.honorsparkingbe.repository.internal.FavoriteParkingZoneRepository;
+import org.example.honorsparkingbe.favoriteParkingZone.repository.FavoriteParkingZoneRepository;
+import org.example.honorsparkingbe.parkingzone.repository.ParkingZoneRepository;
 import org.example.honorsparkingbe.repository.internal.MemberRepository;
-import org.example.honorsparkingbe.repository.internal.ParkingZoneRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -92,5 +93,10 @@ public class FavoriteParkingZoneService {
         .isBookmark(false)
         .parkingZoneId(parkingZoneId)
         .build();
+  }
+
+  @Transactional(readOnly = true)
+  public List<Long> getFavoriteParkingZoneIds(Long userId) {
+    return favoriteParkingZoneRepository.findAllIdsByMemberEntity_IdOrderByIdAsc(userId);
   }
 }

@@ -3,7 +3,7 @@ package org.example.honorsparkingbe.util.client;
 import java.net.URI;
 import org.example.honorsparkingbe.dto.SearchLocalDTO;
 import org.example.honorsparkingbe.dto.response.KakaoLocalClientResponse;
-import org.example.honorsparkingbe.service.FavoriteParkingZoneService;
+import org.example.honorsparkingbe.favoriteParkingZone.service.FavoriteParkingZoneService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

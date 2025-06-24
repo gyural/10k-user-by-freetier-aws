@@ -1,4 +1,4 @@
-package org.example.honorsparkingbe.controller;
+package org.example.honorsparkingbe.favoriteParkingZone.controller;
 
 import static org.example.honorsparkingbe.security.util.SecurityUtil.getCurrentUserId;
 
@@ -10,8 +10,8 @@ import org.example.honorsparkingbe.dto.request.AddFavoriteParkingZoneRequest;
 import org.example.honorsparkingbe.dto.request.DeleteFavoriteParkingZoneRequest;
 import org.example.honorsparkingbe.dto.response.AddFavoriteParkingZoneResponse;
 import org.example.honorsparkingbe.dto.response.DeleteFavoriteParkingZoneResponse;
+import org.example.honorsparkingbe.favoriteParkingZone.service.FavoriteParkingZoneService;
 import org.example.honorsparkingbe.security.CustomUserDetails;
-import org.example.honorsparkingbe.service.FavoriteParkingZoneService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

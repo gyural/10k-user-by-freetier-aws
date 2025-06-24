@@ -21,7 +21,7 @@
 //import org.example.honorsparkingbe.repository.internal.EupMyeonDongRepository;
 //import org.example.honorsparkingbe.repository.internal.MemberRepository;
 //import org.example.honorsparkingbe.repository.internal.ParkingHistoryRepository;
-//import org.example.honorsparkingbe.repository.internal.ParkingZoneRepository;
+//import org.example.honorsparkingbe.parkinglot.ParkingZoneRepository;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;

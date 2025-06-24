@@ -22,6 +22,7 @@ public class ParkingZoneDTOConverter {
       List<ParkingFeeRuleDTO> parkingFeeRuleList
   ) {
     return ParkingZoneDTO.builder()
+        .id(parkingZoneEntity.getId())
         .isFavorite(isFavorite)
         .latitude(parkingZoneEntity.getLatitude())
         .longitude(parkingZoneEntity.getLongitude())

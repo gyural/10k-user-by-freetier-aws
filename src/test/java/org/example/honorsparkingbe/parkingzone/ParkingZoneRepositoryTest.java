@@ -1,4 +1,4 @@
-package org.example.honorsparkingbe.unit.repository;
+package org.example.honorsparkingbe.parkingzone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,10 +12,10 @@ import org.example.honorsparkingbe.domain.entity.CityEntity;
 import org.example.honorsparkingbe.domain.entity.DistrictEntity;
 import org.example.honorsparkingbe.domain.entity.EupMyeonDongEntity;
 import org.example.honorsparkingbe.domain.entity.ParkingZoneEntity;
+import org.example.honorsparkingbe.parkingzone.repository.ParkingZoneRepository;
 import org.example.honorsparkingbe.repository.internal.CityRepository;
 import org.example.honorsparkingbe.repository.internal.DistrictRepository;
 import org.example.honorsparkingbe.repository.internal.EupMyeonDongRepository;
-import org.example.honorsparkingbe.repository.internal.ParkingZoneRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

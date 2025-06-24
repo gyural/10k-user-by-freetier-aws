@@ -1,4 +1,4 @@
-package org.example.honorsparkingbe.unit.controller;
+package org.example.honorsparkingbe.parkingzone;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -9,13 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.apache.catalina.security.SecurityConfig;
 import org.example.honorsparkingbe.Slf4jRestControllerAdvice;
-import org.example.honorsparkingbe.controller.ParkingZoneInfoController;
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.domain.enums.MemberRole;
-import org.example.honorsparkingbe.dto.ParkingZoneListDTO;
 import org.example.honorsparkingbe.dto.request.ParkingZoneListRequest;
+import org.example.honorsparkingbe.dto.response.ParkingZoneListResponse;
+import org.example.honorsparkingbe.parkingzone.controller.ParkingZoneInfoController;
+import org.example.honorsparkingbe.parkingzone.service.ParkingZoneInfoService;
 import org.example.honorsparkingbe.security.CustomUserDetails;
-import org.example.honorsparkingbe.service.ParkingZoneInfoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,10 +82,8 @@ public class ParkingInfoListControllerTest {
         .longitude(127.7)
         .build();
     // Mock Service 설정
-    when(parkingZoneInfoService.getParkingZones(ParkingZoneListDTO.builder()
-        .parkingZoneListRequest(request)
-        .userId(1L)
-        .build())).thenReturn(any());
+    ParkingZoneListResponse mockResult = new ParkingZoneListResponse();
+    when(parkingZoneInfoService.getParkingZones(request, 1L)).thenReturn(mockResult);
 
     //when
     mockMvc.perform(get("/api/v1/parkingzone/list")
@@ -94,6 +92,6 @@ public class ParkingInfoListControllerTest {
             .param("longitude", String.valueOf(request.getLongitude())))
         .andExpect(status().isOk());
 
-    verify(parkingZoneInfoService, times(1)).getParkingZones(any());
+    verify(parkingZoneInfoService, times(1)).getParkingZones(any(), any());
   }
 }
