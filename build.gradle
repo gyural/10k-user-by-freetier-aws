@@ -108,7 +108,9 @@ tasks.register("dockerBuildxMultiPlatform", Exec) {
     group = "docker"
     description = "Build and push multi-platform docker image using buildx"
 
-    def imageName = "gyural/honors-parking-buildx:latest"
+    // 커맨드라인에서 -Ptag=your-tag 식으로 받을 수 있음
+    def tag = project.hasProperty("tag") ? project.getProperty("tag") : "latest"
+    def imageName = "gyural/honors-parking-buildx:${tag}"
 
     commandLine "docker", "buildx", "build",
             "--platform", "linux/amd64,linux/arm64",
