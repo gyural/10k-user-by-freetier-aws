@@ -4,6 +4,7 @@ package org.example.honorsparkingbe.config;
  * Spring Security 설정 클래스 - 접근 권한 설정, 로그인 로그아웃 및 세션 관리, CSRF 비활성화 등
  */
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Set;
 import org.example.honorsparkingbe.security.ApiKeyAuthFilter;
@@ -11,10 +12,13 @@ import org.example.honorsparkingbe.security.AuthWhiteList;
 import org.example.honorsparkingbe.security.CustomFormLoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2LoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2UserService;
+import org.example.honorsparkingbe.security.RequestLoggingFilter;
 import org.example.honorsparkingbe.util.AesUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,17 +41,20 @@ public class SecurityConfig {
   private final String activeProfile;
   private final ApiKeyAuthFilter apiKeyAuthFilter;
   private final AesUtil aesUtil;
+  private final RequestLoggingFilter requestLoggingFilter;
 
   private static final Set<String> CSRF_REQUIRED_PROFILES = Set.of("prod", "performanceTest");
 
   public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, Environment environment,
-      ApiKeyAuthFilter apiKeyAuthFilter, AesUtil aesUtil) {
+      ApiKeyAuthFilter apiKeyAuthFilter, AesUtil aesUtil,
+      RequestLoggingFilter requestLoggingFilter) {
 
     this.customOAuth2UserService = customOAuth2UserService;
     this.activeProfile = environment.getProperty("spring.profiles.active",
         "default"); // 현재 프로필 가져오기
     this.apiKeyAuthFilter = apiKeyAuthFilter;
     this.aesUtil = aesUtil;
+    this.requestLoggingFilter = requestLoggingFilter;
   }
 
   /**
@@ -55,7 +62,6 @@ public class SecurityConfig {
    */
   @Bean
   public BCryptPasswordEncoder bCryptPasswordEncoder() {
-
     return new BCryptPasswordEncoder();
   }
 
@@ -73,48 +79,34 @@ public class SecurityConfig {
             .requestMatchers("/api/v1/my/**").hasAnyRole("ADMIN", "USER") // /api/v1/my/**만 허용
             .anyRequest().authenticated()
         )
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint((request, response, authException) -> {
+              response.setContentType("application/json;charset=UTF-8");
+              response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+              response.getWriter().write("{\"error\":\"Invalid or missing authentication\"}");
+            })
+            .accessDeniedHandler((request, response, accessDeniedException) -> {
+              response.setContentType("application/json;charset=UTF-8");
+              response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+              response.getWriter().write("{\"error\":\"Unauthorized - Access is denied\"}");
+            })
+        )
         .addFilterBefore(apiKeyAuthFilter,
             UsernamePasswordAuthenticationFilter.class); // API Key 필터 추가
 
-//        .exceptionHandling(exception -> exception
-//            .authenticationEntryPoint((request, response, authException) -> {
-//              // 인증 실패 로그 출력
-//              System.out.println("❌ Unauthorized access detected: " + authException.getMessage());
-//
-//              // 요청 정보 출력
-//              System.out.println("🔗 Request URI: " + request.getRequestURI());
-//              System.out.println("➡️ Request Method: " + request.getMethod());
-//
-//              // 요청 헤더 출력
-//              System.out.println("📦 Request Headers:");
-//              request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
-//                System.out.println("  " + headerName + ": " + request.getHeader(headerName));
-//              });
-//
-//              Cookie[] cookies = request.getCookies();
-//              System.out.println("🍪 Request Cookies:");
-//              if (cookies != null) {
-//                for (Cookie cookie : cookies) {
-//                  System.out.println("  " + cookie.getName() + " = " + cookie.getValue());
-//                }
-//              } else {
-//                System.out.println("  (No Cookies)");
-//              }
-//
-//              // 인증 예외 스택 출력
-//              authException.printStackTrace();
-//
-//              // 클라이언트에 401 반환
-//              response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-//            })
-
     http
+//        .addFilterBefore(requestLoggingFilter, CorsFilter.class)
         .formLogin((formLogin) -> formLogin
             .loginProcessingUrl("/api/v1/auth/login") // 로그인 처리 경로
             .successHandler(new CustomFormLoginSuccessHandler()) // 커스텀 성공 핸들러 등록(json 반환)
+            .failureHandler((request, response, exception) -> {
+              response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+              response.setContentType("application/json;charset=UTF-8");
+              response.getWriter().write("{\"error\":\"Invalid username or password\"}");
+              System.out.println("🚨 Login failed: " + exception.getMessage());
+            })
             .permitAll() // 로그인 페이지 접근 허용
         )
-
         .oauth2Login((oauth2) -> oauth2
             .loginPage("/login")
             //.defaultSuccessUrl("/api/v1/session/info", true) // 소셜 로그인 성공 후 이동 경로
@@ -132,30 +124,9 @@ public class SecurityConfig {
           .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
       );
     }
-    // http.csrf(auth -> auth.disable());
 
     http
         .httpBasic((basic) -> basic.disable());
-
-    // CSRF 활성화 시 로그아웃을 GET 요청으로 하기 위해
-//        http
-//                .logout((auth) -> auth
-//                        .logoutUrl("/api/v1/logout") // 로그아웃 경로
-//                        .logoutSuccessUrl("/api/v1/") // 로그아웃 성공 시 리다이렉트 경로
-//                );
-
-    // 다중 로그인 설정
-//        http
-//                .sessionManagement((auth) -> auth
-//                        .maximumSessions(1)
-//                        .maxSessionsPreventsLogin(true)
-//                );
-
-    // 세션 고정 공격 보호
-//        http
-//                .sessionManagement((auth) -> auth
-//                        .sessionFixation().changeSessionId()
-//                );
 
     return http.build();
   }
@@ -192,5 +163,11 @@ public class SecurityConfig {
     serializer.setUseSecureCookie(true); // HTTPS에서만 쿠키 전송 (http에서는 쿠키 전송이 안되므로 개발 환경에서는 false로 설정)
     serializer.setSameSite("None"); // 크로스 사이트 요청에서 쿠키 허용
     return serializer;
+  }
+
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
+    return configuration.getAuthenticationManager();
   }
 }
