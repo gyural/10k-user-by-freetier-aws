@@ -30,25 +30,23 @@ public class CsrfController {
     CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
 
     // 이미 쿠키로 세팅되어 있다면 중복 설정하지 않음
-    boolean tokenCookieExists = false;
+    String existingToken = null;
     if (request.getCookies() != null) {
       for (Cookie cookie : request.getCookies()) {
         if ("XSRF-TOKEN".equals(cookie.getName())) {
-          tokenCookieExists = true;
+          existingToken = cookie.getValue();
           break;
         }
       }
     }
 
-    // XSRF-TOKEN 쿠키가 없다면 생성
-    if (!tokenCookieExists) {
+    if (existingToken == null || !existingToken.equals(csrfToken.getToken())) {
       ResponseCookie cookie = ResponseCookie.from("XSRF-TOKEN", csrfToken.getToken())
           .path("/")
           .httpOnly(false)
           .secure(true)
           .sameSite("None")
           .build();
-
       response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 

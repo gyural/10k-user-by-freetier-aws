@@ -1,7 +1,5 @@
 package org.example.honorsparkingbe.parkingzone.service;
 
-import static org.example.honorsparkingbe.parkingzone.cache.ParkingZoneCacheManager.PARKING_ZONE_CACHE_NAME;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +19,6 @@ import org.example.honorsparkingbe.parkingzone.cache.ParkingZoneCacheManager;
 import org.example.honorsparkingbe.parkingzone.repository.ParkingZoneRepository;
 import org.example.honorsparkingbe.util.converter.dto.ParkingFeeRuleDTOConverter;
 import org.example.honorsparkingbe.util.converter.dto.ParkingZoneDTOConverter;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -78,7 +75,7 @@ public class ParkingZoneInfoService {
     );
 
     // 7. page관련 데이터 추출
-    Long totalItems = parkingZoneCacheService.getTotalParkingZoneCount(); // 전체 주차장 수
+    Long totalItems = getTotalParkingZoneCount(); // 전체 주차장 수
     int totalPages =
         (totalItems.intValue() + pageable.getPageSize() - 1) / pageable.getPageSize(); // 총 페이지 수
 
@@ -130,67 +127,22 @@ public class ParkingZoneInfoService {
   }
 
   // 1 casche 활용 X
-//  private List<ParkingZoneDTO> getParkingzonesByIds(
-//      List<Long> totalParkingZoneIds,
-//      List<Long> favoriteZonesIds) {
-//
-//    List<ParkingZoneDTO> result = new ArrayList<>();
-//
-//    List<ParkingZoneEntity> dbResults = parkingZoneRepository.findAllByIdIn(totalParkingZoneIds);
-//    for (ParkingZoneEntity entity : dbResults) {
-//      System.out.println("Saving to cache: " + entity.getId());
-//      result.add(
-//          parkingZoneCacheService.putParkingZone(
-//              parkingZoneDTOConverter.toDTO(
-//                  entity,
-//                  favoriteZonesIds.contains(entity.getId()), // 즐겨찾기 여부
-//                  parkingFeeRuleDTOConverter.toDtoList(entity.getParkingFeeRuleEntities())
-//              )
-//          )
-//      );
-//    }
-//    Map<Long, ParkingZoneDTO> map = result.stream()
-//        .collect(Collectors.toMap(ParkingZoneDTO::getId, Function.identity()));
-//
-//    return totalParkingZoneIds.stream()
-//        .map(map::get)
-//        .filter(Objects::nonNull)
-//        .collect(Collectors.toList());
-//  }
-
-  // 2 casche 활용 0
   private List<ParkingZoneDTO> getParkingzonesByIds(
       List<Long> totalParkingZoneIds,
       List<Long> favoriteZonesIds) {
 
     List<ParkingZoneDTO> result = new ArrayList<>();
-    List<Long> missIds = new ArrayList<>();
 
-    Cache cache = cacheManager.getCache(PARKING_ZONE_CACHE_NAME);
-
-    for (Long id : totalParkingZoneIds) {
-      ParkingZoneDTO cached = cache != null ? cache.get(id, ParkingZoneDTO.class) : null;
-      if (cached != null) {
-        result.add(cached);
-      } else {
-        missIds.add(id);
-      }
+    List<ParkingZoneEntity> dbResults = parkingZoneRepository.findAllByIdIn(totalParkingZoneIds);
+    for (ParkingZoneEntity entity : dbResults) {
+      result.add(
+          parkingZoneDTOConverter.toDTO(
+              entity,
+              favoriteZonesIds.contains(entity.getId()), // 즐겨찾기 여부
+              parkingFeeRuleDTOConverter.toDtoList(entity.getParkingFeeRuleEntities())
+          )
+      );
     }
-    if (!missIds.isEmpty()) {
-      List<ParkingZoneEntity> dbResults = parkingZoneRepository.findAllByIdIn(missIds);
-      for (ParkingZoneEntity entity : dbResults) {
-        result.add(
-            parkingZoneCacheService.putParkingZone(
-                parkingZoneDTOConverter.toDTO(
-                    entity,
-                    favoriteZonesIds.contains(entity.getId()), // 즐겨찾기 여부
-                    parkingFeeRuleDTOConverter.toDtoList(entity.getParkingFeeRuleEntities())
-                )
-            )
-        );
-      }
-    }
-
     Map<Long, ParkingZoneDTO> map = result.stream()
         .collect(Collectors.toMap(ParkingZoneDTO::getId, Function.identity()));
 
@@ -200,6 +152,56 @@ public class ParkingZoneInfoService {
         .collect(Collectors.toList());
   }
 
+  // 2 casche 활용 0
+//  private List<ParkingZoneDTO> getParkingzonesByIds(
+//      List<Long> totalParkingZoneIds,
+//      List<Long> favoriteZonesIds) {
+//
+//    List<ParkingZoneDTO> result = new ArrayList<>();
+//    List<Long> missIds = new ArrayList<>();
+//
+//    Cache cache = cacheManager.getCache(PARKING_ZONE_CACHE_NAME);
+//
+//    for (Long id : totalParkingZoneIds) {
+//      ParkingZoneDTO cached = cache != null ? cache.get(id, ParkingZoneDTO.class) : null;
+//      if (cached != null) {
+//        result.add(cached);
+//      } else {
+//        missIds.add(id);
+//      }
+//    }
+//    if (!missIds.isEmpty()) {
+//      List<ParkingZoneEntity> dbResults = parkingZoneRepository.findAllByIdIn(missIds);
+//      for (ParkingZoneEntity entity : dbResults) {
+//        result.add(
+//            parkingZoneCacheService.putParkingZone(
+//                parkingZoneDTOConverter.toDTO(
+//                    entity,
+//                    favoriteZonesIds.contains(entity.getId()), // 즐겨찾기 여부
+//                    parkingFeeRuleDTOConverter.toDtoList(entity.getParkingFeeRuleEntities())
+//                )
+//            )
+//        );
+//      }
+//    }
+//
+//    Map<Long, ParkingZoneDTO> map = result.stream()
+//        .collect(Collectors.toMap(ParkingZoneDTO::getId, Function.identity()));
+//
+//    return totalParkingZoneIds.stream()
+//        .map(map::get)
+//        .filter(Objects::nonNull)
+//        .collect(Collectors.toList());
+//  }
+
+  //  // 1. casche 활용 X
+  private Long getTotalParkingZoneCount() {
+    return parkingZoneRepository.count();
+  }
+  // 2. casche 활용 O
+//  private Long getTotalParkingZoneCount() {
+//    return parkingZoneCacheService.getTotalParkingZoneCount();
+//  }
 
 }
 

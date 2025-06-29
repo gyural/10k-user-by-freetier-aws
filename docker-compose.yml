@@ -1,49 +1,50 @@
-version: '3.8'
-
 services:
 
   redis:
     image: redis
+    container_name: redis
     platform: linux/amd64
     restart: always
     ports:
       - "6379:6379"
     networks:
       - my-network
-  #  db:
-  #    image: mysql
-  #    platform: linux/amd64
-  #    restart: always
-  #    environment:
-  #      MYSQL_ROOT_PASSWORD: 1234
-  #      MYSQL_DATABASE: parking
-  #      MYSQL_USER: user
-  #      MYSQL_PASSWORD: 1234
-  #    ports:
-  #      - "3306:3306"
-  #    volumes:
-  #      - mysql-data:/var/lib/mysql
-  #    networks:
-  #      - my-network
+  db:
+    image: mysql
+    platform: linux/amd64
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: parking
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 1234
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - my-network
 
   backend:
     container_name: honorsParking
     depends_on:
-      #      - db
+      - db
       - redis
-    build: .
-    #    image: gyural/honors-parking-buildx:latest
+    #    build: .
+    image:
+      gyural/honors-parking-buildx:cache-on
     #    platform: linux/amd64
-    platform: linux/arm64
+    #    platform: linux/arm64
     ports:
       - "8080:8080"
     environment:
-      db-url: ${DB_URL}
-      db-username: ${DB_USERNAME}
-      db-password: ${DB_PASSWORD}
-      redis-host: ${REDIS_HOST}
-      redis-port: ${REDIS_PORT}
+      db-url: jdbc:mysql://db:3306/parking
+      db-username: user
+      db-password: 1234
+      redis-host: redis
+      #      redis-port: 6379
       SPRING_PROFILES_ACTIVE: performanceTest
+      LOGGING_LEVEL_ROOT: INFO
     networks:
       - my-network
 
