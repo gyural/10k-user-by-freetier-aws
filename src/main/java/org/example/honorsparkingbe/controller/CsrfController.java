@@ -4,7 +4,6 @@ package org.example.honorsparkingbe.controller;
  * CSRF 토큰 반환 컨트롤러 - 클라이언트가 CSRF 토큰을 요청하면 값을 반환
  */
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -36,32 +35,6 @@ public class CsrfController {
       throw new IllegalStateException("CSRF protection is not enabled or token not generated yet");
     }
     log.debug("CSRF token value: {}", csrfToken.getToken());
-
-    // ✅ 기존 쿠키 확인 (중복 발급 방지)
-    String existingToken = null;
-    if (request.getCookies() != null) {
-      for (Cookie cookie : request.getCookies()) {
-        if ("XSRF-TOKEN".equals(cookie.getName())) {
-          existingToken = cookie.getValue();
-          break;
-        }
-      }
-    }
-
-//    if (!csrfToken.getToken().equals(existingToken)) {
-//      // ✅ 새로 발급할 필요가 있다면 쿠키로 넣기
-//      ResponseCookie cookie = ResponseCookie.from("XSRF-TOKEN", csrfToken.getToken())
-//          .path("/")
-//          .httpOnly(false) // JS가 읽을 수 있어야 함
-//          .secure(true)    // https 전용
-//          .sameSite("None") // cross-site 요청을 허용할 경우
-//          .build();
-//      response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-//
-//      log.debug("Added XSRF-TOKEN cookie: {}", cookie.toString());
-//    } else {
-//      log.debug("Reusing existing XSRF-TOKEN cookie");
-//    }
 
     // ✅ 프론트에서 헤더로 보낼 때 필요한 정보
     return Map.of(
