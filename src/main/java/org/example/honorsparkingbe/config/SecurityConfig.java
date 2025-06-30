@@ -12,7 +12,6 @@ import org.example.honorsparkingbe.security.AuthWhiteList;
 import org.example.honorsparkingbe.security.CustomFormLoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2LoginSuccessHandler;
 import org.example.honorsparkingbe.security.CustomOAuth2UserService;
-import org.example.honorsparkingbe.security.RequestLoggingFilter;
 import org.example.honorsparkingbe.util.AesUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,20 +40,17 @@ public class SecurityConfig {
   private final String activeProfile;
   private final ApiKeyAuthFilter apiKeyAuthFilter;
   private final AesUtil aesUtil;
-  private final RequestLoggingFilter requestLoggingFilter;
 
   private static final Set<String> CSRF_REQUIRED_PROFILES = Set.of("prod", "performanceTest");
 
   public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, Environment environment,
-      ApiKeyAuthFilter apiKeyAuthFilter, AesUtil aesUtil,
-      RequestLoggingFilter requestLoggingFilter) {
+      ApiKeyAuthFilter apiKeyAuthFilter, AesUtil aesUtil) {
 
     this.customOAuth2UserService = customOAuth2UserService;
     this.activeProfile = environment.getProperty("spring.profiles.active",
         "default"); // 현재 프로필 가져오기
     this.apiKeyAuthFilter = apiKeyAuthFilter;
     this.aesUtil = aesUtil;
-    this.requestLoggingFilter = requestLoggingFilter;
   }
 
   /**

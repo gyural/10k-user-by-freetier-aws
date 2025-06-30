@@ -8,6 +8,8 @@ package org.example.honorsparkingbe.security;
 
 import org.example.honorsparkingbe.domain.entity.MemberEntity;
 import org.example.honorsparkingbe.repository.internal.MemberRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
+  Logger logger = LoggerFactory.getLogger(CustomUserDetailsService.class);
   private final MemberRepository memberRepository;
 
   public CustomUserDetailsService(MemberRepository memberRepository) {
@@ -25,13 +28,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String authId) throws UsernameNotFoundException {
-    System.out.println("로그인 시도 : " + authId);
+    logger.debug("로그인 시도 : {}", authId);
     MemberEntity userData = memberRepository.findByAuthId(authId);
     if (userData == null) {
-      System.out.println("유저 정보를 찾을 수 없음 : " + authId);
+      logger.debug("유저 정보를 찾을 수 없음 : {}", authId);
       throw new UsernameNotFoundException("User not found with authId: " + authId);
     }
-    System.out.println("유저 정보 : " + userData);
+    logger.debug("유저 정보 : {}:", userData);
     return new CustomUserDetails(userData);
   }
 }
