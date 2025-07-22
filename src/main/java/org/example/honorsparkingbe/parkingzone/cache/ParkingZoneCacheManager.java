@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.honorsparkingbe.dto.ParkingZoneDTO;
 import org.example.honorsparkingbe.parkingzone.repository.ParkingZoneRepository;
 import org.example.honorsparkingbe.util.RedisUtil;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -22,14 +21,19 @@ public class ParkingZoneCacheManager {
   private final RedisUtil redisUtil;
   private final ObjectMapper objectMapper;
 
-  @CachePut(value = "parkingZoneDTO", key = "#parkingZoneDTO.id")
-  public ParkingZoneDTO putParkingZone(ParkingZoneDTO parkingZoneDTO) {
-    return parkingZoneDTO;
-  }
 
   @Cacheable(cacheNames = "parkingZoneCount")
   public Long getTotalParkingZoneCount() {
     return parkingZoneRepository.count();
+  }
+
+
+  public void putParkingZoneDTOMap(List<ParkingZoneDTO> parkingZoneDTOList) {
+    Map<String, Object> keyValueMap = new HashMap<>();
+    parkingZoneDTOList.forEach(
+        dto -> keyValueMap.put(PARKING_ZONE_CACHE_NAME + "::" + dto.getId(), dto));
+
+    redisUtil.mset(keyValueMap);
   }
 
   /**
@@ -46,11 +50,7 @@ public class ParkingZoneCacheManager {
 
     // 2. mget 실행
     List<Object> rawValues = redisUtil.getByIds(keys);
-    for (int i = 0; i < rawValues.size(); i++) {
-      Object val = rawValues.get(i);
-      System.out.println("index=" + i + ", class=" + (val == null ? "null" : val.getClass()));
-      System.out.println("value=" + val);
-    }
+
     // 3. id와 결과 매칭
     Map<Long, ParkingZoneDTO> resultMap = new HashMap<>();
     for (int i = 0; i < parkingZoneIds.size(); i++) {
