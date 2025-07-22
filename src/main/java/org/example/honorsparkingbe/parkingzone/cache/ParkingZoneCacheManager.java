@@ -22,12 +22,25 @@ public class ParkingZoneCacheManager {
   private final ObjectMapper objectMapper;
 
 
+  /**
+   * Returns the total number of parking zones, using a cached value if available.
+   *
+   * @return the total count of parking zones
+   */
   @Cacheable(cacheNames = "parkingZoneCount")
   public Long getTotalParkingZoneCount() {
     return parkingZoneRepository.count();
   }
 
 
+  /**
+   * Stores a list of ParkingZoneDTO objects in Redis cache, mapping each DTO's ID to its corresponding cache key.
+   *
+   * Each ParkingZoneDTO is stored with a Redis key composed of a fixed prefix and the DTO's ID.
+   * Existing cached values for these keys will be overwritten.
+   *
+   * @param parkingZoneDTOList the list of ParkingZoneDTO objects to cache
+   */
   public void putParkingZoneDTOMap(List<ParkingZoneDTO> parkingZoneDTOList) {
     Map<String, Object> keyValueMap = new HashMap<>();
     parkingZoneDTOList.forEach(
@@ -37,10 +50,13 @@ public class ParkingZoneCacheManager {
   }
 
   /**
-   * 주차장 ID 목록을 받아 해당 주차장 DTO를 Redis 캐시에서 조회합니다. 만약 해당 ID cache Miss가 발생하면 value는 null이 됩니다.
+   * Retrieves a map of parking zone IDs to their cached ParkingZoneDTO objects from Redis.
    *
-   * @param parkingZoneIds
-   * @return
+   * For each provided parking zone ID, attempts to fetch the corresponding ParkingZoneDTO from the Redis cache.
+   * If a cache miss occurs or the cached value is not a ParkingZoneDTO, the map entry for that ID will be null.
+   *
+   * @param parkingZoneIds List of parking zone IDs to retrieve from cache.
+   * @return Map of parking zone IDs to their cached ParkingZoneDTO objects, or null if not found in cache.
    */
   public Map<Long, ParkingZoneDTO> parkingZoneDTOMapByCache(List<Long> parkingZoneIds) {
     // 1. Redis 키로 변환
