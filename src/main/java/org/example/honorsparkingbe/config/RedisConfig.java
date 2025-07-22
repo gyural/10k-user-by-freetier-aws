@@ -66,10 +66,10 @@ public class RedisConfig {
   @Bean
   public RedisTemplate<String, Object> redisTemplate() {
     final RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-    redisTemplate.setKeySerializer(new StringRedisSerializer());
+    redisTemplate.setKeySerializer(StringRedisSerializer.UTF_8);
+    redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
     redisTemplate.setHashKeySerializer(new GenericToStringSerializer<>(Object.class));
     redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
-    redisTemplate.setValueSerializer(new StringRedisSerializer());
     redisTemplate.setConnectionFactory(redisConnectionFactory());
     return redisTemplate;
   }
