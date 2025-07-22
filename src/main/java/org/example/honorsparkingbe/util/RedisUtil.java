@@ -28,14 +28,31 @@ public class RedisUtil {
     return Boolean.TRUE.equals(redisTemplate.delete(key));
   }
 
+  /**
+   * Checks whether the specified key exists in Redis.
+   *
+   * @param key the key to check for existence
+   * @return true if the key exists, false otherwise
+   */
   public boolean hasKey(String key) {
     return Boolean.TRUE.equals(redisTemplate.hasKey(key));
   }
 
+  /**
+   * Retrieves the values associated with the specified list of keys from Redis.
+   *
+   * @param keys the list of Redis keys to retrieve values for
+   * @return a list of values corresponding to the provided keys; missing keys will have null values in the list
+   */
   public List<Object> getByIds(List<String> keys) {
     return redisTemplate.opsForValue().multiGet(keys);
   }
 
+  /**
+   * Stores multiple key-value pairs in Redis in a single batch operation.
+   *
+   * @param keyValueMap a map containing the keys and values to be stored in Redis
+   */
   public void mset(Map<String, Object> keyValueMap) {
     redisTemplate.opsForValue().multiSet(keyValueMap);
   }

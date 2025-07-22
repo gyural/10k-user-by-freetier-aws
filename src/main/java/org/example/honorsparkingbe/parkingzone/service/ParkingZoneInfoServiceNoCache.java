@@ -38,11 +38,13 @@ public class ParkingZoneInfoServiceNoCache {
   private final ParkingZoneCacheManager parkingZoneCacheManager;
 
   /**
-   * 주차장 리스트를 불러오는 서비스
+   * Retrieves a paginated list of parking zones for a user, prioritizing favorite zones and supplementing with nearby non-favorite zones as needed.
    *
-   * @param request DTO에서 필요한 값 추출
-   * @param userId  현재 로그인한 유저 ID
-   * @return ParkingZoneListResponse
+   * The method returns parking zone details along with pagination metadata. Favorite parking zones are listed first, followed by additional zones based on proximity to the provided latitude and longitude, ensuring the total matches the page size.
+   *
+   * @param request Contains pagination and location information for the parking zone query.
+   * @param userId The ID of the user requesting parking zone information.
+   * @return A response containing the list of parking zones and pagination details.
    */
   @Transactional(readOnly = true)
   public ParkingZoneListResponse getParkingZones(ParkingZoneListRequest request, Long userId) {
@@ -87,11 +89,26 @@ public class ParkingZoneInfoServiceNoCache {
         .build();
   }
 
+  /**
+   * Creates a {@link Pageable} object for pagination, defaulting to the first page if the page number is null.
+   *
+   * @param pageNum  the page number to retrieve, or null to default to page 0
+   * @param pageSize the number of items per page
+   * @return a {@link Pageable} instance for the specified page and size
+   */
   private Pageable createPageable(Integer pageNum, int pageSize) {
     return PageRequest.of(pageNum == null ? 0 : pageNum, pageSize);
   }
 
-  // 1 casche 활용 X
+  /**
+   * Retrieves a list of ParkingZoneDTOs for the specified parking zone IDs, marking which zones are favorites and including their parking fee rules.
+   *
+   * The returned list preserves the order of the input ID list and excludes any IDs not found in the database.
+   *
+   * @param totalParkingZoneIds the list of parking zone IDs to retrieve, in desired order
+   * @param favoriteZonesIds the list of parking zone IDs that are marked as favorites
+   * @return a list of ParkingZoneDTOs corresponding to the input IDs, with favorite status and fee rules populated
+   */
   private List<ParkingZoneDTO> getParkingzonesByIds(
       List<Long> totalParkingZoneIds,
       List<Long> favoriteZonesIds) {
@@ -118,7 +135,11 @@ public class ParkingZoneInfoServiceNoCache {
   }
 
 
-  // 1. casche 활용 X
+  /**
+   * Retrieves the total number of parking zones from the repository.
+   *
+   * @return the total count of parking zones
+   */
   private Long getTotalParkingZoneCount() {
     return parkingZoneRepository.count();
   }
