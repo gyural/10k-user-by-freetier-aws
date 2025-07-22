@@ -312,7 +312,7 @@ public class FavoriteParkingZoneRepositoryTest {
 
     // when: 즐겨찾기 주차장 ID 목록 조회
     List<Long> favoriteParkingZoneIds = favoriteParkingZoneRepository.findAllIdsByMemberEntity_IdOrderByIdAsc(
-        memberId);
+        memberId, PageRequest.of(0, 10)).stream().toList();
 
     // then: ID 목록이 정확하게 반환되는지 확인
     assertThat(favoriteParkingZoneIds).hasSize(3);

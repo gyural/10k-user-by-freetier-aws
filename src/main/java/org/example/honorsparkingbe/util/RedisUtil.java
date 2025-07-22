@@ -1,5 +1,6 @@
 package org.example.honorsparkingbe.util;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.example.honorsparkingbe.dto.NotificationQueueItem;
@@ -30,4 +31,7 @@ public class RedisUtil {
     return Boolean.TRUE.equals(redisTemplate.hasKey(key));
   }
 
+  public List<Object> getByIds(List<String> keys) {
+    return redisTemplate.opsForValue().multiGet(keys);
+  }
 }
