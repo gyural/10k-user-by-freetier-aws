@@ -1,6 +1,7 @@
 package org.example.honorsparkingbe.util;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.example.honorsparkingbe.dto.NotificationQueueItem;
@@ -33,5 +34,9 @@ public class RedisUtil {
 
   public List<Object> getByIds(List<String> keys) {
     return redisTemplate.opsForValue().multiGet(keys);
+  }
+
+  public void mset(Map<String, Object> keyValueMap) {
+    redisTemplate.opsForValue().multiSet(keyValueMap);
   }
 }

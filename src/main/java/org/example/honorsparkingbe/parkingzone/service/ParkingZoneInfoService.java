@@ -96,31 +96,29 @@ public class ParkingZoneInfoService {
     List<Long> missIds = new ArrayList<>();
 
     // casche에서 조회 및 result 저장
-    Map<Long, ParkingZoneDTO> cachedParkingZones = parkingZoneCacheManager.parkingZoneDTOMapByCache(
-        totalParkingZoneIds);
-    System.out.println(cachedParkingZones.toString()); // 로그용
+    Map<Long, ParkingZoneDTO> cachedParkingZones = parkingZoneCacheManager
+        .parkingZoneDTOMapByCache(totalParkingZoneIds);
     for (Long id : cachedParkingZones.keySet()) {
-      if (cachedParkingZones.get(cachedParkingZones) == null) {
+      if (cachedParkingZones.get(id) == null) {
         missIds.add(id);
       } else {
         result.add(cachedParkingZones.get(id));
       }
     }
 
-    // missIds DB에서 조회
+    // missIds DB 조회
     if (!missIds.isEmpty()) {
       List<ParkingZoneEntity> dbResults = parkingZoneRepository.findAllByIdIn(missIds);
-      for (ParkingZoneEntity entity : dbResults) {
-        result.add(
-            parkingZoneCacheService.putParkingZone(
-                parkingZoneDTOConverter.toDTO(
-                    entity,
-                    favoriteZonesIds.contains(entity.getId()), // 즐겨찾기 여부
-                    parkingFeeRuleDTOConverter.toDtoList(entity.getParkingFeeRuleEntities())
-                )
-            )
-        );
-      }
+
+      List<ParkingZoneDTO> missedParkingZoneDTOs = dbResults.stream().map(el ->
+          parkingZoneDTOConverter.toDTO(
+              el,
+              favoriteZonesIds.contains(el.getId()), // 즐겨찾기 여부
+              parkingFeeRuleDTOConverter.toDtoList(el.getParkingFeeRuleEntities())
+          )).toList();
+      result.addAll(missedParkingZoneDTOs);
+
+      parkingZoneCacheManager.putParkingZoneDTOMap(missedParkingZoneDTOs);
     }
 
     Map<Long, ParkingZoneDTO> map = result.stream()
