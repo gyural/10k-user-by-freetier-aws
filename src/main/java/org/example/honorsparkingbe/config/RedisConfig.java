@@ -63,6 +63,14 @@ public class RedisConfig {
     return template;
   }
 
+  /**
+   * Configures and returns a RedisTemplate for String keys and Object values using JDK serialization.
+   *
+   * The template uses UTF-8 string serialization for keys, JDK serialization for values and hash values,
+   * and generic string serialization for hash keys. The connection factory is set to the configured Redis connection.
+   *
+   * @return a RedisTemplate configured for general-purpose object storage in Redis
+   */
   @Bean
   public RedisTemplate<String, Object> redisTemplate() {
     final RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();

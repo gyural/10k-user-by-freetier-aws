@@ -36,7 +36,14 @@ public interface FavoriteParkingZoneRepository extends
   @EntityGraph(attributePaths = {"parkingZoneEntity.id"})
   Set<FavoriteParkingZoneEntity> findAllByMemberEntity_Id(Long memberId);
 
-  @EntityGraph(attributePaths = {"parkingZoneEntity.id"})
+  /**
+       * Retrieves a paginated list of IDs for favorite parking zone entries associated with the specified member, ordered by entry ID in ascending order.
+       *
+       * @param memberId the ID of the member whose favorite parking zone entry IDs are to be retrieved
+       * @param pageable pagination information for the result set
+       * @return a page of favorite parking zone entry IDs for the given member
+       */
+      @EntityGraph(attributePaths = {"parkingZoneEntity.id"})
   @Query("SELECT f.id FROM FavoriteParkingZoneEntity f WHERE f.memberEntity.id = :memberId ORDER BY f.id ASC")
   Page<Long> findAllIdsByMemberEntity_IdOrderByIdAsc(@Param("memberId") Long memberId,
       Pageable pageable);

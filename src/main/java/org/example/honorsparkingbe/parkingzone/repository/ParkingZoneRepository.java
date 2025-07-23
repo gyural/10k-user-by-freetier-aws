@@ -71,6 +71,12 @@ public interface ParkingZoneRepository extends JpaRepository<ParkingZoneEntity, 
       """)
   Page<ParkingZoneEntity> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
+  /**
+   * Counts the number of parking zones whose zone name or related city, district, or eupMyeonDong names contain the specified keyword, case-insensitively.
+   *
+   * @param keyword the search keyword to match against zone and location names
+   * @return the count of matching parking zones
+   */
   @Query("""
           SELECT COUNT(p) FROM ParkingZoneEntity p
           WHERE LOWER(p.zoneName) LIKE LOWER(CONCAT('%', :keyword, '%'))
@@ -80,7 +86,18 @@ public interface ParkingZoneRepository extends JpaRepository<ParkingZoneEntity, 
       """)
   Long countByKeyword(@Param("keyword") String keyword);
 
-  // 일반 주차장 id를 거리순으로 페이징 (즐겨찾기 id는 제외)
+  /**
+   * Retrieves a list of parking zone IDs ordered by geographic distance from the specified latitude and longitude.
+   *
+   * The result is paginated using the provided limit and offset. Optionally excludes parking zones whose IDs are in the given exclusion list; if the exclusion list is null, no IDs are excluded.
+   *
+   * @param latitude the latitude coordinate to measure distance from
+   * @param longitude the longitude coordinate to measure distance from
+   * @param limit the maximum number of IDs to return
+   * @param offset the number of results to skip before starting to collect the return list
+   * @param excludeIds a list of parking zone IDs to exclude from the results, or null to include all
+   * @return a list of parking zone IDs sorted by ascending distance from the specified coordinates
+   */
   @Query(value = """
       SELECT p.id
       FROM parkingZone p

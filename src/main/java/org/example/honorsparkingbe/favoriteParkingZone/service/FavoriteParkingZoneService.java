@@ -71,6 +71,13 @@ public class FavoriteParkingZoneService {
     }
   }
 
+  /**
+   * Deletes a favorite parking zone for a user.
+   *
+   * @param dto Data transfer object containing the user ID and parking zone ID to delete from favorites.
+   * @return Response indicating successful deletion and the parking zone ID.
+   * @throws RuntimeException if the favorite parking zone does not exist or deletion fails.
+   */
   @Transactional
   public DeleteFavoriteParkingZoneResponse deleteFavoriteParkingZone(
       DeleteFavoriteParkingZoneDTO dto
@@ -96,6 +103,13 @@ public class FavoriteParkingZoneService {
         .build();
   }
 
+  /**
+   * Retrieves a paginated list of favorite parking zone IDs for the specified user.
+   *
+   * @param userId   the ID of the user whose favorite parking zone IDs are to be retrieved
+   * @param pageable the pagination information
+   * @return a list of parking zone IDs marked as favorites by the user
+   */
   @Transactional(readOnly = true)
   public List<Long> getFavoriteParkingZoneIds(Long userId, Pageable pageable) {
     return favoriteParkingZoneRepository.findAllIdsByMemberEntity_IdOrderByIdAsc(userId, pageable)
