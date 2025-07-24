@@ -32,7 +32,7 @@ services:
       - redis
     #    build: .
     image:
-      gyural/honors-parking-buildx:cache-on
+      gyural/honors-parking-buildx:cache-off
     #    platform: linux/amd64
     #    platform: linux/arm64
     ports:

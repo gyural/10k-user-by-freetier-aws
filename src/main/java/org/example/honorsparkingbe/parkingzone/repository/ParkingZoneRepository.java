@@ -84,7 +84,6 @@ public interface ParkingZoneRepository extends JpaRepository<ParkingZoneEntity, 
   @Query(value = """
       SELECT p.id
       FROM parkingZone p
-      WHERE (:excludeIds IS NULL OR p.id NOT IN (:excludeIds))
       ORDER BY (6371 * acos(
           cos(radians(:latitude)) * cos(radians(p.latitude)) *
           cos(radians(p.longitude) - radians(:longitude)) +
@@ -93,6 +92,25 @@ public interface ParkingZoneRepository extends JpaRepository<ParkingZoneEntity, 
       LIMIT :limit OFFSET :offset
       """, nativeQuery = true)
   List<Long> findNormalParkingZoneIdsByDistance(
+      @Param("latitude") double latitude,
+      @Param("longitude") double longitude,
+      @Param("limit") int limit,
+      @Param("offset") int offset
+  );
+
+  // 일반 주차장 id를 거리순으로 페이징 (즐겨찾기 id는 제외)
+  @Query(value = """
+      SELECT p.id
+      FROM parkingZone p
+      WHERE (:excludeIds IS NULL OR p.id NOT IN (:excludeIds))
+      ORDER BY (6371 * acos(
+          cos(radians(:latitude)) * cos(radians(p.latitude)) *
+          cos(radians(p.longitude) - radians(:longitude)) +
+          sin(radians(:latitude)) * sin(radians(p.latitude))
+      )) ASC
+      LIMIT :limit OFFSET :offset
+      """, nativeQuery = true)
+  List<Long> findNormalParkingZoneIdsByDistanceWithExclusion(
       @Param("latitude") double latitude,
       @Param("longitude") double longitude,
       @Param("limit") int limit,

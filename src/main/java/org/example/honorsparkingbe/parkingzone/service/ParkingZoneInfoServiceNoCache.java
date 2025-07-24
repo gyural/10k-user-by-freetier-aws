@@ -53,13 +53,25 @@ public class ParkingZoneInfoServiceNoCache {
     List<Long> favoriteParkingZoneIds = favoriteParkingZoneService.getFavoriteParkingZoneIds(userId,
         pageable);
     List<Long> targetParkingZoneIds = new ArrayList<>(favoriteParkingZoneIds);
+    
     if (favoriteParkingZoneIds.size() < pageable.getPageSize() /*10*/) {
-      List<Long> nonFavoriteParkingZoneIds = parkingZoneRepository.findNormalParkingZoneIdsByDistance(
-          request.getLatitude(),
-          request.getLongitude(),
-          10 - favoriteParkingZoneIds.size(),
-          pageable.getPageNumber() * pageable.getPageSize(),
-          favoriteParkingZoneIds.isEmpty() ? null : favoriteParkingZoneIds);
+      List<Long> nonFavoriteParkingZoneIds =
+          parkingZoneRepository.findNormalParkingZoneIdsByDistanceWithExclusion(
+              request.getLatitude(),
+              request.getLongitude(),
+              10 - favoriteParkingZoneIds.size(),
+              pageable.getPageNumber() * pageable.getPageSize(),
+              favoriteParkingZoneIds.isEmpty() ? null : favoriteParkingZoneIds);
+
+      targetParkingZoneIds.addAll(nonFavoriteParkingZoneIds);
+    } else if (!favoriteParkingZoneIds.isEmpty()) {
+      List<Long> nonFavoriteParkingZoneIds =
+          parkingZoneRepository.findNormalParkingZoneIdsByDistance(
+              request.getLatitude(),
+              request.getLongitude(),
+              10 - favoriteParkingZoneIds.size(),
+              pageable.getPageNumber() * pageable.getPageSize()
+          );
 
       targetParkingZoneIds.addAll(nonFavoriteParkingZoneIds);
     }

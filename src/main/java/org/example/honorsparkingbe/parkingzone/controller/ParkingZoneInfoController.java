@@ -35,6 +35,6 @@ public class ParkingZoneInfoController {
 
     Long userId = getCurrentUserId();
 
-    return ResponseEntity.ok(parkingZoneInfoService.getParkingZones(request, userId));
+    return ResponseEntity.ok(parkingZoneInfoServiceNoCache.getParkingZones(request, userId));
   }
 }
